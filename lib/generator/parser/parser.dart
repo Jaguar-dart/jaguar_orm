@@ -6,6 +6,10 @@ import 'package:source_gen_help/source_gen_help.dart';
 
 import 'package:jaguar_orm/src/annotations/annotations.dart' as ant;
 
+part 'methods/find.dart';
+part 'methods/delete.dart';
+part 'methods/update.dart';
+
 class ParsedColumn {
   final FieldElement element;
 
@@ -71,7 +75,14 @@ class ParsedBean {
 
   final ParsedColumn primary;
 
-  ParsedBean(this.clazz, this.model, this.columns, this.primary);
+  final List<ParsedFind> finds;
+
+  final List<ParsedUpdate> updates;
+
+  final List<ParsedDelete> deletes;
+
+  ParsedBean(this.clazz, this.model, this.columns, this.primary, this.finds,
+      this.updates, this.deletes);
 
   String get name => clazz.name;
 
@@ -102,6 +113,22 @@ class ParsedBean {
 
     ParsedColumn primary = primaries.length == 1 ? primaries.first : null;
 
-    return new ParsedBean(clazz, model, columns, primary);
+    List<ParsedFind> finds = clazz.methods
+        .map(ParsedFind.detect)
+        .where((ParsedFind f) => f != null)
+        .toList();
+
+    List<ParsedUpdate> updates = clazz.methods
+        .map(ParsedUpdate.detect)
+        .where((ParsedUpdate f) => f != null)
+        .toList();
+
+    List<ParsedDelete> deletes = clazz.methods
+        .map(ParsedDelete.detect)
+        .where((ParsedDelete f) => f != null)
+        .toList();
+
+    return new ParsedBean(
+        clazz, model, columns, primary, finds, updates, deletes);
   }
 }

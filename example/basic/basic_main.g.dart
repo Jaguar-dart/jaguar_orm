@@ -7,8 +7,8 @@ part of example.basic;
 // Target: class PostsBean
 // **************************************************************************
 
-abstract class _$PostsBean extends Bean<Post> {
-  _$PostsBean(Adapter adapter) : super(adapter);
+abstract class _PostsBean extends Bean<Post> {
+  _PostsBean(Adapter adapter) : super(adapter);
 
   String get tableName => Post.tableName;
 
@@ -64,6 +64,22 @@ abstract class _$PostsBean extends Bean<Post> {
 
   Future<int> delete(String id) async {
     DeleteStatement delete = deleterQ.where(this.id.eq(id));
+    return execDelete(delete);
+  }
+
+  Future<Stream<Post>> findByAuthor(String author) async {
+    FindStatement find = finderQ.where(this.author.eq(author));
+    return execFind(find);
+  }
+
+  Future<dynamic> updateByAuthor(String author, int replies) async {
+    UpdateStatement update =
+        updaterQ.where(this.author.eq(author)).set(this.replies.set(replies));
+    return execUpdate(update);
+  }
+
+  Future<dynamic> deleteByAuthor(String author) async {
+    DeleteStatement delete = deleterQ.where(this.author.eq(author));
     return execDelete(delete);
   }
 }

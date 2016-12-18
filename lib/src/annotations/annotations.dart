@@ -1,5 +1,7 @@
 library jaguar_orm.annotation;
 
+export 'package:jaguar_query/jaguar_query.dart' show OrderBy;
+
 class GenBean {
   const GenBean();
 }
@@ -36,8 +38,44 @@ class Find {
   const Find();
 }
 
-class WhereEq {
-  final Symbol field;
+class Update {
+  const Update();
+}
 
-  const WhereEq(this.field);
+class Delete {
+  const Delete();
+}
+
+abstract class Where {}
+
+class WhereEq implements Where {
+  const WhereEq();
+}
+
+class WhereNe implements Where {
+  const WhereNe();
+}
+
+class WhereLt implements Where {
+  const WhereLt();
+}
+
+class WhereGt implements Where {
+  const WhereGt();
+}
+
+class WhereGtEq implements Where {
+  const WhereGtEq();
+}
+
+class WhereLtEq implements Where {
+  const WhereLtEq();
+}
+
+class WhereLike implements Where {
+  const WhereLike();
+}
+
+class SetField {
+  const SetField();
 }

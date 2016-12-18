@@ -19,7 +19,7 @@ dependencies:
   source_gen_help:
     git:
       url: https://github.com/Jaguar-dart/source_gen_help.git
-      ref: d5d427e
+      ref: 4acd8b6
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'

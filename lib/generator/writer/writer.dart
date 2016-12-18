@@ -14,8 +14,7 @@ class Writer {
   String toString() => _w.toString();
 
   void _generate() {
-    _w.writeln(
-        'abstract class _\$' + _b.name + ' extends Bean<${_b.modelType}> {');
+    _w.writeln('abstract class _${_b.name} extends Bean<${_b.modelType}> {');
     _w.writeln();
 
     _writeConstructor();
@@ -30,11 +29,17 @@ class Writer {
 
     _writeCurd();
 
+    _b.finds.forEach(_writeFindMethod);
+
+    _b.updates.forEach(_writeUpdateMethod);
+
+    _b.deletes.forEach(_writeDeleteMethod);
+
     _w.writeln('}');
   }
 
   void _writeConstructor() {
-    _w.writeln('_\$${_b.name}(Adapter adapter) : super(adapter);');
+    _w.writeln('_${_b.name}(Adapter adapter) : super(adapter);');
     _w.writeln();
   }
 
@@ -128,5 +133,57 @@ class Writer {
         'DeleteStatement delete = deleterQ.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
     _w.writeln('return execDelete(delete);');
     _w.writeln('}');
+  }
+
+  void _writeFindMethod(Find find) {
+    _w.write(find.prototype);
+    _w.writeln(' async {');
+
+    _w.writeln('FindStatement find = finderQ');
+
+    find.wheres.forEach((Where where) {
+      _w.write('.where(this.${where.field}.${where.op}(${where.field}))');
+    });
+    _w.writeln(';');
+
+    _w.writeln('return execFind(find);');
+    _w.writeln('}');
+    _w.writeln();
+  }
+
+  void _writeUpdateMethod(Update update) {
+    _w.write(update.prototype);
+    _w.writeln(' async {');
+
+    _w.writeln('UpdateStatement update = updaterQ');
+
+    update.wheres.forEach((Where where) {
+      _w.write('.where(this.${where.field}.${where.op}(${where.field}))');
+    });
+
+    update.sets.forEach((SetColumn set) {
+      _w.write('.set(this.${set.field}.set(${set.field}))');
+    });
+    _w.writeln(';');
+
+    _w.writeln('return execUpdate(update);');
+    _w.writeln('}');
+    _w.writeln();
+  }
+
+  void _writeDeleteMethod(Delete delete) {
+    _w.write(delete.prototype);
+    _w.writeln(' async {');
+
+    _w.writeln('DeleteStatement delete = deleterQ');
+
+    delete.wheres.forEach((Where where) {
+      _w.write('.where(this.${where.field}.${where.op}(${where.field}))');
+    });
+    _w.writeln(';');
+
+    _w.writeln('return execDelete(delete);');
+    _w.writeln('}');
+    _w.writeln();
   }
 }
