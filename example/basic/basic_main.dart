@@ -1,9 +1,13 @@
 // Copyright (c) 2016, Ravi Teja Gudapati. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+library example.basic;
+
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
+
+part 'basic_main.g.dart';
 
 class Post {
   @PrimaryKey()
@@ -20,11 +24,12 @@ class Post {
   static String tableName = 'posts';
 }
 
-/// This must be generated from [PostsBean] and [Post]
-class _$PostsBean extends Bean<Post, String> {
-  _$PostsBean(Adapter<String> adapter) : super(adapter);
+class _$Dummy extends Bean<Post> {
+  _$Dummy(Adapter adapter) : super(adapter);
 
-  String get tableName => 'posts';
+  String get tableName => Post.tableName;
+
+  StrField get author => new StrField('author');
 
   Future<Post> find(String id) async {
     FindStatement find =
@@ -32,32 +37,41 @@ class _$PostsBean extends Bean<Post, String> {
     return await execFindOne(find);
   }
 
-  StrField get author => new StrField('author');
-
   Future<Stream<Post>> _findByAuthor(String auth) async {
     FindStatement find = finderQ.where(author.eq(auth));
     return await execFind(find);
   }
 
   Post fromMap(Map map) {
-    Post post = new Post();
+    Post model = new Post();
 
-    post.id = map['id'];
-    post.id = map['author'];
-    post.id = map['message'];
-    post.id = map['likes'];
-    post.id = map['replies'];
+    model.id = map['id'];
+    model.author = map['author'];
+    model.message = map['message'];
+    model.likes = map['likes'];
+    model.replies = map['replies'];
 
-    return post;
+    return model;
+  }
+
+  List<SetColumn> toSetColumns(Post model) {
+    List<SetColumn> ret = [];
+
+    ret.add(author.set(model.author));
+
+    return ret;
   }
 }
 
-class PostsBean extends _$PostsBean {
-  PostsBean(Adapter<String> adapter) : super(adapter);
+@GenBean()
+class PostsBean extends _$PostsBean implements Bean<Post> {
+  PostsBean(Adapter adapter) : super(adapter);
 
+  /*
   @Find()
   Future<Stream<Post>> findByAuthor(@WhereEq(#author) String auth) =>
       _findByAuthor(auth);
+      */
 }
 
 main() {}

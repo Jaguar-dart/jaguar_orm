@@ -3,7 +3,7 @@ library jaguar_orm.adapter;
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 
-abstract class Adapter<PrimaryKeyType> {
+abstract class Adapter {
   Future connect();
 
   /// Returns a list of rows found by executing [statement]
@@ -14,7 +14,7 @@ abstract class Adapter<PrimaryKeyType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<PrimaryKeyType> insert(InsertStatement statement);
+  Future<dynamic> insert(InsertStatement statement);
 
   /// Updates the row and returns the number of rows updated
   Future<int> update(UpdateStatement statement);

@@ -5,8 +5,8 @@ import 'package:jaguar_query/jaguar_query.dart';
 
 import 'package:jaguar_orm/src/adapter/adapter.dart';
 
-abstract class Bean<ModelType, PrimaryKeyType> {
-  final Adapter<PrimaryKeyType> adapter;
+abstract class Bean<ModelType> {
+  final Adapter adapter;
 
   Bean(this.adapter);
 
@@ -37,7 +37,7 @@ abstract class Bean<ModelType, PrimaryKeyType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<PrimaryKeyType> execInsert(InsertStatement statement) async {
+  Future<dynamic> execInsert(InsertStatement statement) async {
     return await adapter.insert(statement);
   }
 
@@ -57,4 +57,6 @@ abstract class Bean<ModelType, PrimaryKeyType> {
   }
 
   ModelType fromMap(Map map);
+
+  List<SetColumn> toSetColumns(ModelType model);
 }
