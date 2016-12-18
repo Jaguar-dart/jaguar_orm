@@ -3,9 +3,7 @@
 
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:jaguar_orm/src/annotations/annotations.dart';
-import 'package:jaguar_orm/src/field/field.dart';
-import 'package:jaguar_orm/src/bean/bean.dart';
+import 'package:jaguar_orm/jaguar_orm.dart';
 
 class Post {
   @PrimaryKey()
@@ -36,7 +34,7 @@ class _$PostsBean extends Bean<Post, String> {
 
   StrField get author => new StrField('author');
 
-  Future<List<Post>> _findByAuthor(String auth) async {
+  Future<Stream<Post>> _findByAuthor(String auth) async {
     FindStatement find = finderQ.where(author.eq(auth));
     return await execFind(find);
   }
@@ -58,7 +56,7 @@ class PostsBean extends _$PostsBean {
   PostsBean(Adapter<String> adapter) : super(adapter);
 
   @Find()
-  Future<List<Post>> findByAuthor(@WhereEq(#author) String auth) =>
+  Future<Stream<Post>> findByAuthor(@WhereEq(#author) String auth) =>
       _findByAuthor(auth);
 }
 

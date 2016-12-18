@@ -6,4 +6,7 @@
 /// More dartdocs go here.
 library jaguar_orm;
 
-export 'src/jaguar_orm_base.dart';
+export 'src/adapter/adapter.dart';
+export 'src/annotations/annotations.dart';
+export 'src/bean/bean.dart';
+export 'src/field/field.dart';

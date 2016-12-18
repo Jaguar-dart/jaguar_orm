@@ -3,28 +3,7 @@ library jaguar_orm.bean;
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 
-abstract class Adapter<PrimaryKeyType> {
-  Future connect();
-
-  /// Returns a list of rows found by executing [statement]
-  Future<Map> findOne(FindStatement statement);
-
-  /// Returns a list of rows found by executing [statement]
-  Future<List<Map>> find(FindStatement statement);
-
-  /// Executes the insert statement and returns the primary key of
-  /// inserted row
-  Future<PrimaryKeyType> insert(InsertStatement statement);
-
-  /// Updates the row and returns the number of rows updated
-  Future<int> update(UpdateStatement statement);
-
-  /// Deletes the requested row
-  Future<int> delete(DeleteStatement statement);
-
-  /// Creates the table
-  Future<Null> createTable(CreateTableStatement statement);
-}
+import 'package:jaguar_orm/src/adapter/adapter.dart';
 
 abstract class Bean<ModelType, PrimaryKeyType> {
   final Adapter<PrimaryKeyType> adapter;
@@ -48,9 +27,12 @@ abstract class Bean<ModelType, PrimaryKeyType> {
   }
 
   /// Returns a list of rows found by executing [statement]
-  Future<List<ModelType>> execFind(FindStatement statement) async {
-    List<Map> rows = await adapter.find(statement);
-    return rows.map((Map map) => fromMap(map)).toList();
+  Future<Stream<ModelType>> execFind(FindStatement statement) async {
+    StreamTransformer transformer = new StreamTransformer.fromHandlers(
+        handleData: (Map row, EventSink<ModelType> sink) {
+      sink.add(fromMap(row));
+    });
+    return (await adapter.find(statement)).transform(transformer);
   }
 
   /// Executes the insert statement and returns the primary key of
