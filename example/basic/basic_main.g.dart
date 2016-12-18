@@ -36,6 +36,7 @@ abstract class _$PostsBean extends Bean<Post> {
 
   List<SetColumn> toSetColumns(Post model) {
     List<SetColumn> ret = [];
+
     ret.add(id.set(model.id));
     ret.add(author.set(model.author));
     ret.add(message.set(model.message));
@@ -43,5 +44,26 @@ abstract class _$PostsBean extends Bean<Post> {
     ret.add(replies.set(model.replies));
 
     return ret;
+  }
+
+  Future<dynamic> create(Post model) async {
+    InsertStatement insert = inserterQ.setMany(toSetColumns(model));
+    return execInsert(insert);
+  }
+
+  Future<int> update(Post model) async {
+    UpdateStatement update =
+        updaterQ.where(id.eq(model.id)).setMany(toSetColumns(model));
+    return execUpdate(update);
+  }
+
+  Future<Post> find(String id) async {
+    FindStatement find = finderQ.where(this.id.eq(id));
+    return await execFindOne(find);
+  }
+
+  Future<int> delete(String id) async {
+    DeleteStatement delete = deleterQ.where(this.id.eq(id));
+    return execDelete(delete);
   }
 }

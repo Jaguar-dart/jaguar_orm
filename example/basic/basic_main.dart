@@ -24,45 +24,6 @@ class Post {
   static String tableName = 'posts';
 }
 
-class _$Dummy extends Bean<Post> {
-  _$Dummy(Adapter adapter) : super(adapter);
-
-  String get tableName => Post.tableName;
-
-  StrField get author => new StrField('author');
-
-  Future<Post> find(String id) async {
-    FindStatement find =
-        finderQ.from(Post.tableName).where(C.eq('id', V.Str(id)));
-    return await execFindOne(find);
-  }
-
-  Future<Stream<Post>> _findByAuthor(String auth) async {
-    FindStatement find = finderQ.where(author.eq(auth));
-    return await execFind(find);
-  }
-
-  Post fromMap(Map map) {
-    Post model = new Post();
-
-    model.id = map['id'];
-    model.author = map['author'];
-    model.message = map['message'];
-    model.likes = map['likes'];
-    model.replies = map['replies'];
-
-    return model;
-  }
-
-  List<SetColumn> toSetColumns(Post model) {
-    List<SetColumn> ret = [];
-
-    ret.add(author.set(model.author));
-
-    return ret;
-  }
-}
-
 @GenBean()
 class PostsBean extends _$PostsBean implements Bean<Post> {
   PostsBean(Adapter adapter) : super(adapter);

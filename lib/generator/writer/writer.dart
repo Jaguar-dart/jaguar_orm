@@ -28,6 +28,8 @@ class Writer {
 
     _writeToSetColumns();
 
+    _writeCurd();
+
     _w.writeln('}');
   }
 
@@ -43,7 +45,7 @@ class Writer {
 
   void _writeFields(Field field) {
     _w.writeln(
-        "${field.type} get ${field.field} => new ${field.type}('${field.key}');");
+        "${field.vType} get ${field.field} => new ${field.vType}('${field.key}');");
     _w.writeln();
   }
 
@@ -62,8 +64,8 @@ class Writer {
   }
 
   void _writeToSetColumns() {
-    _w.write('List<SetColumn> toSetColumns(${_b.modelType} model) {');
-    _w.write('List<SetColumn> ret = [];');
+    _w.writeln('List<SetColumn> toSetColumns(${_b.modelType} model) {');
+    _w.writeln('List<SetColumn> ret = [];');
     _w.writeln();
 
     _b.fields.forEach((Field field) {
@@ -71,7 +73,60 @@ class Writer {
     });
 
     _w.writeln();
-    _w.write('return ret;');
-    _w.write('}');
+    _w.writeln('return ret;');
+    _w.writeln('}');
+  }
+
+  void _writeCurd() {
+    _writeCreate();
+    _writeUpdate();
+    _writeFind();
+    _writeDelete();
+  }
+
+  void _writeCreate() {
+    _w.writeln('Future<dynamic> create(${_b.modelType} model) async {');
+    _w.write('InsertStatement insert = inserterQ');
+    _w.writeln('.setMany(toSetColumns(model));');
+    _w.writeln('return execInsert(insert);');
+    _w.writeln('}');
+  }
+
+  void _writeUpdate() {
+    if (_b.primary == null) {
+      return;
+    }
+
+    _w.writeln('Future<int> update(${_b.modelType} model) async {');
+    _w.write('UpdateStatement update = updaterQ.where(${_b.primary.field}');
+    _w.writeln('.eq(model.${_b.primary.field})).setMany(toSetColumns(model));');
+    _w.writeln('return execUpdate(update);');
+    _w.writeln('}');
+  }
+
+  void _writeFind() {
+    if (_b.primary == null) {
+      return;
+    }
+
+    _w.writeln(
+        'Future<${_b.modelType}> find(${_b.primary.type} ${_b.primary.field}) async {');
+    _w.writeln(
+        'FindStatement find = finderQ.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
+    _w.writeln('return await execFindOne(find);');
+    _w.writeln('}');
+  }
+
+  void _writeDelete() {
+    if (_b.primary == null) {
+      return;
+    }
+
+    _w.writeln(
+        'Future<int> delete(${_b.primary.type} ${_b.primary.field}) async {');
+    _w.writeln(
+        'DeleteStatement delete = deleterQ.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
+    _w.writeln('return execDelete(delete);');
+    _w.writeln('}');
   }
 }

@@ -19,6 +19,8 @@ class ParsedColumn {
 
   String get name => element.name;
 
+  bool get isPrimary => instantiated is ant.PrimaryKey;
+
   static ParsedColumn detect(FieldElement f) {
     //If IgnoreField is present, skip!
     {
@@ -67,7 +69,9 @@ class ParsedBean {
 
   final List<ParsedColumn> columns;
 
-  ParsedBean(this.clazz, this.model, this.columns);
+  final ParsedColumn primary;
+
+  ParsedBean(this.clazz, this.model, this.columns, this.primary);
 
   String get name => clazz.name;
 
@@ -89,6 +93,15 @@ class ParsedBean {
         .where((ParsedColumn col) => col is ParsedColumn)
         .toList();
 
-    return new ParsedBean(clazz, model, columns);
+    List<ParsedColumn> primaries =
+        columns.where((ParsedColumn col) => col.isPrimary).toList();
+
+    if (primaries.length > 1) {
+      throw new Exception('Only one primary key allowed!');
+    }
+
+    ParsedColumn primary = primaries.length == 1 ? primaries.first : null;
+
+    return new ParsedBean(clazz, model, columns, primary);
   }
 }

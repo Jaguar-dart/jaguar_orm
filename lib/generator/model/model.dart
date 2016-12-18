@@ -9,9 +9,14 @@ class Field {
 
   final String type;
 
+  final String vType;
+
   final String key;
 
-  Field(this.type, this.field, this.key);
+  Field(this.type, this.vType, this.field, this.key);
+
+  static Field fromParsed(ParsedColumn col) => new Field(
+      col.fieldType.name, _getValType(col.fieldType), col.name, col.key);
 }
 
 class Bean {
@@ -21,7 +26,10 @@ class Bean {
 
   final List<Field> fields;
 
-  Bean(this.name, this.modelType, List<Field> fields) : fields = fields ?? [];
+  final Field primary;
+
+  Bean(this.name, this.modelType, List<Field> fields, this.primary)
+      : fields = fields ?? [];
 }
 
 class ToModel {
@@ -32,12 +40,10 @@ class ToModel {
   ToModel(this._parsed) {
     List<Field> fields = [];
 
-    _parsed.columns
-        .map((ParsedColumn col) =>
-            new Field(_getValType(col.fieldType), col.name, col.key))
-        .forEach(fields.add);
+    _parsed.columns.map(Field.fromParsed).forEach(fields.add);
 
-    _model = new Bean(_parsed.name, _parsed.model.name, fields);
+    _model = new Bean(_parsed.name, _parsed.model.name, fields,
+        Field.fromParsed(_parsed.primary));
   }
 
   Bean get model => _model;
