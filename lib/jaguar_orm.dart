@@ -9,4 +9,4 @@ library jaguar_orm;
 export 'src/adapter/adapter.dart';
 export 'src/annotations/annotations.dart';
 export 'src/bean/bean.dart';
-export 'src/field/field.dart';
+export 'package:jaguar_query/jaguar_query.dart';
