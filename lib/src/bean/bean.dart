@@ -3,8 +3,6 @@ library jaguar_orm.bean;
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 
-import 'package:jaguar_orm/src/adapter/adapter.dart';
-
 abstract class Bean<ModelType> {
   final Adapter adapter;
 
@@ -52,9 +50,11 @@ abstract class Bean<ModelType> {
   }
 
   /// Creates the table
+  /* TODO
   Future<Null> execCreateTable(CreateTableStatement statement) async {
     return await adapter.createTable(statement);
   }
+  */
 
   ModelType fromMap(Map map);
 
