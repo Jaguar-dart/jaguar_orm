@@ -3,19 +3,26 @@ library jaguar_orm.bean;
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 
+/// Interface for bean class for a model
 abstract class Bean<ModelType> {
+  /// The adapter for a particular database
   final Adapter adapter;
 
   Bean(this.adapter);
 
+  /// The name of the table in database
   String get tableName;
 
+  /// Creates a 'find' query
   FindStatement get finderQ => Sql.find.from(tableName);
 
+  /// Creates a 'delete' query
   DeleteStatement get deleterQ => Sql.delete.from(tableName);
 
+  /// Creates a 'update' query
   UpdateStatement get updaterQ => Sql.update.into(tableName);
 
+  /// Creates a 'insert' query
   InsertStatement get inserterQ => Sql.insert.into(tableName);
 
   /// Returns a list of rows found by executing [statement]
@@ -56,7 +63,9 @@ abstract class Bean<ModelType> {
   }
   */
 
+  /// Creates a model from the map
   ModelType fromMap(Map map);
 
+  /// Creates list of 'set' column from model to be used in update or insert query
   List<SetColumn> toSetColumns(ModelType model);
 }
