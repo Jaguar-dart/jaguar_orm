@@ -12,8 +12,6 @@ class Author {
 
   String name;
 
-  List<Post> posts;
-
   static String tableName = 'authors';
 }
 

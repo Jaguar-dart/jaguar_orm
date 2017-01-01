@@ -41,6 +41,4 @@ class PostsBean extends _PostsBean implements Bean<Post> {
       super.deleteByAuthor(author);
 }
 
-main() {
-
-}
+main() {}
