@@ -107,7 +107,12 @@ class ManyToMany implements ColumnBase {
 
 /// Annotation to generate 'find' method in beans
 class Find {
-  const Find();
+  
+  final int limit;
+  
+  final int offset;
+  
+  const Find(this.limit,this.offset);
 }
 
 /// Annotation to generate 'update' method in beans
