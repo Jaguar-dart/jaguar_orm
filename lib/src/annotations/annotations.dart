@@ -160,11 +160,6 @@ class WhereLike implements Where {
   const WhereLike();
 }
 
-/// Annotation on parameter of bean method to declare them as 'is like' condition
-class WhereLike implements Where {
-  const WhereLike();
-}
-
 /// Annotation to generate 'limit' condition
 class Limit{
   const Limit();
