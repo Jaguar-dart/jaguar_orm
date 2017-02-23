@@ -33,8 +33,9 @@ abstract class Bean<ModelType> {
 
   /// Returns a list of rows found by executing [statement]
   Future<Stream<ModelType>> execFind(FindStatement statement) async {
-    StreamTransformer transformer = new StreamTransformer.fromHandlers(
-        handleData: (Map row, EventSink<ModelType> sink) {
+    StreamTransformer<Map, ModelType> transformer =
+        new StreamTransformer.fromHandlers(
+            handleData: (Map row, EventSink<ModelType> sink) {
       sink.add(fromMap(row));
     });
     return (await adapter.find(statement)).transform(transformer);

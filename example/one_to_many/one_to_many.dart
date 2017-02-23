@@ -2,7 +2,7 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 /// NOTE: This is experimentation. jaguar_query doesn't support foreign keys yet
-import 'dart:async';
+
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 
@@ -12,14 +12,14 @@ class Author {
 
   String name;
 
-  static String tableName = 'authors';
+  static const String tableName = 'authors';
 }
 
 class Post {
   @PrimaryKey()
   String id;
 
-  @ForeignKey(AuthorBean, #id)
+  @ForeignKey(AuthorBean.tableName, 'id')
   String authorId;
 
   String message;
@@ -32,7 +32,7 @@ class Post {
 }
 
 class AuthorBean {
-  String get tableName => Author.tableName;
+  static const String tableName = Author.tableName;
 
   AuthorBean();
 

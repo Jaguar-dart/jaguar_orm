@@ -49,7 +49,7 @@ class ParsedColumn {
         .map((ElementAnnotation annot) => new AnnotationElementWrap(annot))
         .map((AnnotationElementWrap annot) => annot.instantiated)
         .where((dynamic instantiated) => instantiated is ant.ColumnBase)
-        .toList();
+        .toList() as List<ant.ColumnBase>;
 
     if (columns.length > 1) {
       throw new Exception('Only one Column annotation is allowed on a Field!');

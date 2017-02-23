@@ -44,11 +44,8 @@ class ParsedUpdate {
       }
     }
 
-    List<ParsedWhere> wheres = method.parameters
-        .map(ParsedWhere.detect)
-        .where((List<ParsedUpdate> wh) => wh != null)
-        .expand((List<ParsedUpdate> wh) => wh)
-        .toList();
+    List<ParsedWhere> wheres =
+        method.parameters.map(ParsedWhere.detect).expand((wh) => wh).toList();
 
     List<ParsedSetColumn> sets = method.parameters
         .map(ParsedSetColumn.detect)

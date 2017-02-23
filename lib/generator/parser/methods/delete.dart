@@ -21,11 +21,8 @@ class ParsedDelete {
       }
     }
 
-    List<ParsedWhere> wheres = method.parameters
-        .map(ParsedWhere.detect)
-        .where((List<ParsedDelete> wh) => wh != null)
-        .expand((List<ParsedDelete> wh) => wh)
-        .toList();
+    List<ParsedWhere> wheres =
+        method.parameters.map(ParsedWhere.detect).expand((wh) => wh).toList();
 
     return new ParsedDelete(method, wheres);
   }

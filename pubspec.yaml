@@ -1,6 +1,6 @@
 name: jaguar_orm
 description: Source generated ORM for SQL/NoSQL
-version: 0.0.2
+version: 0.0.3
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -10,7 +10,7 @@ environment:
   sdk: ">=1.8.0 <2.0.0"
 
 dependencies:
-  jaguar_query: '>=0.0.2 <0.1.0'
+  jaguar_query: '>=0.0.10 <0.1.0'
   source_gen: "^0.5.1"
   build: ">=0.4.1 <0.5.0"
   yaml: ">=2.1.10 <3.0.0"

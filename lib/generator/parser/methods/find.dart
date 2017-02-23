@@ -45,11 +45,8 @@ class ParsedFind {
       }
     }
 
-    List<ParsedWhere> wheres = method.parameters
-        .map(ParsedWhere.detect)
-        .where((List<ParsedFind> wh) => wh != null)
-        .expand((List<ParsedFind> wh) => wh)
-        .toList();
+    List<ParsedWhere> wheres =
+        method.parameters.map(ParsedWhere.detect).expand((wh) => wh).toList();
 
     return new ParsedFind(method, wheres);
   }
