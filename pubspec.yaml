@@ -1,6 +1,6 @@
 name: jaguar_orm
 description: Source generated ORM for SQL/NoSQL
-version: 0.0.3
+version: 0.0.4
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -15,10 +15,7 @@ dependencies:
   build: ">=0.4.1 <0.5.0"
   yaml: ">=2.1.10 <3.0.0"
   intl: ">=0.14.0 <0.15.0"
-  source_gen_help:
-    git:
-      url: https://github.com/Jaguar-dart/source_gen_help.git
-      ref: 4acd8b6
+  source_gen_help: '>=0.0.4 <0.1.0'
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
