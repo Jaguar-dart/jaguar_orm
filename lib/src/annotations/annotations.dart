@@ -107,7 +107,12 @@ class ManyToMany implements ColumnBase {
 
 /// Annotation to generate 'find' method in beans
 class Find {
-  const Find();
+  
+  final int limit;
+  
+  final int offset;
+  
+  const Find(this.limit,this.offset);
 }
 
 /// Annotation to generate 'update' method in beans
@@ -158,6 +163,16 @@ class WhereLtEq implements Where {
 /// Annotation on parameter of bean method to declare them as 'is like' condition
 class WhereLike implements Where {
   const WhereLike();
+}
+
+/// Annotation to generate 'limit' condition
+class Limit{
+  const Limit();
+}
+
+/// Annotation to generate 'offset' condition
+class Offset{
+  const Offset();
 }
 
 /// Annotation on parameter of bean method to declare them as 'set'
