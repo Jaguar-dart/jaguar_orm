@@ -2,7 +2,7 @@ library jaguar.generator.phase;
 
 import 'dart:io';
 
-import 'package:build/build.dart';
+import 'package:build_runner/build_runner.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:yaml/yaml.dart';
 

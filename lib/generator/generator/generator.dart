@@ -1,6 +1,6 @@
 library serialize.generator.generator;
 
-import 'package:build/build.dart';
+import 'package:build_runner/build_runner.dart';
 
 import 'package:jaguar_orm/generator/phase/phase.dart';
 
