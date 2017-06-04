@@ -10,8 +10,7 @@ environment:
   sdk: ">=1.8.0 <2.0.0"
 
 dependencies:
-  jaguar_query: # '>=0.0.10 <0.1.0'
-    path: ../jaguar_query
+  jaguar_query: '>=0.0.18 <0.1.0'
   source_gen: "^0.5.1"
   build: ">=0.7.0 <0.8.0"
   yaml: ">=2.1.10 <3.0.0"
