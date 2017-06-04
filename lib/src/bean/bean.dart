@@ -58,11 +58,13 @@ abstract class Bean<ModelType> {
   }
 
   /// Creates the table
-  /* TODO
-  Future<Null> execCreateTable(CreateTableStatement statement) async {
+  Future<Null> execCreateTable(CreateStatement statement) async {
     return await adapter.createTable(statement);
   }
-  */
+
+  Future<Null> execCreateDatabase(CreateDbStatement st) async {
+    return await adapter.createDatabase(st);
+  }
 
   /// Creates a model from the map
   ModelType fromMap(Map map);

@@ -3,65 +3,102 @@
 
 /// NOTE: This is experimentation. jaguar_query doesn't support foreign keys yet
 
+import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 
 class Author {
   @PrimaryKey()
-  String id;
+  int id;
 
   String name;
 
+  @HasMany()
+  List<Post> posts;
+
   static const String tableName = 'authors';
+
+  String toString() => "Author($id, $name, $posts)";
 }
 
 class Post {
   @PrimaryKey()
-  String id;
+  int id;
 
-  @ForeignKey(AuthorBean.tableName, 'id')
-  String authorId;
+  @ForeignKey(AuthorBean, #id)
+  int authorId;
 
   String message;
 
-  int likes;
+  @BelongsTo()
+  Author author;
 
-  int replies;
+  static String tableName = 'post';
 
-  static String tableName = 'posts';
+  String toString() => "Post($id, $authorId, $author, $message)";
 }
 
-class AuthorBean {
-  static const String tableName = Author.tableName;
+abstract class _AuthorBean implements Bean<Author> {
+  String get tableName => Author.tableName;
 
-  AuthorBean();
-
-  StrField get id => new StrField('id');
+  IntField get id => new IntField('id');
 
   StrField get name => new StrField('name');
 
-  FindStatement get finder => Sql.find.from(tableName);
+  /// Creates a model from the map
+  Author fromMap(Map map) => new Author()
+    ..id = map['_id']
+    ..name = map['name'];
 
-  FindStatement find(String id) =>
-      Sql.find.from(Post.tableName).where(this.id.eq(id));
+  /// Creates list of 'set' column from model to be used in update or insert query
+  List<SetColumn> toSetColumns(Author model) => <SetColumn>[
+    id.set(model.id),
+    name.set(model.name),
+  ];
+
+  Future<Author> findById(int id) async {
+    final st = finderQ.where(this.id.eq(id));
+    return await execFindOne(st);
+  }
 }
 
-class PostsBean {
-  static String get tableName => 'posts';
+class AuthorBean extends Bean<Author> with _AuthorBean {
+  AuthorBean(Adapter adapter): super(adapter);
+}
 
-  PostsBean();
+abstract class _PostBean implements Bean<Post> {
+  String get tableName => Post.tableName;
 
-  StrField get id => new StrField('id');
+  IntField get id => new IntField('id');
 
-  StrField get authorId => new StrField('authorId');
+  IntField get authorId => new IntField('authorId');
 
-  FindStatement get finder => Sql.find.from(tableName);
+  StrField get message => new StrField('message');
 
-  FindStatement find(String id) =>
-      Sql.find.from(Post.tableName).where(this.id.eq(id));
+  /// Creates a model from the map
+  Post fromMap(Map map) => new Post()
+    ..id = map['_id']
+    ..authorId = map['authorid']
+    ..message = map['message'];
+
+  /// Creates list of 'set' column from model to be used in update or insert query
+  List<SetColumn> toSetColumns(Post model) => <SetColumn>[
+    id.set(model.id),
+    authorId.set(model.authorId),
+    message.set(model.message),
+  ];
+
+  Future<Post> findById(int id) async {
+    final st = finderQ.where(this.id.eq(id));
+    return await execFindOne(st);
+  }
+}
+
+class PostsBean extends Bean<Post> with _PostBean {
+  PostsBean(Adapter adapter): super(adapter);
 
   FindStatement findByAuthor(Author author) =>
-      finder.where(authorId.eq(author.id));
+      finderQ.where(authorId.eq(author.id));
 }
 
 main() {}
