@@ -7,5 +7,4 @@
 library jaguar_orm;
 
 export 'src/annotations/annotations.dart';
-export 'src/bean/bean.dart';
 export 'package:jaguar_query/jaguar_query.dart';
