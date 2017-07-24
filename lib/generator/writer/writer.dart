@@ -91,7 +91,7 @@ class Writer {
 
   void _writeCreate() {
     _w.writeln('Future<dynamic> create(${_b.modelType} model) async {');
-    _w.write('InsertStatement insert = inserterQ');
+    _w.write('final Insert insert = inserter');
     _w.writeln('.setMany(toSetColumns(model));');
     _w.writeln('return execInsert(insert);');
     _w.writeln('}');
@@ -103,7 +103,7 @@ class Writer {
     }
 
     _w.writeln('Future<int> update(${_b.modelType} model) async {');
-    _w.write('UpdateStatement update = updaterQ.where(${_b.primary.field}');
+    _w.write('final Update update = updater.where(${_b.primary.field}');
     _w.writeln('.eq(model.${_b.primary.field})).setMany(toSetColumns(model));');
     _w.writeln('return execUpdate(update);');
     _w.writeln('}');
@@ -117,7 +117,7 @@ class Writer {
     _w.writeln(
         'Future<${_b.modelType}> find(${_b.primary.type} ${_b.primary.field}) async {');
     _w.writeln(
-        'FindStatement find = finderQ.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
+        'final Find find = finder.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
     _w.writeln('return await execFindOne(find);');
     _w.writeln('}');
   }
@@ -130,7 +130,7 @@ class Writer {
     _w.writeln(
         'Future<int> delete(${_b.primary.type} ${_b.primary.field}) async {');
     _w.writeln(
-        'DeleteStatement delete = deleterQ.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
+        'final Delete delete = deleter.where(this.${_b.primary.field}.eq(${_b.primary.field}));');
     _w.writeln('return execDelete(delete);');
     _w.writeln('}');
   }
@@ -139,7 +139,7 @@ class Writer {
     _w.write(find.prototype);
     _w.writeln(' async {');
 
-    _w.writeln('FindStatement find = finderQ');
+    _w.writeln('final Find find = finder');
 
     find.wheres.forEach((Where where) {
       _w.write('.where(this.${where.field}.${where.op}(${where.field}))');
@@ -155,7 +155,7 @@ class Writer {
     _w.write(update.prototype);
     _w.writeln(' async {');
 
-    _w.writeln('UpdateStatement update = updaterQ');
+    _w.writeln('Update update = updater');
 
     update.wheres.forEach((Where where) {
       _w.write('.where(this.${where.field}.${where.op}(${where.field}))');
@@ -175,7 +175,7 @@ class Writer {
     _w.write(delete.prototype);
     _w.writeln(' async {');
 
-    _w.writeln('DeleteStatement delete = deleterQ');
+    _w.writeln('final Delete delete = deleter');
 
     delete.wheres.forEach((Where where) {
       _w.write('.where(this.${where.field}.${where.op}(${where.field}))');

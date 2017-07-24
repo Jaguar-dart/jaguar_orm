@@ -14,7 +14,7 @@ class ParsedDelete {
     {
       bool isDelete = method.metadata
           .map((AnnotationElementWrap annot) => annot.instantiated)
-          .any((dynamic instantiated) => instantiated is ant.Delete);
+          .any((dynamic instantiated) => instantiated is ant.Deleter);
 
       if (!isDelete) {
         return null;

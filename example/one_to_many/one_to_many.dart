@@ -57,7 +57,7 @@ abstract class _AuthorBean implements Bean<Author> {
   ];
 
   Future<Author> findById(int id) async {
-    final st = finderQ.where(this.id.eq(id));
+    final st = finder.where(this.id.eq(id));
     return await execFindOne(st);
   }
 }
@@ -89,7 +89,7 @@ abstract class _PostBean implements Bean<Post> {
   ];
 
   Future<Post> findById(int id) async {
-    final st = finderQ.where(this.id.eq(id));
+    final st = finder.where(this.id.eq(id));
     return await execFindOne(st);
   }
 }
@@ -97,8 +97,8 @@ abstract class _PostBean implements Bean<Post> {
 class PostsBean extends Bean<Post> with _PostBean {
   PostsBean(Adapter adapter): super(adapter);
 
-  FindStatement findByAuthor(Author author) =>
-      finderQ.where(authorId.eq(author.id));
+  Find findByAuthor(Author author) =>
+      finder.where(authorId.eq(author.id));
 }
 
 main() {}

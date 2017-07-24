@@ -1,16 +1,16 @@
 part of jaguar_orm.annotation;
 
 /// Annotation to generate 'find' method in beans
-class Find {
-  const Find();
+class Finder {
+  const Finder();
 }
 
 /// Annotation to generate 'update' method in beans
-class Update {
-  const Update();
+class Updater {
+  const Updater();
 }
 
 /// Annotation to generate 'delete' method in beans
-class Delete {
-  const Delete();
+class Deleter {
+  const Deleter();
 }

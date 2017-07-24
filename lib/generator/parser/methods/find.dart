@@ -38,7 +38,7 @@ class ParsedFind {
     {
       bool isFind = method.metadata
           .map((AnnotationElementWrap annot) => annot.instantiated)
-          .any((dynamic instantiated) => instantiated is ant.Find);
+          .any((dynamic instantiated) => instantiated is ant.Finder);
 
       if (!isFind) {
         return null;

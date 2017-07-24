@@ -37,7 +37,7 @@ class ParsedUpdate {
     {
       bool isUpdate = method.metadata
           .map((AnnotationElementWrap annot) => annot.instantiated)
-          .any((dynamic instantiated) => instantiated is ant.Update);
+          .any((dynamic instantiated) => instantiated is ant.Updater);
 
       if (!isUpdate) {
         return null;
