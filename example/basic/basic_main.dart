@@ -27,18 +27,6 @@ class Post {
 @GenBean()
 class PostsBean extends Bean<Post> with _PostsBean  {
   PostsBean(Adapter adapter) : super(adapter);
-
-  @Finder()
-  Future<Stream<Post>> findByAuthor(@WhereEq() String author) =>
-      super.findByAuthor(author);
-
-  @Updater()
-  Future updateByAuthor(@WhereEq() String author, @SetField() int replies) =>
-      super.updateByAuthor(author, replies);
-
-  @Deleter()
-  Future deleteByAuthor(@WhereEq() String author) =>
-      super.deleteByAuthor(author);
 }
 
 main() {}
