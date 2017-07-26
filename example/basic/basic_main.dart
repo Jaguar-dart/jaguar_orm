@@ -27,6 +27,10 @@ class Post {
 @GenBean()
 class PostsBean extends Bean<Post> with _PostsBean  {
   PostsBean(Adapter adapter) : super(adapter);
+
+  Future createTable() async {
+    //TODO Sql.create(tableName).ifNotExists().addInt();
+  }
 }
 
 main() {}
