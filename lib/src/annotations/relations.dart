@@ -1,18 +1,20 @@
 part of jaguar_orm.annotation;
 
 class BelongsTo {
-  const BelongsTo();
+  final String by;
+
+  const BelongsTo(this.by);
 }
 
-class HasOne {
-  const HasOne();
+class HasOneBean {
+  final Type bean;
+
+  const HasOneBean(this.bean);
 }
 
 class HasMany {
   const HasMany();
 }
-
-
 
 /* TODO
 /// Annotation to declare a model property as foreign key with 'one-to-one'

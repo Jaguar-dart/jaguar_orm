@@ -9,15 +9,15 @@ part of example.basic;
 abstract class _PostsBean implements Bean<Post> {
   String get tableName => Post.tableName;
 
-  static final StrField id = new StrField('id');
+  final StrField id = new StrField('id');
 
-  static final StrField author = new StrField('author');
+  final StrField author = new StrField('author');
 
-  static final StrField message = new StrField('message');
+  final StrField message = new StrField('message');
 
-  static final IntField likes = new IntField('likes');
+  final IntField likes = new IntField('likes');
 
-  static final IntField replies = new IntField('replies');
+  final IntField replies = new IntField('replies');
 
   Post fromMap(Map map) {
     Post model = new Post();

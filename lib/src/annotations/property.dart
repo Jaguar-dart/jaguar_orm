@@ -34,11 +34,21 @@ class ForeignKey implements ColumnBase {
   /// Name of the column in database
   final String key;
 
-  /// The bean of the foreign model
+  /// The field/column in the foreign bean
+  final String foreign;
+
+  const ForeignKey(this.foreign, [this.key]);
+}
+
+/// Annotation to declare a model property as foreign key in database table
+class ForeignKeyBean implements ColumnBase {
   final Type bean;
 
-  /// The field/column in the foreign bean
-  final Symbol field;
+  /// Name of the column in database
+  final String key;
 
-  const ForeignKey(this.bean, this.field, [this.key]);
+  /// The field/column in the foreign bean
+  final String foreign;
+
+  const ForeignKeyBean(this.bean, {this.key, this.foreign: 'id'});
 }

@@ -3,6 +3,7 @@
 
 /// NOTE: This is experimentation. jaguar_query doesn't support foreign keys yet
 
+/* TODO
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
@@ -102,3 +103,5 @@ class PostsBean extends Bean<Post> with _PostBean {
 }
 
 main() {}
+
+*/

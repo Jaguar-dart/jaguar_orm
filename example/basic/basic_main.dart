@@ -25,7 +25,7 @@ class Post {
 }
 
 @GenBean()
-class PostsBean extends Bean<Post> with _PostsBean  {
+class PostsBean extends Bean<Post> with _PostsBean {
   PostsBean(Adapter adapter) : super(adapter);
 
   Future createTable() async {
@@ -33,4 +33,7 @@ class PostsBean extends Bean<Post> with _PostsBean  {
   }
 }
 
-main() {}
+main() async {
+  final x = new PostsBean(null);
+  print(await x.createTable());
+}
