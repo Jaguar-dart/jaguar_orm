@@ -33,13 +33,13 @@ class Address {
   String id;
 
   @BelongsTo(UserBean)
-  String userid;
+  String userId;
 
   String street;
 
   static String tableName = 'address';
 
-  String toString() => "Post($id, $userid, $street)";
+  String toString() => "Post($id, $userId, $street)";
 }
 
 @GenBean()
@@ -68,7 +68,7 @@ class AddressBean extends Bean<Address> with _AddressBean {
         .create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('street', length: 150)
-        .addStr('userid', length: 50, foreignTable: '_user', foreignCol: 'id');
+        .addStr('user_id', length: 50, foreignTable: '_user', foreignCol: 'id');
     return execCreateTable(st);
   }
 }

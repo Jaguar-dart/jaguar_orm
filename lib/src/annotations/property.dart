@@ -1,16 +1,20 @@
 part of jaguar_orm.annotation;
 
-/// Annotation on model property to ignore it
-class IgnoreColumn {
-  const IgnoreColumn();
-}
-
 /// Interface for annotation on/for model property
 abstract class ColumnBase {
   /// Name of the column in database
   String get col;
 
   bool get nullable;
+}
+
+/// Annotation on model property to ignore it
+class IgnoreColumn implements ColumnBase {
+  final String col = null;
+
+  final bool nullable = true;
+
+  const IgnoreColumn();
 }
 
 /// Annotation to declare a model property as database column
@@ -55,4 +59,38 @@ class ForeignKey implements ColumnBase {
   const ForeignKey(this.table,
       {this.col, this.nullable: false, this.refCol: 'id'})
       : bean = null;
+}
+
+class BelongsTo implements ForeignKey {
+  final Type bean;
+
+  /// Name of the column in database
+  final String col;
+
+  final bool nullable;
+
+  final String table = null;
+
+  /// The field/column in the foreign bean
+  final String refCol;
+
+  const BelongsTo(this.bean,
+      {this.col, this.nullable: false, this.refCol: 'id'});
+}
+
+class BelongsToMany implements ForeignKey {
+  final Type bean;
+
+  /// Name of the column in database
+  final String col;
+
+  final bool nullable;
+
+  final String table = null;
+
+  /// The field/column in the foreign bean
+  final String refCol;
+
+  const BelongsToMany(this.bean,
+      {this.col, this.nullable: false, this.refCol: 'id'});
 }

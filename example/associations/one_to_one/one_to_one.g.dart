@@ -79,8 +79,8 @@ abstract class _UserBean implements Bean<User> {
 
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
-      User newModel;
-      await addressBean.removeByUser(id);
+      final User newModel = await find(id);
+      await addressBean.removeByUser(newModel.id);
     }
     final Remove remove = remover.where(this.id.eq(id));
     return execRemove(remove);
@@ -108,7 +108,7 @@ abstract class _UserBean implements Bean<User> {
         models,
         (User model) => [model.id],
         addressBean.findByUserList,
-        (Address model) => [model.userid],
+        (Address model) => [model.userId],
         (User model, Address child) => model.address = child,
         cascade: cascade);
   }
@@ -121,7 +121,7 @@ abstract class _AddressBean implements Bean<Address> {
 
   final StrField id = new StrField('id');
 
-  final StrField userid = new StrField('userid');
+  final StrField userId = new StrField('user_id');
 
   final StrField street = new StrField('street');
 
@@ -129,7 +129,7 @@ abstract class _AddressBean implements Bean<Address> {
     Address model = new Address();
 
     model.id = map['id'];
-    model.userid = map['userid'];
+    model.userId = map['user_id'];
     model.street = map['street'];
 
     return model;
@@ -139,7 +139,7 @@ abstract class _AddressBean implements Bean<Address> {
     List<SetColumn> ret = [];
 
     ret.add(id.set(model.id));
-    ret.add(userid.set(model.userid));
+    ret.add(userId.set(model.userId));
     ret.add(street.set(model.street));
 
     return ret;
@@ -184,14 +184,14 @@ abstract class _AddressBean implements Bean<Address> {
     return execRemove(remover.where(exp));
   }
 
-  Future<Address> findByUser(String userid,
+  Future<Address> findByUser(String userId,
       {bool preload: false, bool cascade: false}) async {
-    final Find find = finder.where(this.userid.eq(userid));
+    final Find find = finder.where(this.userId.eq(userId));
     return await execFindOne(find);
   }
 
-  Future<int> removeByUser(String userid) async {
-    final Remove rm = remover.where(this.userid.eq(userid));
+  Future<int> removeByUser(String userId) async {
+    final Remove rm = remover.where(this.userId.eq(userId));
     return await execRemove(rm);
   }
 
@@ -199,12 +199,12 @@ abstract class _AddressBean implements Bean<Address> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder;
     for (User model in models) {
-      find.or(this.userid.eq(model.id));
+      find.or(this.userId.eq(model.id));
     }
     return await (await execFind(find)).toList();
   }
 
   void associateUser(Address child, User parent) {
-    child.userid = parent.id;
+    child.userId = parent.id;
   }
 }

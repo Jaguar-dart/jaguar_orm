@@ -5,12 +5,12 @@
 
 library example.has_one;
 
+/* TODO
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_orm/src/relations/relations.dart';
 
-/* TODO
 part 'associations.g.dart';
 
 class Games {

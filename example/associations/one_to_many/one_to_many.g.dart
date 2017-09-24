@@ -83,8 +83,8 @@ abstract class _AuthorBean implements Bean<Author> {
 
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
-      Author newModel;
-      await postBean.removeByAuthor(id);
+      final Author newModel = await find(id);
+      await postBean.removeByAuthor(newModel.id);
     }
     final Remove remove = remover.where(this.id.eq(id));
     return execRemove(remove);
@@ -113,7 +113,7 @@ abstract class _AuthorBean implements Bean<Author> {
         models,
         (Author model) => [model.id],
         postBean.findByAuthorList,
-        (Post model) => [model.authorid],
+        (Post model) => [model.authorId],
         (Author model, Post child) => model.posts.add(child),
         cascade: cascade);
   }
@@ -126,16 +126,16 @@ abstract class _PostBean implements Bean<Post> {
 
   final StrField id = new StrField('id');
 
-  final StrField message = new StrField('message');
+  final StrField authorId = new StrField('author_id');
 
-  final StrField authorid = new StrField('authorid');
+  final StrField message = new StrField('message');
 
   Post fromMap(Map map) {
     Post model = new Post();
 
     model.id = map['id'];
+    model.authorId = map['author_id'];
     model.message = map['message'];
-    model.authorid = map['authorid'];
 
     return model;
   }
@@ -144,8 +144,8 @@ abstract class _PostBean implements Bean<Post> {
     List<SetColumn> ret = [];
 
     ret.add(id.set(model.id));
+    ret.add(authorId.set(model.authorId));
     ret.add(message.set(model.message));
-    ret.add(authorid.set(model.authorid));
 
     return ret;
   }
@@ -189,14 +189,14 @@ abstract class _PostBean implements Bean<Post> {
     return execRemove(remover.where(exp));
   }
 
-  Future<List<Post>> findByAuthor(String authorid,
+  Future<List<Post>> findByAuthor(String authorId,
       {bool preload: false, bool cascade: false}) async {
-    final Find find = finder.where(this.authorid.eq(authorid));
+    final Find find = finder.where(this.authorId.eq(authorId));
     return await (await execFind(find)).toList();
   }
 
-  Future<int> removeByAuthor(String authorid) async {
-    final Remove rm = remover.where(this.authorid.eq(authorid));
+  Future<int> removeByAuthor(String authorId) async {
+    final Remove rm = remover.where(this.authorId.eq(authorId));
     return await execRemove(rm);
   }
 
@@ -204,12 +204,12 @@ abstract class _PostBean implements Bean<Post> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder;
     for (Author model in models) {
-      find.or(this.authorid.eq(model.id));
+      find.or(this.authorId.eq(model.id));
     }
     return await (await execFind(find)).toList();
   }
 
   void associateAuthor(Post child, Author parent) {
-    child.authorid = parent.id;
+    child.authorId = parent.id;
   }
 }

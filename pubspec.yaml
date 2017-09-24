@@ -1,6 +1,6 @@
 name: jaguar_orm
 description: Source generated ORM for SQL/NoSQL
-version: 0.2.0-dev
+version: 0.2.1-dev
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 homepage: https://github.com/Jaguar-dart/jaguar_orm
@@ -14,4 +14,4 @@ dependencies:
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
-  jaguar_query_postgresql: ^0.2.4
+  jaguar_query_postgresql: ^0.2.5
