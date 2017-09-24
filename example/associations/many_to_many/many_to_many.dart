@@ -9,9 +9,10 @@ import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
 part 'many_to_many.g.dart';
 
 class Category {
-  @PrimaryKey()
+  @PrimaryKey(length: 50)
   String id;
 
+  @Column(length: 50)
   String name;
 
   @ManyToMany(PivotBean, TodoListBean)
@@ -23,9 +24,10 @@ class Category {
 }
 
 class TodoList {
-  @PrimaryKey()
+  @PrimaryKey(length: 50)
   String id;
 
+  @Column(length: 50)
   String description;
 
   @ManyToMany(PivotBean, CategoryBean)
@@ -37,10 +39,10 @@ class TodoList {
 }
 
 class Pivot {
-  @BelongsToMany(TodoListBean)
+  @BelongsToMany(TodoListBean, length: 50)
   String todolistId;
 
-  @BelongsToMany(CategoryBean)
+  @BelongsToMany(CategoryBean, length: 50)
   String categoryId;
 
   static String tableName = 'pivot';
@@ -63,14 +65,6 @@ class TodoListBean extends Bean<TodoList> with _TodoListBean {
     _categoryBean ??= new CategoryBean(adapter);
     return _categoryBean;
   }
-
-  Future createTable() {
-    final st = Sql
-        .create(tableName)
-        .addStr('id', primary: true, length: 50)
-        .addStr('description', length: 50);
-    return execCreateTable(st);
-  }
 }
 
 @GenBean()
@@ -83,14 +77,6 @@ class CategoryBean extends Bean<Category> with _CategoryBean {
       : pivotBean = new PivotBean(adapter),
         todoListBean = new TodoListBean(adapter),
         super(adapter);
-
-  Future createTable() {
-    final st = Sql
-        .create(tableName)
-        .addStr('id', primary: true, length: 50)
-        .addStr('name', length: 150);
-    return execCreateTable(st);
-  }
 }
 
 @GenBean()
@@ -109,16 +95,6 @@ class PivotBean extends Bean<Pivot> with _PivotBean {
   TodoListBean get todoListBean {
     _todoListBean ??= new TodoListBean(adapter);
     return _todoListBean;
-  }
-
-  Future createTable() {
-    final st = Sql
-        .create(tableName)
-        .addStr('todolist_id',
-            length: 50, foreignTable: TodoList.tableName, foreignCol: 'id')
-        .addStr('category_id',
-            length: 50, foreignTable: Category.tableName, foreignCol: 'id');
-    return execCreateTable(st);
   }
 }
 

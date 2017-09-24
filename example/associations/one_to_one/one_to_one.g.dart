@@ -31,6 +31,13 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
+  Future createTable() async {
+    final st = Sql.create(tableName);
+    st.addStr(id.name, primary: true, length: 50);
+    st.addStr(name.name, length: 50);
+    return execCreateTable(st);
+  }
+
   Future<Null> insert(User model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     await execInsert(insert);
@@ -121,16 +128,16 @@ abstract class _AddressBean implements Bean<Address> {
 
   final StrField id = new StrField('id');
 
-  final StrField userId = new StrField('user_id');
-
   final StrField street = new StrField('street');
+
+  final StrField userId = new StrField('user_id');
 
   Address fromMap(Map map) {
     Address model = new Address();
 
     model.id = map['id'];
-    model.userId = map['user_id'];
     model.street = map['street'];
+    model.userId = map['user_id'];
 
     return model;
   }
@@ -139,10 +146,18 @@ abstract class _AddressBean implements Bean<Address> {
     List<SetColumn> ret = [];
 
     ret.add(id.set(model.id));
-    ret.add(userId.set(model.userId));
     ret.add(street.set(model.street));
+    ret.add(userId.set(model.userId));
 
     return ret;
+  }
+
+  Future createTable() async {
+    final st = Sql.create(tableName);
+    st.addStr(id.name, primary: true, length: 50);
+    st.addStr(street.name, length: 150);
+    st.addStr(userId.name, foreignTable: User.tableName, foreignCol: 'id');
+    return execCreateTable(st);
   }
 
   Future<dynamic> insert(Address model) async {

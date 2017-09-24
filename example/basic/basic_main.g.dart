@@ -43,6 +43,16 @@ abstract class _PostsBean implements Bean<Post> {
     return ret;
   }
 
+  Future createTable() async {
+    final st = Sql.create(tableName);
+    st.addStr(id.name, primary: true);
+    st.addStr(author.name);
+    st.addStr(message.name);
+    st.addInt(likes.name);
+    st.addInt(replies.name);
+    return execCreateTable(st);
+  }
+
   Future<dynamic> insert(Post model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return execInsert(insert);

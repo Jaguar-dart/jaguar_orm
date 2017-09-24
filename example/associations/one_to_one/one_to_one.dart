@@ -15,9 +15,10 @@ import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
 part 'one_to_one.g.dart';
 
 class User {
-  @PrimaryKey()
+  @PrimaryKey(length: 50)
   String id;
 
+  @Column(length: 50)
   String name;
 
   @HasOne(AddressBean)
@@ -29,13 +30,14 @@ class User {
 }
 
 class Address {
-  @PrimaryKey()
+  @PrimaryKey(length: 50)
   String id;
+
+  @Column(length: 150)
+  String street;
 
   @BelongsTo(UserBean)
   String userId;
-
-  String street;
 
   static String tableName = 'address';
 
@@ -49,28 +51,11 @@ class UserBean extends Bean<User> with _UserBean {
         super(adapter);
 
   final AddressBean addressBean;
-
-  Future createTable() {
-    final st = Sql
-        .create(tableName)
-        .addStr('id', primary: true, length: 50)
-        .addStr('name', length: 50);
-    return execCreateTable(st);
-  }
 }
 
 @GenBean()
 class AddressBean extends Bean<Address> with _AddressBean {
   AddressBean(Adapter adapter) : super(adapter);
-
-  Future createTable() {
-    final st = Sql
-        .create(tableName)
-        .addStr('id', primary: true, length: 50)
-        .addStr('street', length: 150)
-        .addStr('user_id', length: 50, foreignTable: '_user', foreignCol: 'id');
-    return execCreateTable(st);
-  }
 }
 
 /// The adapter

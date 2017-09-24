@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Create table
+
 ## 0.2.1
 
 - Angular like table specification

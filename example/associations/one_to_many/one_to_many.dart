@@ -38,7 +38,8 @@ class Post {
 
 @GenBean(
   columns: const {
-    'id': const PrimaryKey(),
+    'id': const PrimaryKey(length: 50),
+    'name': const Column(length: 50)
   },
   relations: const {
     'posts': const HasMany(PostBean),
@@ -62,8 +63,9 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 
 @GenBean(
   columns: const {
-    'id': const PrimaryKey(),
-    'authorId': const BelongsTo(AuthorBean)
+    'id': const PrimaryKey(length: 50),
+    'authorId': const BelongsTo(AuthorBean, length: 50),
+    'message': const Column(length: 150),
   },
 )
 class PostBean extends Bean<Post> with _PostBean {

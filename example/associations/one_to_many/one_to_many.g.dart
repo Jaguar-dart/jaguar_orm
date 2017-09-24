@@ -31,6 +31,13 @@ abstract class _AuthorBean implements Bean<Author> {
     return ret;
   }
 
+  Future createTable() async {
+    final st = Sql.create(tableName);
+    st.addStr(id.name, primary: true, length: 50);
+    st.addStr(name.name, length: 50);
+    return execCreateTable(st);
+  }
+
   Future<Null> insert(Author model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     await execInsert(insert);
@@ -148,6 +155,15 @@ abstract class _PostBean implements Bean<Post> {
     ret.add(message.set(model.message));
 
     return ret;
+  }
+
+  Future createTable() async {
+    final st = Sql.create(tableName);
+    st.addStr(id.name, primary: true, length: 50);
+    st.addStr(authorId.name,
+        foreignTable: Author.tableName, foreignCol: 'id', length: 50);
+    st.addStr(message.name, length: 150);
+    return execCreateTable(st);
   }
 
   Future<dynamic> insert(Post model) async {
