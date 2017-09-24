@@ -1,64 +1,57 @@
 part of jaguar_orm.annotation;
 
-class BelongsTo {
-  final String by;
+abstract class Relation {}
 
-  const BelongsTo(this.by);
-}
-
-class HasOneBean {
+class HasOne implements Relation {
   final Type bean;
 
-  const HasOneBean(this.bean);
+  const HasOne(this.bean);
 }
 
-class HasMany {
-  const HasMany();
+class HasMany implements Relation {
+  final Type bean;
+
+  const HasMany(this.bean);
 }
 
-/* TODO
-/// Annotation to declare a model property as foreign key with 'one-to-one'
-/// relationship to another model
-class OneToOne implements ColumnBase {
+class ManyToMany implements Relation {
+  final Type pivotBean;
+
+  final Type targetBean;
+
+  const ManyToMany(this.pivotBean, this.targetBean);
+}
+
+class BelongsTo implements ForeignKey {
+  final Type bean;
+
   /// Name of the column in database
-  final String key;
+  final String col;
 
-  /// The bean of the foreign model
-  final Type bean;
+  final bool nullable;
+
+  final String table = null;
 
   /// The field/column in the foreign bean
-  final Symbol field;
+  final String refCol;
 
-  const OneToOne(this.bean, this.field, [this.key]);
+  const BelongsTo(this.bean,
+      {this.col, this.nullable: false, this.refCol: 'id'});
 }
 
-/// Annotation to declare a model property as foreign key with 'many-to-one'
-/// relationship to another model
-class ManyToOne implements ColumnBase {
-  /// Name of the column in database
-  final String key;
-
-  /// The bean of the foreign model
+class BelongsToMany implements ForeignKey {
   final Type bean;
 
-  /// The field/column in the foreign bean
-  final Symbol field;
-
-  const ManyToOne(this.bean, this.field, [this.key]);
-}
-
-/// Annotation to declare a model property as foreign key with 'many-to-many'
-/// relationship to another model
-class ManyToMany implements ColumnBase {
   /// Name of the column in database
-  final String key;
+  final String col;
 
-  /// The bean of the foreign model
-  final Type bean;
+  final bool nullable;
+
+  final String table = null;
 
   /// The field/column in the foreign bean
-  final Symbol field;
+  final String refCol;
 
-  const ManyToMany(this.bean, this.field, [this.key]);
+  const BelongsToMany(this.bean,
+      {this.col, this.nullable: false, this.refCol: 'id'});
 }
-*/

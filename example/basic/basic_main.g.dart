@@ -43,24 +43,42 @@ abstract class _PostsBean implements Bean<Post> {
     return ret;
   }
 
-  Future<dynamic> create(Post model) async {
+  Future<dynamic> insert(Post model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return execInsert(insert);
   }
 
   Future<int> update(Post model) async {
     final Update update =
-        updater.where(id.eq(model.id)).setMany(toSetColumns(model));
+        updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
     return execUpdate(update);
   }
 
-  Future<Post> find(String id) async {
+  Future<Post> find(String id,
+      {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await execFindOne(find);
+  }
+
+  Future<List<Post>> findWhere(Expression exp) async {
+    final Find find = finder.where(exp);
+    return await (await execFind(find)).toList();
   }
 
   Future<int> remove(String id) async {
     final Remove remove = remover.where(this.id.eq(id));
     return execRemove(remove);
+  }
+
+  Future<int> removeMany(List<Post> models) async {
+    final Remove remove = remover;
+    for (final model in models) {
+      remove.or(this.id.eq(model.id));
+    }
+    return execRemove(remove);
+  }
+
+  Future<int> removeWhere(Expression exp) async {
+    return execRemove(remover.where(exp));
   }
 }

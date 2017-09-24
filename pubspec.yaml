@@ -3,16 +3,15 @@ description: Source generated ORM for SQL/NoSQL
 version: 0.2.0-dev
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
-- Kevin Segaud <segaud.kevin@gmail.com>
 homepage: https://github.com/Jaguar-dart/jaguar_orm
 
 environment:
   sdk: ">=1.8.0 <2.0.0"
 
 dependencies:
-  jaguar_query: ^0.2.0
-
+  jaguar_query: ^0.2.8
+  quiver: ^0.25.0
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
-  jaguar_query_postgresql:
+  jaguar_query_postgresql: ^0.2.4
