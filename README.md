@@ -2,7 +2,159 @@
 
 Source-generated ORM with relations (one-to-one, one-to-many, many-to-many), preloading, cascading, polymorphic relations, etc 
 
-# Example
+# Features
+
+* Relationships
+  * [One To One](https://github.com/jaguar-orm/one_to_one)  
+  * [One To Many](https://github.com/jaguar-orm/one_to_many)  
+  * [Many To Many](https://github.com/jaguar-orm/many_to_many)  
+* Preloads
+* Cascading
+  * Cascaded inserts
+  * Cascaded updates
+  * Cascaded removals
+* Migration
+* Polymorphic relations
+* Composite primary keys
+* Composite foreign keys
+
+
+# Gettings started
+
+## Install source generator
+
+**jaguar_orm_cli** provides **orm** CLI tool to generate ORM code.
+
+```
+pub global activate jaguar_orm_cli
+```
+
+## Project configuration
+
+**orm** CLI tool reads project configuration from `orm.yaml` configuration file. The `orm` property in configuration file
+must list the paths of all libraries that need ORM generation.
+
+### Example orm.yaml file
+
+```yaml
+beans:
+  - bin/main.dart
+  - lib/models/user.dart
+  - lib/models/book.dart
+```
+
+## Simple example
+
+### Model
+
+```dart
+class User {
+  @PrimaryKey()
+  String id;
+
+  String name;
+
+  static const String tableName = '_user';
+
+  String toString() => "User($id, $name)";
+}
+```
+
+### Bean
+
+A `Bean` performs database actions on behalf of the model. In this case, `UserBean` performs actions for `User` model.
+Much of the `Bean`'s functionality will be source generated.
+
+```dart
+@GenBean()
+class UserBean extends Bean<User> with _UserBean {
+  UserBean(Adapter adapter) : super(adapter);
+}
+```
+
+### Generating the Bean
+
+Given the configuration and `GenBean` annotation, **orm** CLI can magically generate ORM methods for you. Here is the
+command:
+
+```bash
+orm build
+```
+
+We will see, how we can use the generated ORM methods to perform basic CRUD operations on `User` table/model.
+
+### Connecting to database
+
+We will use PostgreSQL for this tutorial. `PgAdapter` is found in the package [**jaguar_query_postgresql**](https://github.com/Jaguar-dart/jaguar_query_postgresql).
+
+```dart
+PgAdapter _adapter =
+    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+await _adapter.connect();
+```
+
+### Creating instance of bean
+
+`Bean`s internally use **jaguar_query**'s `Adapter` interface to talk to database. Lets create an instance of `UserBean`.
+
+```dart
+final userBean = new UserBean(_adapter);
+```
+
+### Dropping table
+
+```dart
+await userBean.drop();
+```
+
+### Creating table
+
+```dart
+await userBean.createTable();
+
+```
+
+### Inserting new record
+
+```dart
+await userBean.insert(new User()
+    ..id = '1'
+    ..name = 'teja');
+```
+
+### Fetching record by primary key
+
+```dart
+User user = await userBean.find('1');
+```
+
+### Fetching all records
+
+```dart
+List<User> users = await userBean.getAll();
+```
+
+### Updating a record
+
+```dart
+User user = await userBean.find('1');
+user.name = 'teja hackborn';
+await userBean.update(user);
+```
+
+### Remove by id
+
+```dart
+await userBean.remove('1');
+```
+
+### Remove all
+
+```dart
+await userBean.removeAll();
+```
+
+# One-To-One example
 
 ```dart
 class User {

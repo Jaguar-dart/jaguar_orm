@@ -6,39 +6,27 @@ part of example.basic;
 // Generator: BeanGenerator
 // **************************************************************************
 
-abstract class _PostsBean implements Bean<Post> {
-  String get tableName => Post.tableName;
+abstract class _UserBean implements Bean<User> {
+  String get tableName => User.tableName;
 
   final StrField id = new StrField('id');
 
-  final StrField author = new StrField('author');
+  final StrField name = new StrField('name');
 
-  final StrField message = new StrField('message');
-
-  final IntField likes = new IntField('likes');
-
-  final IntField replies = new IntField('replies');
-
-  Post fromMap(Map map) {
-    Post model = new Post();
+  User fromMap(Map map) {
+    User model = new User();
 
     model.id = map['id'];
-    model.author = map['author'];
-    model.message = map['message'];
-    model.likes = map['likes'];
-    model.replies = map['replies'];
+    model.name = map['name'];
 
     return model;
   }
 
-  List<SetColumn> toSetColumns(Post model, [bool update = false]) {
+  List<SetColumn> toSetColumns(User model, [bool update = false]) {
     List<SetColumn> ret = [];
 
     ret.add(id.set(model.id));
-    ret.add(author.set(model.author));
-    ret.add(message.set(model.message));
-    ret.add(likes.set(model.likes));
-    ret.add(replies.set(model.replies));
+    ret.add(name.set(model.name));
 
     return ret;
   }
@@ -46,31 +34,28 @@ abstract class _PostsBean implements Bean<Post> {
   Future createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true);
-    st.addStr(author.name);
-    st.addStr(message.name);
-    st.addInt(likes.name);
-    st.addInt(replies.name);
+    st.addStr(name.name);
     return execCreateTable(st);
   }
 
-  Future<dynamic> insert(Post model) async {
+  Future<dynamic> insert(User model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return execInsert(insert);
   }
 
-  Future<int> update(Post model) async {
+  Future<int> update(User model) async {
     final Update update =
         updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
     return execUpdate(update);
   }
 
-  Future<Post> find(String id,
+  Future<User> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await execFindOne(find);
   }
 
-  Future<List<Post>> findWhere(Expression exp) async {
+  Future<List<User>> findWhere(Expression exp) async {
     final Find find = finder.where(exp);
     return await (await execFind(find)).toList();
   }
@@ -80,7 +65,7 @@ abstract class _PostsBean implements Bean<Post> {
     return execRemove(remove);
   }
 
-  Future<int> removeMany(List<Post> models) async {
+  Future<int> removeMany(List<User> models) async {
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));

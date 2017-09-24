@@ -3,37 +3,81 @@
 
 library example.basic;
 
+import 'dart:io';
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
+import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
 
 part 'basic_main.g.dart';
 
-class Post {
+class User {
   @PrimaryKey()
   String id;
 
-  String author;
+  String name;
 
-  String message;
+  static const String tableName = '_user';
 
-  int likes;
-
-  int replies;
-
-  static String tableName = 'posts';
+  String toString() => "User($id, $name)";
 }
 
 @GenBean()
-class PostsBean extends Bean<Post> with _PostsBean {
-  PostsBean(Adapter adapter) : super(adapter);
-
-  Future createTable() async {
-    //TODO Sql.create(tableName).ifNotExists().addInt();
-  }
+class UserBean extends Bean<User> with _UserBean {
+  UserBean(Adapter adapter) : super(adapter);
 }
 
+/// The adapter
+PgAdapter _adapter =
+    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+
 main() async {
-  final x = new PostsBean(null);
-  print(await x.createTable());
+  // Connect to database
+  await _adapter.connect();
+
+  // Create beans
+  final userBean = new UserBean(_adapter);
+
+  // Drop old tables
+  await userBean.drop();
+
+  // Create new tables
+  await userBean.createTable();
+
+  // Insert a new record
+  await userBean.insert(new User()
+    ..id = '1'
+    ..name = 'teja');
+  await userBean.insert(new User()
+    ..id = '2'
+    ..name = 'kleak');
+  await userBean.insert(new User()
+    ..id = '3'
+    ..name = 'lejard');
+
+  // Fetching record by primary key
+  User user = await userBean.find('1');
+  print(user);
+
+  // Updating a record
+  user.name = 'teja hackborn';
+  await userBean.update(user);
+
+  // Fetching all records
+  List<User> users = await userBean.getAll();
+  print(users);
+
+  // Remove
+  await userBean.remove('1');
+
+  users = await userBean.getAll();
+  print(users);
+
+  // Remove all
+  await userBean.removeAll();
+
+  users = await userBean.getAll();
+  print(users);
+
+  exit(0);
 }
