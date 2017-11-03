@@ -41,7 +41,7 @@ class Address {
 
   static String tableName = 'address';
 
-  String toString() => "Post($id, $userId, $street)";
+  String toString() => "Address($id, $userId, $street)";
 }
 
 @GenBean()
@@ -143,6 +143,13 @@ main() async {
 
   // Cascaded removal of One-To-One relation
   await userBean.remove('1', true);
+
+  {
+    final users = await userBean.getAll();
+    print(users);
+    final addresses = await addressBean.getAll();
+    print(addresses);
+  }
 
   // Remove addresses belonging to a User
   await addressBean.removeByUser('2');
