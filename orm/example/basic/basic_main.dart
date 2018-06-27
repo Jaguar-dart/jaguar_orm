@@ -9,7 +9,7 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-part 'basic_main.g.dart';
+part 'basic_main.jorm.dart';
 
 class User {
   @PrimaryKey()
@@ -17,7 +17,7 @@ class User {
 
   String name;
 
-  static const String tableName = '_user';
+  static const String tableName = 'usr';
 
   String toString() => "User($id, $name)";
 }

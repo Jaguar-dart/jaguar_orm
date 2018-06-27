@@ -3,7 +3,7 @@
 part of example.has_one;
 
 // **************************************************************************
-// Generator: BeanGenerator
+// BeanGenerator
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {

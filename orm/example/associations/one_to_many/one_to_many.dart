@@ -10,7 +10,7 @@ import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_orm/src/relations/relations.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-part 'one_to_many.g.dart';
+part 'one_to_many.jorm.dart';
 
 class Author {
   String id;

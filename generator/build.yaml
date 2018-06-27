@@ -1,0 +1,8 @@
+# Read about `build.yaml` at https://pub.dartlang.org/packages/build_config
+builders:
+  jaguar_orm_gen:
+    import: "package:jaguar_orm_gen/builder.dart"
+    builder_factories: ["jaguarOrm"]
+    build_extensions: {".dart": [".jorm.dart"]}
+    auto_apply: root_package
+    build_to: source

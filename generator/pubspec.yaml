@@ -1,0 +1,27 @@
+name: jaguar_orm_gen
+description: Generator for jaguar_orm
+version: 2.1.1
+authors:
+- Ravi Teja Gudapati <tejainece@gmail.com>
+- Kevin Segaud <segaud.kevin@gmail.com>
+homepage: https://github.com/Jaguar-dart/jaguar_orm
+documentation:
+
+environment:
+  sdk: '>=2.0.0-dev.55.0 <2.0.0'
+
+dependencies:
+  jaguar_query: ^2.1.1
+  jaguar_orm: ^2.1.1
+  analyzer: ^0.32.0
+  build: ^0.12.0
+  logging: ^0.11.0
+  source_gen: ">=0.8.0 <0.9.0"
+  meta: ^1.1.5
+
+dev_dependencies:
+  test: ^0.12.0
+  build_runner: ^0.9.0
+  build_test: ^0.10.0
+  collection: ^1.14.10
+  path: ^1.6.1

@@ -10,11 +10,13 @@ environment:
   sdk: '>=2.0.0-dev.55.0 <2.0.0'
 
 dependencies:
-  jaguar_query: # ^0.2.8
-    path: ../query
-  quiver: ^0.25.0
+  jaguar_query: ^2.1.1
+  quiver_hashcode: ^1.0.0
 
 dev_dependencies:
   test: ^1.0.0
   jaguar_query_postgres: # ^0.2.5
     path: ../postgres
+  build_runner: ^0.9.0
+  jaguar_orm_gen:
+    path: ../generator

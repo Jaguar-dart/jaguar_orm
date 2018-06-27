@@ -3,7 +3,7 @@
 part of example.many_to_many;
 
 // **************************************************************************
-// Generator: BeanGenerator
+// BeanGenerator
 // **************************************************************************
 
 abstract class _TodoListBean implements Bean<TodoList> {

@@ -3,7 +3,7 @@
 part of example.basic;
 
 // **************************************************************************
-// Generator: BeanGenerator
+// BeanGenerator
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {

@@ -4,7 +4,7 @@ version: 2.1.1
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
-homepage: https://github.com/Jaguar-dart/jaguar_query
+homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
 environment:

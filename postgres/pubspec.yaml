@@ -11,9 +11,7 @@ environment:
   sdk: '>=2.0.0-dev.55.0 <2.0.0'
 
 dependencies:
-  jaguar_query: # ^0.2.4
-    path: ../query
-  logging:
+  jaguar_query: ^2.1.1
   postgres: ^1.0.0-beta.1
 
 dev_dependencies:

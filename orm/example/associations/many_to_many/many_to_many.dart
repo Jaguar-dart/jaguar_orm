@@ -6,7 +6,7 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-part 'many_to_many.g.dart';
+part 'many_to_many.jorm.dart';
 
 class Category {
   @PrimaryKey(length: 50)

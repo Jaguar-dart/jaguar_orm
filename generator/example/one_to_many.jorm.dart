@@ -3,7 +3,7 @@
 part of example.one_to_many;
 
 // **************************************************************************
-// Generator: BeanGenerator
+// BeanGenerator
 // **************************************************************************
 
 abstract class _AuthorBean implements Bean<Author> {
@@ -33,8 +33,8 @@ abstract class _AuthorBean implements Bean<Author> {
 
   Future createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(name.name, length: 50);
+    st.addStr(id.name, primary: true);
+    st.addStr(name.name);
     return execCreateTable(st);
   }
 
@@ -133,16 +133,16 @@ abstract class _PostBean implements Bean<Post> {
 
   final StrField id = new StrField('id');
 
-  final StrField authorId = new StrField('author_id');
-
   final StrField message = new StrField('message');
+
+  final StrField authorId = new StrField('author_id');
 
   Post fromMap(Map map) {
     Post model = new Post();
 
     model.id = map['id'];
-    model.authorId = map['author_id'];
     model.message = map['message'];
+    model.authorId = map['author_id'];
 
     return model;
   }
@@ -151,18 +151,17 @@ abstract class _PostBean implements Bean<Post> {
     List<SetColumn> ret = [];
 
     ret.add(id.set(model.id));
-    ret.add(authorId.set(model.authorId));
     ret.add(message.set(model.message));
+    ret.add(authorId.set(model.authorId));
 
     return ret;
   }
 
   Future createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(authorId.name,
-        foreignTable: Author.tableName, foreignCol: 'id', length: 50);
-    st.addStr(message.name, length: 150);
+    st.addStr(id.name, primary: true);
+    st.addStr(message.name);
+    st.addStr(authorId.name, foreignTable: Author.tableName, foreignCol: 'id');
     return execCreateTable(st);
   }
 

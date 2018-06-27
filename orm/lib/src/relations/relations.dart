@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:quiver/core.dart';
+import 'package:quiver_hashcode/hashcode.dart';
 
 class HashableValues {
   final UnmodifiableListView items;
