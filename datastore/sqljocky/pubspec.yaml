@@ -1,0 +1,25 @@
+name: jaguar_query_sqljocky_data_store
+description: Data store implementation for MySQL
+version: 0.0.1
+authors:
+- Ravi Teja Gudapati <tejainece@gmail.com>
+homepage: https://github.com/Jaguar-dart/jaguar_query_sqljocky_data_store
+documentation:
+
+environment:
+  sdk: '>=1.20.1 <2.0.0'
+
+dependencies:
+  jaguar_data_store: ^0.1.0
+  jaguar: ^0.6.5
+  jaguar_query_data_store: ^0.2.1
+  jaguar_query: ^0.2.1
+  jaguar_json: ^0.1.2
+  jaguar_serializer: ^0.3.10
+  jaguar_sqljocky: ^0.1.0
+  jaguar_query_sqljocky: ^0.2.2
+
+dev_dependencies:
+  test:
+  ulid: ^1.0.0
+  http: ^0.11.3+13

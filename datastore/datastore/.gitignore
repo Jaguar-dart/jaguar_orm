@@ -1,6 +1,5 @@
 # Files and directories created by pub
 .packages
-.dart_tool
 .pub/
 build/
 packages

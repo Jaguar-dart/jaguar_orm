@@ -1,0 +1,28 @@
+name: jaguar_query_postgresql_data_store
+version: 0.2.1
+description: Data store implementation for PostgreSQL
+authors:
+- Ravi Teja Gudapati <tejainece@gmail.com>
+- Kevin Segaud <segaud.kevin@gmail.com>
+homepage: https://github.com/Jaguar-dart/jaguar_query_postgresql_data_store
+documentation:
+
+environment:
+  sdk: ">=1.8.0 <2.0.0"
+
+dependencies:
+  jaguar_data_store: ^0.1.0
+  jaguar: ^0.6.5
+  jaguar_query_data_store: ^0.2.0
+  jaguar_postgresql: ^0.5.2
+  jaguar_query_postgresql: ^0.2.1
+  jaguar_query: ^0.2.1
+  jaguar_json: ^0.1.2
+  jaguar_serializer: ^0.3.10
+
+  postgresql: ^0.3.4+1
+
+dev_dependencies:
+  test:
+  ulid: ^1.0.0
+  http: ^0.11.3+13

@@ -1,0 +1,20 @@
+name: jaguar_query
+description: Dialect neutral, fluent Dart DSL to build SQL/NoSQL queries
+version: 2.1.1
+authors:
+- Ravi Teja Gudapati <tejainece@gmail.com>
+- Kevin Segaud <segaud.kevin@gmail.com>
+homepage: https://github.com/Jaguar-dart/jaguar_query
+documentation:
+
+environment:
+  sdk: '>=2.0.0-dev.55.0 <2.0.0'
+
+dependencies:
+  meta:
+
+dev_dependencies:
+  test: '>=0.12.0 <0.13.0'
+  jaguar_query_postgresql:
+    path: ../postgresql
+  jaguar_serializer: ^2.1.8

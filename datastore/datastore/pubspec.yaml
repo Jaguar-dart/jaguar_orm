@@ -1,0 +1,20 @@
+name: jaguar_query_data_store
+version: 0.2.1
+description: Data store (CURD abstraction) implementation for jaguar_query
+authors:
+  - Ravi Teja Gudapati <tejainece@gmail.com>
+  - Kevin Segaud <segaud.kevin@gmail.com>
+homepage: https://github.com/Jaguar-dart/jaguar_query_data_store
+documentation:
+
+environment:
+  sdk: ">=1.8.0 <2.0.0"
+
+dependencies:
+  jaguar_data_store: ^0.1.0
+  jaguar: ^0.6.5
+  jaguar_query: ^0.2.1
+  jaguar_serializer: ^0.3.4
+
+dev_dependencies:
+  test:
