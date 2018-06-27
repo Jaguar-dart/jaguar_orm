@@ -1,12 +1,9 @@
 // Copyright (c) 2016, teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+import 'dart:io';
 import 'dart:async';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
-
-/// The adapter
-PgAdapter _adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
 // The model
 class Post {
@@ -22,6 +19,10 @@ class Post {
 
   String toString() => '$id $msg $author';
 }
+
+/// The adapter
+PgAdapter _adapter =
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 /// The bean
 class PostBean {
@@ -41,7 +42,7 @@ class PostBean {
     final st = new Create()
         .named(tableName)
         .ifNotExists()
-        .addInt('_id', primary: true, autoIncrement: true)
+        .addNullInt('_id', primary: true)
         .addNullStr('msg')
         .addNullStr('author');
 
@@ -50,11 +51,11 @@ class PostBean {
 
   /// Inserts a new post into table
   Future insert(Post post) async {
-    Insert inserter = Sql.insert(tableName)
-        .set(id, post.id)
-        .set(msg, post.msg)
-        .set(author, post.author)
-        .id('_id');
+    Insert inserter = new Insert()..into(tableName);
+
+    inserter.set(id, post.id);
+    inserter.set(msg, post.msg);
+    inserter.set(author, post.author);
 
     return await _adapter.insert(inserter);
   }
@@ -107,7 +108,7 @@ class PostBean {
   }
 
   /// Deletes a post by [id]
-  Future<int> delete(int id) async {
+  Future<int> remove(int id) async {
     Remove deleter = new Remove()..from(tableName);
 
     deleter.where(this.id.eq(id));
@@ -116,7 +117,7 @@ class PostBean {
   }
 
   /// Deletes all posts
-  Future<int> deleteAll() async {
+  Future<int> removeAll() async {
     Remove deleter = new Remove()..from(tableName);
 
     return await _adapter.remove(deleter);
@@ -129,38 +130,33 @@ main() async {
 
   final bean = new PostBean();
 
-  await _adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
-
   await bean.createTable();
 
   // Delete all
-  await bean.deleteAll();
+  await bean.removeAll();
 
   // Insert some posts
-  final id1 = await bean.insert(new Post.make(1, 'Whatever 1', 'mark'));
-  final id2 = await bean.insert(new Post.make(2, 'Whatever 2', 'bob'));
+  await bean.insert(new Post.make(1, 'Whatever 1', 'mark'));
+  await bean.insert(new Post.make(2, 'Whatever 2', 'bob'));
 
   // Find one post
-  Post post = await bean.findOne(id1);
+  Post post = await bean.findOne(1);
   print(post);
-
-  print('Fetching all:');
-  print('-------------');
 
   // Find all posts
   List<Post> posts = await bean.findAll();
   print(posts);
 
   // Update a post
-  print(await bean.update(id1, 'rowling'));
+  await bean.update(1, 'rowling');
 
   // Check that the post is updated
-  post = await bean.findOne(id1);
+  post = await bean.findOne(1);
   print(post);
 
   // Delete some posts
-  print(await bean.delete(id1));
-  print(await bean.delete(id2));
+  await bean.remove(1);
+  await bean.remove(2);
 
   // Find a post when none exists
   try {
@@ -172,4 +168,6 @@ main() async {
 
   // Close connection
   await _adapter.close();
+
+  exit(0);
 }

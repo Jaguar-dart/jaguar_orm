@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
-import 'package:jaguar_serializer/serializer.dart';
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
+import 'package:jaguar_serializer/jaguar_serializer.dart';
 
 class Author {
   int id;
@@ -54,17 +54,16 @@ class PostSerializer extends Serializer<Post> implements Mapper<Post> {
 final PostSerializer postSerializer = new PostSerializer();
 
 final PgAdapter adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/postgres');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
-Future<Null> dropTables() async {
+Future<void> dropTables() async {
   final st = new Drop()..onlyIfExists().many(['post', 'author']);
   await adapter.dropTable(st);
 }
 
-Future<Null> createTables() async {
+Future<void> createTables() async {
   {
-    await Sql
-        .create('author')
+    await Sql.create('author')
         .ifNotExists()
         .addInt('_id', primary: true, autoIncrement: true)
         .addStr('name', length: 100)
@@ -72,8 +71,7 @@ Future<Null> createTables() async {
   }
 
   {
-    await Sql
-        .create('post')
+    await Sql.create('post')
         .ifNotExists()
         .addInt('_id', primary: true, autoIncrement: true)
         .addInt('authorId', foreignTable: 'author', foreignCol: '_id')
@@ -83,8 +81,8 @@ Future<Null> createTables() async {
   }
 }
 
-Future<int> insertAuthor(String name) async =>
-    Sql.insert('author').id('_id').setString('name', 'teja').exec(adapter);
+Future<int> insertAuthor(String name) =>
+    Sql.insert('author').id('_id').setString('name', 'teja').exec<int>(adapter);
 
 Future<List<Author>> getAuthors() async =>
     (await Sql.find('author').exec(adapter).many())
@@ -111,31 +109,29 @@ Future<Author> getAuthorIdWithRelated(int id) async {
 }
 */
 
-Future<Null> removeAuthors() async {
+Future<void> removeAuthors() async {
   Remove st = Sql.remove('author');
   await adapter.remove(st);
 }
 
-Future<int> insertPost(int authorId, String message, int likes) => Sql
-    .insert('post')
-    .id('_id')
-    .setInt('authorId', authorId)
-    .setString('message', message)
-    .setInt('likes', likes)
-    .exec(adapter);
+Future<int> insertPost(int authorId, String message, int likes) =>
+    Sql.insert('post')
+        .id('_id')
+        .setInt('authorId', authorId)
+        .setString('message', message)
+        .setInt('likes', likes)
+        .exec(adapter);
 
 Future<List<Post>> getPosts() =>
     Sql.find('post').exec(adapter).manyMapped(postSerializer);
 
-Future<Post> getPostById(int id) => Sql
-    .find('post')
+Future<Post> getPostById(int id) => Sql.find('post')
     .where(col('_id').eq(id))
     .exec(adapter)
     .oneMapped(postSerializer);
 
 Future<Post> getPostByIdRelated(int id) async {
-  Find st = Sql
-      .find('post')
+  Find st = Sql.find('post')
       .sel('post.*')
       .selManyPrefixed('author', ['_id', 'name'])
       .innerJoin('author', 'author')
@@ -154,18 +150,17 @@ Future<Post> getPostByIdRelated(int id) async {
   return post;
 }
 
-Future<List<Post>> getPostsByAuthorId(int authorId) => Sql
-    .find('post')
+Future<List<Post>> getPostsByAuthorId(int authorId) => Sql.find('post')
     .where(col('authorId').eq(authorId))
     .exec(adapter)
     .manyMapped(postSerializer);
 
-Future<Null> removePosts() async {
+Future<void> removePosts() async {
   Remove st = Sql.remove('post');
   await adapter.remove(st);
 }
 
-Future<Null> getRelatedPost(Post post) async {
+Future<void> getRelatedPost(Post post) async {
   post.author = await getAuthorId(post.authorId);
 }
 

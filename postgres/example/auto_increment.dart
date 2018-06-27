@@ -2,11 +2,11 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
 /// The adapter
 PgAdapter _adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 // The model
 class Post {

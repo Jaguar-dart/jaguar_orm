@@ -441,7 +441,7 @@ class Create implements Statement {
     return this;
   }
 
-  Future<Null> exec(Adapter adapter) => adapter.createTable(this);
+  Future<void> exec(Adapter adapter) => adapter.createTable(this);
 
   QueryCreateInfo _info;
 

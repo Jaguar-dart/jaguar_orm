@@ -11,10 +11,10 @@ environment:
   sdk: '>=2.0.0-dev.55.0 <2.0.0'
 
 dependencies:
-  meta:
+  meta: ^1.1.5
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
-  jaguar_query_postgresql:
-    path: ../postgresql
+  jaguar_query_postgres:
+    path: ../postgres
   jaguar_serializer: ^2.1.8

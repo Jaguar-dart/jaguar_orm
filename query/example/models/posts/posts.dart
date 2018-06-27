@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 import 'package:jaguar_query/jaguar_query.dart';
 
 class Author {
@@ -29,8 +29,8 @@ class Post {
 }
 
 main() async {
-  PgAdapter adapter =
-      new PgAdapter('postgres://postgres:dart_jaguar@localhost/postgres');
+  final PgAdapter adapter =
+      new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
   await adapter.connect();
 
   await adapter.remove(Sql.remove(Post.tableName));
@@ -57,8 +57,7 @@ main() async {
   }
 
   {
-    final st = Sql
-        .find(Post.tableName)
+    final st = Sql.find(Post.tableName)
         .fullJoin(Author.tableName)
         .joinOn(eq('author._id', 1))
         .where(eqCol('post.authorid', col('_id', 'author')));

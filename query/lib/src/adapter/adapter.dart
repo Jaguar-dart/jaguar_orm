@@ -6,10 +6,10 @@ import 'package:jaguar_query/jaguar_query.dart';
 /// Adapter interface that must be implemented to support new databases
 abstract class Adapter<ConnType> {
   /// Makes a new connection to database
-  Future<Null> connect();
+  Future<void> connect();
 
   /// Closes the connection
-  Future<Null> close();
+  Future<void> close();
 
   ConnType get connection;
 
@@ -21,7 +21,7 @@ abstract class Adapter<ConnType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<dynamic> insert(Insert statement);
+  Future<T> insert<T>(Insert statement);
 
   /// Updates the row and returns the number of rows updated
   Future<int> update(Update statement);
@@ -30,16 +30,16 @@ abstract class Adapter<ConnType> {
   Future<int> remove(Remove statement);
 
   /// Creates the table
-  Future<Null> createTable(Create statement);
+  Future<void> createTable(Create statement);
 
   /// Create the database
-  Future<Null> createDatabase(CreateDb statement);
+  Future<void> createDatabase(CreateDb statement);
 
   /// Drops tables from database
-  Future<Null> dropTable(Drop st);
+  Future<void> dropTable(Drop st);
 
   /// Drops tables from database
-  Future<Null> dropDb(DropDb st);
+  Future<void> dropDb(DropDb st);
 }
 
 /// Used to convert [Map] to model [ModelType]

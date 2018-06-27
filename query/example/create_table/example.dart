@@ -1,5 +1,5 @@
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:jaguar_query_postgresql/composer.dart';
+import 'package:jaguar_query_postgres/composer.dart';
 
 class Post {
   String id;
@@ -18,8 +18,7 @@ class Post {
 }
 
 main() {
-  Create st = Sql
-      .create('post')
+  Create st = Sql.create('post')
       .addStr('_id', primary: true)
       .addStr('authorId', foreignTable: 'author', foreignCol: '_id')
       .addStr('author')

@@ -12,7 +12,7 @@ class CreateDb implements Statement {
     return this;
   }
 
-  Future<Null> exec(Adapter adapter) => adapter.createDatabase(this);
+  Future<void> exec(Adapter adapter) => adapter.createDatabase(this);
 }
 
 class DropDb implements Statement {
@@ -34,5 +34,5 @@ class DropDb implements Statement {
     return this;
   }
 
-  Future<Null> exec(Adapter adapter) => adapter.dropDb(this);
+  Future<void> exec(Adapter adapter) => adapter.dropDb(this);
 }

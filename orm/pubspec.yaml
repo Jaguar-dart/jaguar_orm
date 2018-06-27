@@ -16,5 +16,5 @@ dependencies:
 
 dev_dependencies:
   test: ^1.0.0
-  jaguar_query_postgresql: # ^0.2.5
-    path: ../postgresql
+  jaguar_query_postgres: # ^0.2.5
+    path: ../postgres

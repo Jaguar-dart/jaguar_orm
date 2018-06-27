@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
 part 'basic_main.g.dart';
 
@@ -28,8 +28,8 @@ class UserBean extends Bean<User> with _UserBean {
 }
 
 /// The adapter
-PgAdapter _adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+final PgAdapter _adapter =
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database

@@ -78,7 +78,7 @@ class Insert implements Statement {
     return this;
   }
 
-  Future<dynamic> exec(Adapter adapter) => adapter.insert(this);
+  Future<T> exec<T>(Adapter adapter) => adapter.insert<T>(this);
 
   QueryInsertInfo _info;
 

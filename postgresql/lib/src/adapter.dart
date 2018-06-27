@@ -5,7 +5,7 @@ library jaguar_query_postgresql.src;
 
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:postgresql/postgresql.dart' as pg;
+import 'package:postgresql2/postgresql.dart' as pg;
 import 'package:jaguar_query_postgresql/composer.dart';
 
 abstract class JaguarOrmException {}
@@ -60,17 +60,17 @@ class PgAdapter implements Adapter<pg.Connection> {
   // Finds many records in the table
   Future<Stream<Map>> find(Find st) async {
     // Convert [pg.Row] to [Map]
-    final StreamTransformer transformer = new StreamTransformer.fromHandlers(
-        handleData: (pg.Row row, EventSink<dynamic> sink) {
-      sink.add(row.toMap());
-    });
+    final StreamTransformer transformer =
+        new StreamTransformer<pg.Row, Map>.fromHandlers(
+            handleData: (pg.Row row, EventSink<dynamic> sink) =>
+                sink.add(row.toMap()));
 
     Stream<pg.Row> stream = await _connection.query(composeFind(st));
     return stream.transform(transformer);
   }
 
   /// Inserts a record into the table
-  Future<dynamic> insert(Insert st) async {
+  Future<T> insert<T>(Insert st) async {
     var result = await _connection.query(composeInsert(st)).toList();
 
     if (result.length > 0) {

@@ -1,10 +1,11 @@
-name: jaguar_query_postgresql
+name: jaguar_query_postgres
 description: postgresql adapter for jaguar_query
 version: 2.1.1
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
 homepage: http://jaguar-dart.github.io
+documentation:
 
 environment:
   sdk: '>=2.0.0-dev.55.0 <2.0.0'
@@ -13,7 +14,7 @@ dependencies:
   jaguar_query: # ^0.2.4
     path: ../query
   logging:
-  postgresql2: ^0.3.4
+  postgres: ^1.0.0-beta.1
 
 dev_dependencies:
   test: ^1.0.0

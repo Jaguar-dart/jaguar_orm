@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_orm/src/relations/relations.dart';
-import 'package:jaguar_query_postgresql/jaguar_query_postgresql.dart';
+import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
 part 'one_to_many.g.dart';
 
@@ -53,8 +53,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
         super(adapter);
 
   Future createTable() {
-    final st = Sql
-        .create(tableName)
+    final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('name', length: 50);
     return execCreateTable(st);
@@ -72,8 +71,7 @@ class PostBean extends Bean<Post> with _PostBean {
   PostBean(Adapter adapter) : super(adapter);
 
   Future createTable() {
-    final st = Sql
-        .create(tableName)
+    final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('message', length: 150)
         .addStr('author_id',
@@ -83,8 +81,8 @@ class PostBean extends Bean<Post> with _PostBean {
 }
 
 /// The adapter
-PgAdapter _adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+final PgAdapter _adapter =
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database

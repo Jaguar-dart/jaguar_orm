@@ -58,14 +58,11 @@ abstract class Bean<ModelType> {
   }
 
   /// Creates the table
-  Future<Null> execCreateTable(Create statement) async {
-    return await adapter.createTable(statement);
-  }
+  Future<void> execCreateTable(Create statement) =>
+      adapter.createTable(statement);
 
   /// Creates database
-  Future<Null> execCreateDatabase(CreateDb st) async {
-    return await adapter.createDatabase(st);
-  }
+  Future<void> execCreateDatabase(CreateDb st) => adapter.createDatabase(st);
 
   /// Fetches all rows in the table/document
   Future<List<ModelType>> getAll() async {
@@ -79,7 +76,7 @@ abstract class Bean<ModelType> {
   }
 
   /// Drops the table if it already exists
-  Future drop() {
+  Future<void> drop() {
     final st = Sql.drop(tableName).onlyIfExists();
     return adapter.dropTable(st);
   }
