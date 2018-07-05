@@ -6,18 +6,22 @@ String composeCreateColumn(final CreateColumn col) {
 
   if (col is CreateInt) {
     if (col.autoIncrement) {
-      sb.write(' SERIAL');
+      sb.write(' INTEGER AUTOINCREMENT');
     } else {
       sb.write(' INT');
     }
   } else if (col is CreateBool) {
-    sb.write(' BOOLEAN');
+    sb.write(' INT');
   } else if (col is CreateDateTime) {
-    sb.write(' TIMESTAMP');
+    sb.write(' TEXT');
   } else if (col is CreateStr) {
-    sb.write(' VARCHAR(');
-    sb.write(col.length);
-    sb.write(')');
+    if (col.length <= 0) {
+      sb.write(' TEXT');
+    } else {
+      sb.write(' CHAR(');
+      sb.write(col.length);
+      sb.write(')');
+    }
   } else {
     throw new Exception('Unknown columns to create ${col.runtimeType}!');
   }
