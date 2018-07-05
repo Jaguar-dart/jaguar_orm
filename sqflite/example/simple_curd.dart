@@ -22,7 +22,7 @@ class Post {
 }
 
 /// The adapter
-PgAdapter _adapter;
+SqfliteAdapter _adapter;
 
 /// The bean
 class PostBean {
@@ -125,7 +125,7 @@ class PostBean {
 }
 
 main() async {
-  _adapter = new PgAdapter(await getDatabasesPath());
+  _adapter = new SqfliteAdapter(await getDatabasesPath());
 
   // Connect
   await _adapter.connect();

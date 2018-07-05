@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
 
 /// The adapter
-PgAdapter _adapter;
+SqfliteAdapter _adapter;
 
 // The model
 class Post {
@@ -125,7 +125,7 @@ class PostBean {
 }
 
 main() async {
-  _adapter = new PgAdapter(await getDatabasesPath());
+  _adapter = new SqfliteAdapter(await getDatabasesPath());
 
   // Connect
   await _adapter.connect();

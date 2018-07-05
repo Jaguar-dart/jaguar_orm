@@ -1,7 +1,7 @@
 // Copyright (c) 2016, teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-/// Implements [Adapter] interface for PostgreSQL database
+/// Implements [Adapter] interface for SQLite database
 ///
 /// Contains composer to compose jaguar_query statements into PostgreSQL
 /// queries

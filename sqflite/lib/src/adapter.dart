@@ -1,7 +1,7 @@
 // Copyright (c) 2016, teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-library jaguar_query_postgresql.src;
+library jaguar_query_sqflite.src;
 
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
@@ -16,23 +16,18 @@ class NoRecordFound implements JaguarOrmException {
   String toString() => 'No record found!';
 }
 
-class PgAdapter implements Adapter<sqf.Database> {
+class SqfliteAdapter implements Adapter<sqf.Database> {
   sqf.Database _connection;
 
   final String path;
   final int version;
 
-  PgAdapter(this.path, {this.version});
+  SqfliteAdapter(this.path, {this.version});
 
-  /*
-  PgAdapter.FromConnection(pg.PostgreSQLConnection connection)
+  SqfliteAdapter.FromConnection(sqf.Database connection)
       : _connection = connection,
-        host = connection.host,
-        port = connection.port,
-        databaseName = connection.databaseName,
-        username = connection.username,
-        password = connection.password;
-        */
+        path = connection.path,
+        version = null;
 
   /// Connects to the database
   Future<void> connect() async {
