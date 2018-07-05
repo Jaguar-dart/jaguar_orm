@@ -100,4 +100,22 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     String strSt = composeDropDb(st);
     await _connection.execute(strSt);
   }
+
+  T parseValue<T>(dynamic v) {
+    if (T == String) {
+      return v;
+    } else if (T == num || T == int || T == num) {
+      return v;
+    } else if (T == DateTime) {
+      if (v == null) return null;
+      if (v is String) return DateTime.parse(v) as T;
+      if (v == int) return DateTime.fromMillisecondsSinceEpoch(v * 1000) as T;
+      return null;
+    } else if (T == bool) {
+      if (v == null) return null;
+      return (v == 0 ? false : true) as T;
+    } else {
+      throw new Exception("Invalid type $T!");
+    }
+  }
 }

@@ -25,7 +25,7 @@ String composeValue(dynamic val) {
   } else if (val is double || val is num) {
     return "$val";
   } else if (val is DateTime) {
-    return "$val"; //TODO
+    return '"$val"';
   } else if (val is bool) {
     return val ? "1" : "0";
   } else {

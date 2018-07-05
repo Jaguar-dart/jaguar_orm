@@ -98,7 +98,8 @@ class Writer {
     _w.writeln();
 
     _b.fields.values.forEach((Field field) {
-      _w.writeln("model.${field.field} = map['${camToSnak(field.colName)}'];");
+      _w.writeln(
+          "model.${field.field} = adapter.parseValue(map['${camToSnak(field.colName)}']);");
     });
 
     _w.writeln();

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.4
+
++ Using `parseValue` for parsing value from Database
+
 ## 2.1.2
 
 + Fixed bug where `BoolField` is generated as `BitField`

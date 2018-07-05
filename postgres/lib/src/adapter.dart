@@ -104,4 +104,9 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   Future<void> dropDb(DropDb st) async {
     await _connection.execute(composeDropDb(st));
   }
+
+  @override
+  T parseValue<T>(dynamic v) {
+    return v as T;
+  }
 }

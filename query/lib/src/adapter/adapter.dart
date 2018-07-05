@@ -40,6 +40,9 @@ abstract class Adapter<ConnType> {
 
   /// Drops tables from database
   Future<void> dropDb(DropDb st);
+
+  /// Parses values coming from database into Dart values
+  T parseValue<T>(dynamic v);
 }
 
 /// Used to convert [Map] to model [ModelType]
