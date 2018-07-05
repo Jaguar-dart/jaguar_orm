@@ -14,11 +14,6 @@ String composeInsert(final Insert st) {
   sb.write(info.values.values.map(composeValue).join(', '));
   sb.write(')');
 
-  if (info.id is String) {
-    sb.write(' RETURNING ');
-    sb.write(info.id);
-  }
-
   return sb.toString();
 }
 
