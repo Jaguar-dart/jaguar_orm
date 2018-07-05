@@ -27,7 +27,7 @@ String composeValue(dynamic val) {
   } else if (val is DateTime) {
     return "$val"; //TODO
   } else if (val is bool) {
-    return val ? 'TRUE' : 'FALSE';
+    return val ? "1" : "0";
   } else {
     throw new Exception("Invalid type ${val.runtimeType}!");
   }
