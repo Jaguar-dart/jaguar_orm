@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.5
+
++ Changed `NumField` to `DoubleField`
+
 ## 2.1.4
 
 + Using `parseValue` for parsing value from Database

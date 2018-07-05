@@ -172,7 +172,7 @@ String getValType(String type) {
   } else if (type == 'int') {
     return 'IntField';
   } else if (type == 'num' || type == 'double') {
-    return 'NumField';
+    return 'DoubleField';
   } else if (type == 'DateTime') {
     return 'DateTimeField';
   }
