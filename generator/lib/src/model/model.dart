@@ -168,7 +168,7 @@ String getValType(String type) {
   if (type == 'String') {
     return 'StrField';
   } else if (type == 'bool') {
-    return 'BitField';
+    return 'BoolField';
   } else if (type == 'int') {
     return 'IntField';
   } else if (type == 'num' || type == 'double') {
