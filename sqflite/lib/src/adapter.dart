@@ -104,7 +104,7 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
   T parseValue<T>(dynamic v) {
     if (T == String) {
       return v;
-    } else if (T == num || T == int || T == num) {
+    } else if (T == num || T == int || T == double) {
       return v;
     } else if (T == DateTime) {
       if (v == null) return null;

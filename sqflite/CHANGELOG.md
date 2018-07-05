@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.5
+
++ `parseValue` double parsing
+
 ## 2.1.4
 
 + Added `parseValue` to parse values from Database
