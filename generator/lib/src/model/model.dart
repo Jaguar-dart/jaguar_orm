@@ -107,7 +107,7 @@ class Field {
 
   bool get auto => false;
 
-  //TODO unique
+  // TODO unique
 
   Field(this.type, this.field, String colName,
       {this.nullable: false,

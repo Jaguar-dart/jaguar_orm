@@ -23,6 +23,7 @@ String composeInsert(final Insert st) {
 }
 
 String composeValue(dynamic val) {
+  if(val == null) return null;
   if (val is int) {
     return "$val";
   } else if (val is String) {

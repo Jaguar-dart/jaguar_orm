@@ -88,9 +88,9 @@ class SqlJockyAdapter implements Adapter<sj.ConnectionPool> {
   }
 
   /// Inserts a record into the table
-  Future<dynamic> insert(Insert st) async {
+  Future<T> insert<T>(Insert st) async {
     sj.Results result = await _connection.query(composeInsert(st));
-    return result.insertId;
+    return result.insertId as T;
   }
 
   /// Updates a record in the table
@@ -118,5 +118,10 @@ class SqlJockyAdapter implements Adapter<sj.ConnectionPool> {
   /// Drops tables from database
   Future<Null> dropTable(Drop st) async {
     await _connection.query(composeDrop(st));
+  }
+
+  @override
+  T parseValue<T>(dynamic v) {
+    return v as T;
   }
 }
