@@ -15,8 +15,8 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  sqflite:
-  jaguar_query:
+  sqflite: ^0.11.0
+  jaguar_query: ^2.1.1
 
 dev_dependencies:
   flutter_test:

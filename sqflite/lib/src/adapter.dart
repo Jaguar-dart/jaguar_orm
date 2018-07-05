@@ -75,7 +75,7 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
   /// Deletes a record from the table
   Future<int> remove(Remove st) {
     String strSt = composeRemove(st);
-    return _connection.execute(strSt);
+    return _connection.rawDelete(strSt);
   }
 
   /// Creates the table
