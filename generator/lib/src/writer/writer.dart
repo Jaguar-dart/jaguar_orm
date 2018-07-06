@@ -262,6 +262,7 @@ class Writer {
       _w.writeln('if(model.${p.property} != null) {');
       _w.writeln('newModel ??= await find(');
       _write(_b.primary.map((f) {
+        if (f.autoIncrement) return 'retId';
         return 'model.${f.field}';
       }).join(','));
       _writeln(');');

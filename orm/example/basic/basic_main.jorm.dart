@@ -13,6 +13,11 @@ abstract class _UserBean implements Bean<User> {
 
   final StrField name = new StrField('name');
 
+  Map<String, Field> get fields => {
+        id.name: id,
+        name.name: name,
+      };
+
   User fromMap(Map map) {
     User model = new User();
 
