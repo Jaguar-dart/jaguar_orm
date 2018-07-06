@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.8
+
++ Remove 'AUTOINCREMENT'
+
 ## 2.1.7
 
 + Autoincrement fix
