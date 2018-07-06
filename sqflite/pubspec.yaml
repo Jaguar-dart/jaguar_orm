@@ -1,6 +1,6 @@
 name: jaguar_query_sqflite
 description: SQFLite adapter for jaguar_query
-version: 2.1.6
+version: 2.1.7
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>

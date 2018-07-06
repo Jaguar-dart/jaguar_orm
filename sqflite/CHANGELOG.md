@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.7
+
++ Autoincrement fix
+
 ## 2.1.6
 
 + Proper number parsing

@@ -250,11 +250,11 @@ class Writer {
       return;
     }
 
-    _w.writeln('Future<Null> insert(${_b
+    _w.writeln('Future<dynamic> insert(${_b
               .modelType} model, {bool cascade: false}) async {');
     _w.write('final Insert insert = inserter');
     _w.writeln('.setMany(toSetColumns(model));');
-    _w.writeln('await execInsert(insert);');
+    _w.writeln('var retId = await execInsert(insert);');
 
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
@@ -297,6 +297,7 @@ class Writer {
       _w.writeln('}');
     }
     _w.writeln('}');
+    _w.writeln('return retId;');
     _w.writeln('}');
   }
 

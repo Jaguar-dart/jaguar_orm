@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.6
+
++ Return insert id for associations
+
 ## 2.1.5
 
 + Changed `NumField` to `DoubleField`

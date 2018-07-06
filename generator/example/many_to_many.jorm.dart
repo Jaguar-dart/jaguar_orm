@@ -18,9 +18,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   TodoList fromMap(Map map) {
     TodoList model = new TodoList();
 
-    model.id = map['id'];
-    model.id1 = map['id1'];
-    model.description = map['description'];
+    model.id = adapter.parseValue(map['id']);
+    model.id1 = adapter.parseValue(map['id1']);
+    model.description = adapter.parseValue(map['description']);
 
     return model;
   }
@@ -43,9 +43,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return execCreateTable(st);
   }
 
-  Future<Null> insert(TodoList model, {bool cascade: false}) async {
+  Future<dynamic> insert(TodoList model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    await execInsert(insert);
+    var retId = await execInsert(insert);
     if (cascade) {
       TodoList newModel;
       if (model.categories != null) {
@@ -56,6 +56,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
         }
       }
     }
+    return retId;
   }
 
   Future<int> update(TodoList model,
@@ -130,8 +131,8 @@ abstract class _CategoryBean implements Bean<Category> {
   Category fromMap(Map map) {
     Category model = new Category();
 
-    model.id = map['id'];
-    model.name = map['name'];
+    model.id = adapter.parseValue(map['id']);
+    model.name = adapter.parseValue(map['name']);
 
     return model;
   }
@@ -152,9 +153,9 @@ abstract class _CategoryBean implements Bean<Category> {
     return execCreateTable(st);
   }
 
-  Future<Null> insert(Category model, {bool cascade: false}) async {
+  Future<dynamic> insert(Category model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    await execInsert(insert);
+    var retId = await execInsert(insert);
     if (cascade) {
       Category newModel;
       if (model.todolists != null) {
@@ -165,6 +166,7 @@ abstract class _CategoryBean implements Bean<Category> {
         }
       }
     }
+    return retId;
   }
 
   Future<int> update(Category model,
@@ -241,9 +243,9 @@ abstract class _PivotBean implements Bean<Pivot> {
   Pivot fromMap(Map map) {
     Pivot model = new Pivot();
 
-    model.todolistId = map['todolist_id'];
-    model.todolistId1 = map['todolist_id1'];
-    model.categoryId = map['category_id'];
+    model.todolistId = adapter.parseValue(map['todolist_id']);
+    model.todolistId1 = adapter.parseValue(map['todolist_id1']);
+    model.categoryId = adapter.parseValue(map['category_id']);
 
     return model;
   }

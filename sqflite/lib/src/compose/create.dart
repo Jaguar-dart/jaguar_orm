@@ -6,7 +6,10 @@ String composeCreateColumn(final CreateColumn col) {
 
   if (col is CreateInt) {
     if (col.autoIncrement) {
-      sb.write(' INTEGER AUTOINCREMENT');
+      if (!col.isPrimaryKey)
+        throw new Exception(
+            'SQLite requires that AUTOINCREMENT columns are Primary keys!');
+      sb.write(' INTEGER PRIMARY KEY AUTOINCREMENT');
     } else {
       sb.write(' INT');
     }
@@ -44,7 +47,9 @@ String composeCreate(final Create create) {
   sb.write(info.columns.values.map(composeCreateColumn).join(', '));
 
   final List<CreateColumn> primaries = info.columns.values
-      .where((CreateColumn col) => col.isPrimaryKey)
+      .where((CreateColumn col) =>
+          col.isPrimaryKey &&
+          (col is! CreateInt || !(col as CreateInt).autoIncrement))
       .toList();
   if (primaries.length != 0) {
     sb.write(', PRIMARY KEY (');

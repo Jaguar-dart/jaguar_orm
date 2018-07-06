@@ -16,8 +16,8 @@ abstract class _UserBean implements Bean<User> {
   User fromMap(Map map) {
     User model = new User();
 
-    model.id = map['id'];
-    model.name = map['name'];
+    model.id = adapter.parseValue(map['id']);
+    model.name = adapter.parseValue(map['name']);
 
     return model;
   }
@@ -38,9 +38,9 @@ abstract class _UserBean implements Bean<User> {
     return execCreateTable(st);
   }
 
-  Future<Null> insert(User model, {bool cascade: false}) async {
+  Future<dynamic> insert(User model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    await execInsert(insert);
+    var retId = await execInsert(insert);
     if (cascade) {
       User newModel;
       if (model.address != null) {
@@ -49,6 +49,7 @@ abstract class _UserBean implements Bean<User> {
         await addressBean.insert(model.address);
       }
     }
+    return retId;
   }
 
   Future<int> update(User model,
@@ -135,9 +136,9 @@ abstract class _AddressBean implements Bean<Address> {
   Address fromMap(Map map) {
     Address model = new Address();
 
-    model.id = map['id'];
-    model.street = map['street'];
-    model.userId = map['user_id'];
+    model.id = adapter.parseValue(map['id']);
+    model.street = adapter.parseValue(map['street']);
+    model.userId = adapter.parseValue(map['user_id']);
 
     return model;
   }

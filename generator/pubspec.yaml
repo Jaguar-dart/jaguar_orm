@@ -1,6 +1,6 @@
 name: jaguar_orm_gen
 description: Generator for jaguar_orm
-version: 2.1.5
+version: 2.1.6
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>

@@ -16,8 +16,8 @@ abstract class _AuthorBean implements Bean<Author> {
   Author fromMap(Map map) {
     Author model = new Author();
 
-    model.id = map['id'];
-    model.name = map['name'];
+    model.id = adapter.parseValue(map['id']);
+    model.name = adapter.parseValue(map['name']);
 
     return model;
   }
@@ -38,9 +38,9 @@ abstract class _AuthorBean implements Bean<Author> {
     return execCreateTable(st);
   }
 
-  Future<Null> insert(Author model, {bool cascade: false}) async {
+  Future<dynamic> insert(Author model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    await execInsert(insert);
+    var retId = await execInsert(insert);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
@@ -51,6 +51,7 @@ abstract class _AuthorBean implements Bean<Author> {
         }
       }
     }
+    return retId;
   }
 
   Future<int> update(Author model,
@@ -140,9 +141,9 @@ abstract class _PostBean implements Bean<Post> {
   Post fromMap(Map map) {
     Post model = new Post();
 
-    model.id = map['id'];
-    model.authorId = map['author_id'];
-    model.message = map['message'];
+    model.id = adapter.parseValue(map['id']);
+    model.authorId = adapter.parseValue(map['author_id']);
+    model.message = adapter.parseValue(map['message']);
 
     return model;
   }
