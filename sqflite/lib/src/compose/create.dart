@@ -9,7 +9,7 @@ String composeCreateColumn(final CreateColumn col) {
       if (!col.isPrimaryKey)
         throw new Exception(
             'SQLite requires that AUTOINCREMENT columns are Primary keys!');
-      sb.write(' INTEGER PRIMARY KEY AUTOINCREMENT');
+      sb.write(' INTEGER PRIMARY KEY');
     } else {
       sb.write(' INT');
     }
