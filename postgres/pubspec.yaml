@@ -1,6 +1,6 @@
 name: jaguar_query_postgres
 description: postgresql adapter for jaguar_query
-version: 2.1.3
+version: 2.1.4
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -11,8 +11,8 @@ environment:
   sdk: '>=2.0.0-dev.55.0 <2.0.0'
 
 dependencies:
-  jaguar_query: ^2.1.2
+  jaguar_query: ^2.1.4
   postgres: ^1.0.0-beta.1
 
 dev_dependencies:
-  test: ^1.0.0
+  test: ^1.2.0

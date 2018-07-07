@@ -45,18 +45,15 @@ main() async {
   await userBean.createTable();
 
   // Insert a new record
-  var id = await userBean.insert(new User()
+  await userBean.insert(new User()
     ..id = '1'
     ..name = 'teja');
-  print(id);
-  id = await userBean.insert(new User()
+  await userBean.insert(new User()
     ..id = '2'
     ..name = 'kleak');
-  print(id);
-  id = await userBean.insert(new User()
+  await userBean.insert(new User()
     ..id = '3'
     ..name = 'lejard');
-  print(id);
 
   // Fetching record by primary key
   User user = await userBean.find('1');

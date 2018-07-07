@@ -13,11 +13,11 @@ abstract class _UserBean implements Bean<User> {
 
   final StrField name = new StrField('name');
 
-  Map<String, Field> get fields => {
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
         id.name: id,
         name.name: name,
       };
-
   User fromMap(Map map) {
     User model = new User();
 
@@ -27,11 +27,17 @@ abstract class _UserBean implements Bean<User> {
     return model;
   }
 
-  List<SetColumn> toSetColumns(User model, [bool update = false]) {
+  List<SetColumn> toSetColumns(User model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
-    ret.add(id.set(model.id));
-    ret.add(name.set(model.name));
+    if (only == null) {
+      ret.add(id.set(model.id));
+      ret.add(name.set(model.name));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(name.name)) ret.add(name.set(model.name));
+    }
 
     return ret;
   }
@@ -48,9 +54,10 @@ abstract class _UserBean implements Bean<User> {
     return execInsert(insert);
   }
 
-  Future<int> update(User model) async {
-    final Update update =
-        updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
+  Future<int> update(User model, {Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
     return execUpdate(update);
   }
 
@@ -58,11 +65,6 @@ abstract class _UserBean implements Bean<User> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await execFindOne(find);
-  }
-
-  Future<List<User>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
-    return await (await execFind(find)).toList();
   }
 
   Future<int> remove(String id) async {
@@ -76,9 +78,5 @@ abstract class _UserBean implements Bean<User> {
       remove.or(this.id.eq(model.id));
     }
     return execRemove(remove);
-  }
-
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
   }
 }

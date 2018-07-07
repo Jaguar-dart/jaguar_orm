@@ -43,23 +43,23 @@ abstract class Bean<ModelType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<dynamic> execInsert(Insert statement) async {
-    return await adapter.insert(statement);
-  }
+  Future<dynamic> execInsert(Insert statement) => adapter.insert(statement);
 
   /// Updates the row and returns the number of rows updated
-  Future<int> execUpdate(Update statement) async {
-    return await adapter.update(statement);
-  }
+  Future<int> execUpdate(Update statement) => adapter.update(statement);
 
   /// Deletes the requested row
-  Future<int> execRemove(Remove statement) async {
-    return await adapter.remove(statement);
-  }
+  Future<int> execRemove(Remove statement) => adapter.remove(statement);
 
   /// Creates the table
   Future<void> execCreateTable(Create statement) =>
       adapter.createTable(statement);
+
+  /// Drops the table if it already exists
+  Future<void> drop() {
+    final st = Sql.drop(tableName).onlyIfExists();
+    return adapter.dropTable(st);
+  }
 
   /// Creates database
   Future<void> execCreateDatabase(CreateDb st) => adapter.createDatabase(st);
@@ -75,16 +75,38 @@ abstract class Bean<ModelType> {
     return await adapter.remove(remover);
   }
 
-  /// Drops the table if it already exists
-  Future<void> drop() {
-    final st = Sql.drop(tableName).onlyIfExists();
-    return adapter.dropTable(st);
-  }
-
   /// Creates a model from the map
   ModelType fromMap(Map map);
 
   /// Creates list of 'set' column from model to be used in update or insert
   /// query
-  List<SetColumn> toSetColumns(ModelType model, [bool update = false]);
+  List<SetColumn> toSetColumns(ModelType model,
+      {bool update = false, Set<String> only});
+
+  Future<ModelType> findOneWhere(Expression exp) async {
+    final Find find = finder.where(exp);
+    return execFindOne(find);
+  }
+
+  Future<List<ModelType>> findWhere(Expression exp) async {
+    final Find find = finder.where(exp);
+    return await (await execFind(find)).toList();
+  }
+
+  Future<int> removeWhere(Expression exp) async {
+    return execRemove(remover.where(exp));
+  }
+
+  Map<String, Field> get fields;
+
+  Future<int> updateFields(
+      Expression where, Map<String, dynamic> values) async {
+    final st = updater.where(where);
+    for (String key in values.keys) {
+      final f = fields[key];
+      if (f == null) throw Exception('Unknown field!');
+      st.set(f, values[key]);
+    }
+    return execUpdate(st);
+  }
 }

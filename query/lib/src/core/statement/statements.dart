@@ -31,6 +31,10 @@ class SetColumn<ValType> {
     _value = value;
     return this;
   }
+
+  String get getColumn => _column;
+
+  ValType get getValue => _value;
 }
 
 abstract class Statement {}

@@ -17,14 +17,12 @@ class Cond<ValType> extends Expression {
   int get length => 1;
 
   /// Creates a 'logical and' expression of this expression and the [other]
-  @checked
   And and(Expression exp) {
     And ret = new And();
     return ret.and(this).and(exp);
   }
 
   /// Creates a 'logical or' expression of this expression and the [other]
-  @checked
   Or or(Expression exp) {
     Or ret = new Or();
     return ret.or(this).or(exp);
@@ -81,14 +79,12 @@ class CondCol<ValType> extends Expression {
   int get length => 1;
 
   /// Creates a 'logical and' expression of this expression and the [other]
-  @checked
   And and(Expression exp) {
     And ret = new And();
     return ret.and(this).and(exp);
   }
 
   /// Creates a 'logical or' expression of this expression and the [other]
-  @checked
   Or or(Expression exp) {
     Or ret = new Or();
     return ret.or(this).or(exp);

@@ -105,8 +105,6 @@ class Field {
 
   final Foreign foreign;
 
-  bool get auto => false;
-
   // TODO unique
 
   Field(this.type, this.field, String colName,

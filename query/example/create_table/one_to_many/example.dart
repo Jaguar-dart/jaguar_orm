@@ -185,7 +185,6 @@ main() async {
 
   {
     Post post = await getPostByIdRelated(post1Id);
-
     print(post);
   }
 

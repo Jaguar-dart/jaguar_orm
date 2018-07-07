@@ -33,7 +33,9 @@ class Writer {
 
     _writeTableName();
 
-    _b.fields.values.forEach(_writeFields);
+    _b.fields.values.forEach(_writeField);
+
+    _writeFieldsMap();
 
     _writeFromMap();
 
@@ -86,10 +88,20 @@ class Writer {
     _w.writeln();
   }
 
-  void _writeFields(Field field) {
+  void _writeField(Field field) {
     _writeln(
         "final ${field.vType} ${field.field} = new ${field.vType}('${camToSnak(field.colName)}');");
     _w.writeln();
+  }
+
+  void _writeFieldsMap() {
+    _w.writeln('Map<String, Field> _fields;');
+
+    _w.writeln('Map<String, Field> get fields => _fields ??= {');
+    for (Field f in _b.fields.values) {
+      _w.writeln('${f.field}.name: ${f.field},');
+    }
+    _w.writeln('};');
   }
 
   void _writeFromMap() {
@@ -165,14 +177,26 @@ class Writer {
 
   void _writeToSetColumns() {
     _w.writeln(
-        'List<SetColumn> toSetColumns(${_b.modelType} model, [bool update = false]) {');
+        'List<SetColumn> toSetColumns(${_b.modelType} model, {bool update = false, Set<String> only}) {');
     _w.writeln('List<SetColumn> ret = [];');
     _w.writeln();
+
+    _w.writeln('if(only == null) {');
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
     });
+
+    _w.writeln('} else {');
+
+    // TODO if update, don't set primary key
+    _b.fields.values.forEach((Field field) {
+      _w.writeln(
+          "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
+    });
+
+    _w.writeln('}');
 
     _w.writeln();
     _w.writeln('return ret;');
@@ -183,10 +207,8 @@ class Writer {
     _writeInsert();
     _writeUpdate();
     _writeFind();
-    _writeFindWhere();
     _writeRemove();
     _writeRemoveMany();
-    _writeRemoveWhere();
   }
 
   void _writeInsert() {
@@ -199,7 +221,7 @@ class Writer {
       return;
     }
 
-    if (_b.primary.length == 1 && _b.primary.first.auto) {
+    if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
       _w.writeln('Future<dynamic> insert(${_b
               .modelType} model, {bool cascade: false}) async {');
       _w.write('final Insert insert = inserter');
@@ -306,26 +328,27 @@ class Writer {
     if (_b.primary.length == 0) return;
 
     if (_b.preloads.length == 0) {
-      _w.writeln('Future<int> update(${_b.modelType} model) async {');
+      _w.writeln(
+          'Future<int> update(${_b.modelType} model, {Set<String> only}) async {');
       _w.write('final Update update = updater.');
       final String wheres = _b.primary
           .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
           .join('.');
       _w.write(wheres);
-      _w.writeln('.setMany(toSetColumns(model));');
+      _w.writeln('.setMany(toSetColumns(model, only: only));');
       _w.writeln('return execUpdate(update);');
       _w.writeln('}');
       return;
     }
 
     _w.writeln(
-        'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false}) async {');
+        'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only}) async {');
     _w.write('final Update update = updater.');
     final String wheres = _b.primary
         .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
         .join('.');
     _w.write(wheres);
-    _w.writeln('.setMany(toSetColumns(model));');
+    _w.writeln('.setMany(toSetColumns(model, only: only));');
     _w.writeln('final ret = execUpdate(update);');
 
     _w.writeln('if(cascade) {');
@@ -401,13 +424,6 @@ class Writer {
     } else {
       _writeln('return await execFindOne(find);');
     }
-    _writeln('}');
-  }
-
-  void _writeFindWhere() {
-    _writeln('Future<List<${_b.modelType}>> findWhere(Expression exp) async {');
-    _writeln('final Find find = finder.where(exp);');
-    _writeln('return await(await execFind(find)).toList();');
     _writeln('}');
   }
 
@@ -532,13 +548,6 @@ class Writer {
     _writeln(');');
     _w.writeln('}');
     _w.writeln('return execRemove(remove);');
-    _w.writeln('}');
-    return;
-  }
-
-  void _writeRemoveWhere() {
-    _w.writeln('Future<int> removeWhere(Expression exp) async {');
-    _w.writeln('return execRemove(remover.where(exp));');
     _w.writeln('}');
     return;
   }

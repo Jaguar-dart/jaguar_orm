@@ -2,7 +2,6 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'package:test/test.dart';
-import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
 void main() {
   group('A group of tests', () {

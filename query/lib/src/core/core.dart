@@ -7,7 +7,6 @@ import 'dart:core';
 import 'dart:core' as core;
 import 'dart:async';
 import 'dart:collection';
-import 'package:meta/meta.dart';
 
 import 'package:jaguar_query/src/operators/operators.dart' as q;
 import 'package:jaguar_query/src/adapter/adapter.dart';

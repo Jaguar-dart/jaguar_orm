@@ -13,6 +13,11 @@ abstract class _TodoListBean implements Bean<TodoList> {
 
   final StrField description = new StrField('description');
 
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        id.name: id,
+        description.name: description,
+      };
   TodoList fromMap(Map map) {
     TodoList model = new TodoList();
 
@@ -22,11 +27,18 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return model;
   }
 
-  List<SetColumn> toSetColumns(TodoList model, [bool update = false]) {
+  List<SetColumn> toSetColumns(TodoList model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
-    ret.add(id.set(model.id));
-    ret.add(description.set(model.description));
+    if (only == null) {
+      ret.add(id.set(model.id));
+      ret.add(description.set(model.description));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(description.name))
+        ret.add(description.set(model.description));
+    }
 
     return ret;
   }
@@ -55,9 +67,10 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<int> update(TodoList model,
-      {bool cascade: false, bool associate: false}) async {
-    final Update update =
-        updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
     final ret = execUpdate(update);
     if (cascade) {
       TodoList newModel;
@@ -80,11 +93,6 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return model;
   }
 
-  Future<List<TodoList>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
-    return await (await execFind(find)).toList();
-  }
-
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final TodoList newModel = await find(id);
@@ -100,10 +108,6 @@ abstract class _TodoListBean implements Bean<TodoList> {
       remove.or(this.id.eq(model.id));
     }
     return execRemove(remove);
-  }
-
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
   }
 
   Future preload(TodoList model, {bool cascade: false}) async {
@@ -123,6 +127,11 @@ abstract class _CategoryBean implements Bean<Category> {
 
   final StrField name = new StrField('name');
 
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        id.name: id,
+        name.name: name,
+      };
   Category fromMap(Map map) {
     Category model = new Category();
 
@@ -132,11 +141,17 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  List<SetColumn> toSetColumns(Category model, [bool update = false]) {
+  List<SetColumn> toSetColumns(Category model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
-    ret.add(id.set(model.id));
-    ret.add(name.set(model.name));
+    if (only == null) {
+      ret.add(id.set(model.id));
+      ret.add(name.set(model.name));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(name.name)) ret.add(name.set(model.name));
+    }
 
     return ret;
   }
@@ -165,9 +180,10 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<int> update(Category model,
-      {bool cascade: false, bool associate: false}) async {
-    final Update update =
-        updater.where(this.id.eq(model.id)).setMany(toSetColumns(model));
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
     final ret = execUpdate(update);
     if (cascade) {
       Category newModel;
@@ -190,11 +206,6 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  Future<List<Category>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
-    return await (await execFind(find)).toList();
-  }
-
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final Category newModel = await find(id);
@@ -210,10 +221,6 @@ abstract class _CategoryBean implements Bean<Category> {
       remove.or(this.id.eq(model.id));
     }
     return execRemove(remove);
-  }
-
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
   }
 
   Future preload(Category model, {bool cascade: false}) async {
@@ -233,6 +240,11 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   final StrField categoryId = new StrField('category_id');
 
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        todolistId.name: todolistId,
+        categoryId.name: categoryId,
+      };
   Pivot fromMap(Map map) {
     Pivot model = new Pivot();
 
@@ -242,11 +254,19 @@ abstract class _PivotBean implements Bean<Pivot> {
     return model;
   }
 
-  List<SetColumn> toSetColumns(Pivot model, [bool update = false]) {
+  List<SetColumn> toSetColumns(Pivot model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
-    ret.add(todolistId.set(model.todolistId));
-    ret.add(categoryId.set(model.categoryId));
+    if (only == null) {
+      ret.add(todolistId.set(model.todolistId));
+      ret.add(categoryId.set(model.categoryId));
+    } else {
+      if (only.contains(todolistId.name))
+        ret.add(todolistId.set(model.todolistId));
+      if (only.contains(categoryId.name))
+        ret.add(categoryId.set(model.categoryId));
+    }
 
     return ret;
   }
@@ -263,15 +283,6 @@ abstract class _PivotBean implements Bean<Pivot> {
   Future<dynamic> insert(Pivot model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return execInsert(insert);
-  }
-
-  Future<List<Pivot>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
-    return await (await execFind(find)).toList();
-  }
-
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,

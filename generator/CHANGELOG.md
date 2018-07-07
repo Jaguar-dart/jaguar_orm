@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.12
+
++ Added `only` to `update`
+
+## 2.1.10
+
++ Removed `findWhere` and `removeWhere`. They are now in `Bean`.
+
+## 2.1.9
+
++ Added `findOneWhere`
+
 ## 2.1.8
 
 + Autoincrement cascading

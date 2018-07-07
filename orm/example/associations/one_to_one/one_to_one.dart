@@ -86,8 +86,7 @@ main() async {
       ..address = (new Address()
         ..id = '1'
         ..street = 'Stockholm');
-    var id = await userBean.insert(user, cascade: true);
-    print(id);
+    await userBean.insert(user, cascade: true);
   }
 
   // Fetch One-To-One preloaded
