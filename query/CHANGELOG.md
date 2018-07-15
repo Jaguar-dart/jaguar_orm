@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.6
+
++ Introducing `ExpressionMaker` for where methods in `Bean`s
+
 ## 2.1.5
 
 + Added `fields` to `Bean`

@@ -3,6 +3,8 @@ library jaguar_query.bean;
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 
+typedef Expression ExpressionMaker<MT>(Bean<MT> bean);
+
 /// Interface for bean class for a model
 abstract class Bean<ModelType> {
   /// The adapter for a particular database
@@ -83,24 +85,31 @@ abstract class Bean<ModelType> {
   List<SetColumn> toSetColumns(ModelType model,
       {bool update = false, Set<String> only});
 
-  Future<ModelType> findOneWhere(Expression exp) async {
+  Future<ModelType> findOneWhere(
+      /* Expression | ExpressionMaker<ModelType> */ exp) async {
     final Find find = finder.where(exp);
     return execFindOne(find);
   }
 
-  Future<List<ModelType>> findWhere(Expression exp) async {
-    final Find find = finder.where(exp);
+  Future<List<ModelType>> findWhere(
+      /* Expression | ExpressionMaker<ModelType> */ where) async {
+    if (where is ExpressionMaker<ModelType>) where = where(this);
+    final Find find = finder.where(where);
     return await (await execFind(find)).toList();
   }
 
-  Future<int> removeWhere(Expression exp) async {
-    return execRemove(remover.where(exp));
+  Future<int> removeWhere(
+      /* Expression | ExpressionMaker<ModelType> */ where) async {
+    if (where is ExpressionMaker<ModelType>) where = where(this);
+    return execRemove(remover.where(where));
   }
 
   Map<String, Field> get fields;
 
   Future<int> updateFields(
-      Expression where, Map<String, dynamic> values) async {
+      /* Expression | ExpressionMaker<ModelType> */ where,
+      Map<String, dynamic> values) async {
+    if (where is ExpressionMaker<ModelType>) where = where(this);
     final st = updater.where(where);
     for (String key in values.keys) {
       final f = fields[key];

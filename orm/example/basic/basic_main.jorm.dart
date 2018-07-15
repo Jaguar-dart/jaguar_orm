@@ -13,16 +13,20 @@ abstract class _UserBean implements Bean<User> {
 
   final StrField name = new StrField('name');
 
+  final IntField age = new IntField('age');
+
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         name.name: name,
+        age.name: age,
       };
   User fromMap(Map map) {
     User model = new User();
 
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
+    model.age = adapter.parseValue(map['age']);
 
     return model;
   }
@@ -34,9 +38,11 @@ abstract class _UserBean implements Bean<User> {
     if (only == null) {
       ret.add(id.set(model.id));
       ret.add(name.set(model.name));
+      ret.add(age.set(model.age));
     } else {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(name.name)) ret.add(name.set(model.name));
+      if (only.contains(age.name)) ret.add(age.set(model.age));
     }
 
     return ret;
@@ -46,6 +52,7 @@ abstract class _UserBean implements Bean<User> {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true);
     st.addStr(name.name);
+    st.addInt(age.name);
     return execCreateTable(st);
   }
 
