@@ -30,7 +30,7 @@ abstract class Bean<ModelType> {
   /// Returns a list of rows found by executing [statement]
   Future<ModelType> findOne(Find statement) async {
     Map row = await adapter.findOne(statement);
-    if (row == null) return fromMap(row);
+    if (row != null) return fromMap(row);
     return null;
   }
 

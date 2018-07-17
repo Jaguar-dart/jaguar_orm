@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.9
+
++ Bug fix in `findOne`
+
 ## 2.1.8
 
 + Introducing `findOne` and `findMany`
