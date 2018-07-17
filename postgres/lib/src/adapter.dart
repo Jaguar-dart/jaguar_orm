@@ -8,14 +8,6 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:jaguar_query_postgres/composer.dart';
 
-abstract class JaguarOrmException {}
-
-class NoRecordFound implements JaguarOrmException {
-  const NoRecordFound();
-
-  String toString() => 'No record found!';
-}
-
 class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   pg.PostgreSQLConnection _connection;
 
@@ -57,25 +49,24 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
     List<Map<String, Map<String, dynamic>>> stream =
         await _connection.mappedResultsQuery(stStr);
 
-    if (stream.length == 0) {
-      throw const NoRecordFound();
-    }
+    if (stream.length == 0) return null;
 
     return stream.first.values.first;
   }
 
   // Finds many records in the table
-  Future<Stream<Map>> find(Find st) async {
+  Future<List<Map>> find(Find st) async {
     String stStr = composeFind(st);
-    List<Map<String, Map<String, dynamic>>> stream =
+    List<Map<String, Map<String, dynamic>>> list =
         await _connection.mappedResultsQuery(stStr);
 
-    return new Stream.fromIterable(stream.map((v) => v.values.first).toList());
+    return list.map((v) => v.values.first).toList();
   }
 
   /// Inserts a record into the table
   Future<T> insert<T>(Insert st) async {
-    var ret = await _connection.query(composeInsert(st));
+    String strSt = composeInsert(st);
+    var ret = await _connection.query(strSt);
     if (ret.isEmpty || ret.first.isEmpty) return null;
     return ret.first.first;
   }
@@ -98,7 +89,8 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
 
   /// Drops tables from database
   Future<void> dropTable(Drop st) async {
-    await _connection.execute(composeDrop(st));
+    String stStr = composeDrop(st);
+    await _connection.execute(stStr);
   }
 
   Future<void> dropDb(DropDb st) async {
