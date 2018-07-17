@@ -17,7 +17,7 @@ abstract class Adapter<ConnType> {
   Future<Map> findOne(Find statement);
 
   /// Returns a list of rows found by executing [statement]
-  Future<Stream<Map>> find(Find statement);
+  Future<List<Map>> find(Find statement);
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
@@ -63,10 +63,7 @@ class FindExecutor<ConnType> {
   Future<Map> one() => adapter.findOne(_st);
 
   /// Returns a row found by executing [statement]
-  Future<List<Map>> many() async => (await adapter.find(_st)).toList();
-
-  /// Returns a row found by executing [statement]
-  Future<Stream<Map>> manyStream() => adapter.find(_st);
+  Future<List<Map>> many() async => await adapter.find(_st);
 
   /// Returns a row found by executing [statement]
   Future<T> oneMapped<T>(Mapper<T> mapper) async {
@@ -77,8 +74,4 @@ class FindExecutor<ConnType> {
   /// Returns a row found by executing [statement]
   Future<List<T>> manyMapped<T>(Mapper<T> mapper) async =>
       (await adapter.find(_st)).map(mapper.fromMap).toList();
-
-  /// Returns a row found by executing [statement]
-  Future<Stream<T>> manyMappedStream<T>(Mapper<T> mapper) async =>
-      (await adapter.find(_st)).map(mapper.fromMap);
 }

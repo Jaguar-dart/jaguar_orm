@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.8
+
++ Introducing `findOne` and `findMany`
+
+### Breaking changes
+
++ Removed all `exec*` methods
+
 ## 2.1.6
 
 + Introducing `ExpressionMaker` for where methods in `Bean`s

@@ -28,34 +28,16 @@ abstract class Bean<ModelType> {
   Insert get inserter => Sql.insert(tableName);
 
   /// Returns a list of rows found by executing [statement]
-  Future<ModelType> execFindOne(Find statement) async {
+  Future<ModelType> findOne(Find statement) async {
     Map row = await adapter.findOne(statement);
-    return fromMap(row);
+    if (row == null) return fromMap(row);
+    return null;
   }
 
   /// Returns a list of rows found by executing [statement]
-  Future<Stream<ModelType>> execFind(Find statement) async {
-    StreamTransformer<Map, ModelType> transformer =
-        new StreamTransformer.fromHandlers(
-            handleData: (Map row, EventSink<ModelType> sink) {
-      sink.add(fromMap(row));
-    });
-    return (await adapter.find(statement)).transform(transformer);
+  Future<List<ModelType>> findMany(Find statement) async {
+    return (await adapter.find(statement)).map(fromMap).toList();
   }
-
-  /// Executes the insert statement and returns the primary key of
-  /// inserted row
-  Future<dynamic> execInsert(Insert statement) => adapter.insert(statement);
-
-  /// Updates the row and returns the number of rows updated
-  Future<int> execUpdate(Update statement) => adapter.update(statement);
-
-  /// Deletes the requested row
-  Future<int> execRemove(Remove statement) => adapter.remove(statement);
-
-  /// Creates the table
-  Future<void> execCreateTable(Create statement) =>
-      adapter.createTable(statement);
 
   /// Drops the table if it already exists
   Future<void> drop() {
@@ -63,19 +45,11 @@ abstract class Bean<ModelType> {
     return adapter.dropTable(st);
   }
 
-  /// Creates database
-  Future<void> execCreateDatabase(CreateDb st) => adapter.createDatabase(st);
-
   /// Fetches all rows in the table/document
-  Future<List<ModelType>> getAll() async {
-    final stream = await execFind(finder);
-    return stream.toList();
-  }
+  Future<List<ModelType>> getAll() => findMany(finder);
 
   /// Removes all rows in table/document
-  Future<int> removeAll() async {
-    return await adapter.remove(remover);
-  }
+  Future<int> removeAll() => adapter.remove(remover);
 
   /// Creates a model from the map
   ModelType fromMap(Map map);
@@ -88,20 +62,19 @@ abstract class Bean<ModelType> {
   Future<ModelType> findOneWhere(
       /* Expression | ExpressionMaker<ModelType> */ exp) async {
     final Find find = finder.where(exp);
-    return execFindOne(find);
+    return findOne(find);
   }
 
   Future<List<ModelType>> findWhere(
       /* Expression | ExpressionMaker<ModelType> */ where) async {
     if (where is ExpressionMaker<ModelType>) where = where(this);
-    final Find find = finder.where(where);
-    return await (await execFind(find)).toList();
+    return await findMany(finder.where(where));
   }
 
   Future<int> removeWhere(
       /* Expression | ExpressionMaker<ModelType> */ where) async {
     if (where is ExpressionMaker<ModelType>) where = where(this);
-    return execRemove(remover.where(where));
+    return adapter.remove(remover.where(where));
   }
 
   Map<String, Field> get fields;
@@ -116,6 +89,6 @@ abstract class Bean<ModelType> {
       if (f == null) throw Exception('Unknown field!');
       st.set(f, values[key]);
     }
-    return execUpdate(st);
+    return adapter.update(st);
   }
 }
