@@ -24,20 +24,25 @@ class BeanGenerator extends GeneratorForAnnotation<ant.GenBean> {
   @override
   Future<String> generateForAnnotatedElement(
       final Element element, ConstantReader annot, BuildStep buildStep) async {
-    if (element is! ClassElement) {
-      throw new Exception("GenBean annotation can only be defined on a class.");
+    try {
+      if (element is! ClassElement) {
+        throw new Exception(
+            "GenBean annotation can only be defined on a class.");
+      }
+
+      final String className = element.name;
+
+      print("Generating bean for $className ...");
+
+      /// Morph [ParsedBean] to [WriterInfo]
+      final WriterInfo bean = ParsedBean.detect(element);
+
+      /// Write the info
+      final writer = Writer(bean);
+
+      return writer.toString();
+    } catch (e, s) {
+      return '/*\n$e\n$s\n*/';
     }
-
-    final String className = element.name;
-
-    print("Generating bean for $className ...");
-
-    /// Morph [ParsedBean] to [WriterInfo]
-    final WriterInfo bean = ParsedBean.detect(element);
-
-    /// Write the info
-    final writer = new Writer(bean);
-
-    return writer.toString();
   }
 }

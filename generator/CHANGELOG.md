@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.14
+
++ Generate `preloadAll` for many-to-many relations
++ Do not generate tableName
+
 ## 2.1.12
 
 + Added `only` to `update`

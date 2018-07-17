@@ -31,8 +31,6 @@ class Writer {
     _w.writeln('abstract class _${_b.name} implements Bean<${_b.modelType}> {');
     _w.writeln();
 
-    _writeTableName();
-
     _b.fields.values.forEach(_writeField);
 
     _writeFieldsMap();
@@ -78,19 +76,14 @@ class Writer {
 
     _writePreloadAll();
 
-    _writePreloadBeans();
+    _writeBeans();
 
     _w.writeln('}');
   }
 
-  void _writeTableName() {
-    _w.writeln('String get tableName => ${_b.modelType}.tableName;');
-    _w.writeln();
-  }
-
   void _writeField(Field field) {
     _writeln(
-        "final ${field.vType} ${field.field} = new ${field.vType}('${camToSnak(field.colName)}');");
+        "final ${field.field} = ${field.vType}('${camToSnak(field.colName)}');");
     _w.writeln();
   }
 
@@ -120,7 +113,7 @@ class Writer {
   }
 
   void _writeCreate() {
-    _w.writeln('Future createTable() async {');
+    _w.writeln('Future<void> createTable() async {');
     _writeln('final st = Sql.create(tableName);');
     for (final Field f in _b.fields.values) {
       _write('st.add');
@@ -148,7 +141,7 @@ class Writer {
       if (f.foreign != null) {
         final foreign = f.foreign;
         if (foreign is ForeignBeaned) {
-          _write(', foreignTable: ${foreign.modelName}.tableName');
+          _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
           _write(", foreignCol: '${foreign.refCol}'");
         } else {
           throw new Exception('Unimplemented!');
@@ -171,7 +164,7 @@ class Writer {
 
       _writeln(');');
     }
-    _writeln('return execCreateTable(st);');
+    _writeln('return adapter.createTable(st);');
     _w.writeln('}');
   }
 
@@ -216,7 +209,7 @@ class Writer {
       _w.writeln('Future<dynamic> insert(${_b.modelType} model) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln('.setMany(toSetColumns(model));');
-      _w.writeln('return execInsert(insert);');
+      _w.writeln('return adapter.insert(insert);');
       _w.writeln('}');
       return;
     }
@@ -227,7 +220,7 @@ class Writer {
       _w.write('final Insert insert = inserter');
       _w.writeln(
           '.setMany(toSetColumns(model))..id(${_b.primary.first.colName});');
-      _w.writeln('final ret = await execInsert(insert);');
+      _w.writeln('final ret = await adapter.insert(insert);');
 
       _w.writeln('if(cascade) {');
       _w.writeln('${_b.modelType} newModel;');
@@ -276,7 +269,7 @@ class Writer {
               .modelType} model, {bool cascade: false}) async {');
     _w.write('final Insert insert = inserter');
     _w.writeln('.setMany(toSetColumns(model));');
-    _w.writeln('var retId = await execInsert(insert);');
+    _w.writeln('var retId = await adapter.insert(insert);');
 
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
@@ -336,7 +329,7 @@ class Writer {
           .join('.');
       _w.write(wheres);
       _w.writeln('.setMany(toSetColumns(model, only: only));');
-      _w.writeln('return execUpdate(update);');
+      _w.writeln('return adapter.update(update);');
       _w.writeln('}');
       return;
     }
@@ -349,7 +342,7 @@ class Writer {
         .join('.');
     _w.write(wheres);
     _w.writeln('.setMany(toSetColumns(model, only: only));');
-    _w.writeln('final ret = execUpdate(update);');
+    _w.writeln('final ret = adapter.update(update);');
 
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
@@ -416,13 +409,13 @@ class Writer {
     _writeln(';');
 
     if (_b.preloads.length > 0) {
-      _writeln('final ${_b.modelType} model = await execFindOne(find);');
+      _writeln('final ${_b.modelType} model = await findOne(find);');
       _writeln('if (preload) {');
       _writeln('await this.preload(model, cascade: cascade);');
       _writeln('}');
       _writeln('return model;');
     } else {
-      _writeln('return await execFindOne(find);');
+      _writeln('return await findOne(find);');
     }
     _writeln('}');
   }
@@ -442,7 +435,7 @@ class Writer {
           .join('.');
       _w.write(wheres);
       _w.writeln(';');
-      _w.writeln('return execRemove(remove);');
+      _w.writeln('return adapter.remove(remove);');
       _w.writeln('}');
       return;
     }
@@ -478,7 +471,7 @@ class Writer {
         .join('.');
     _w.write(wheres);
     _w.writeln(';');
-    _w.writeln('return execRemove(remove);');
+    _w.writeln('return adapter.remove(remove);');
     _w.writeln('}');
   }
 
@@ -505,7 +498,7 @@ class Writer {
     if (_b.preloads.length > 0) {
       if (!m.isMany) {
         _write('final ${_b.modelType} model = await ');
-        _writeln('execFindOne(find);');
+        _writeln('findOne(find);');
 
         _writeln('if (preload) {');
         _writeln('await this.preload(model, cascade: cascade);');
@@ -513,8 +506,8 @@ class Writer {
 
         _writeln('return model;');
       } else {
-        _write('final List<${_b.modelType}> models = await ');
-        _writeln('( await execFind(find)).toList();');
+        _write('final List<${_b.modelType}> models = ');
+        _writeln('await findMany(find);');
 
         _writeln('if (preload) {');
         _writeln('await this.preloadAll(models, cascade: cascade);');
@@ -523,11 +516,11 @@ class Writer {
         _writeln('return models;');
       }
     } else {
-      _write('return await ');
+      _write('return ');
       if (!m.isMany) {
-        _writeln('execFindOne(find);');
+        _writeln('findOne(find);');
       } else {
-        _writeln('( await execFind(find)).toList();');
+        _writeln('findMany(find);');
       }
     }
 
@@ -547,7 +540,7 @@ class Writer {
     _w.write(wheres);
     _writeln(');');
     _w.writeln('}');
-    _w.writeln('return execRemove(remove);');
+    _w.writeln('return adapter.remove(remove);');
     _w.writeln('}');
     return;
   }
@@ -567,7 +560,7 @@ class Writer {
     _w.write(wheres);
     _w.writeln(';');
 
-    _write('return await execRemove(rm);');
+    _write('return await adapter.remove(rm);');
     _w.writeln('}');
   }
 
@@ -590,14 +583,13 @@ class Writer {
     _writeln('}');
 
     if (_b.preloads.length > 0) {
-      _writeln(
-          'final List<${_b.modelType}> retModels = await (await execFind(find)).toList();');
+      _writeln('final List<${_b.modelType}> retModels = await findMany(find);');
       _writeln('if (preload) {');
       _writeln('await this.preloadAll(retModels, cascade: cascade);');
       _writeln('}');
       _writeln('return retModels;');
     } else {
-      _writeln('return await (await execFind(find)).toList();');
+      _writeln('return findMany(find);');
     }
 
     _w.writeln('}');
@@ -607,7 +599,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future preload(${_b.modelType} model, {bool cascade: false}) async {');
+        'Future<void> preload(${_b.modelType} model, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       _write('model.');
       _write(p.property);
@@ -637,7 +629,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
+        'Future<void> preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
@@ -645,9 +637,9 @@ class Writer {
                   .property} ??= []);');
         }
 
-        _write('await PreloadHelper.');
+        _write('await OneToXHelper.');
         // Arg1: models
-        _write('preload<${_b.modelType}, ${p.modelName}>(models, ');
+        _write('preloadAll<${_b.modelType}, ${p.modelName}>(models, ');
         // Arg2: ParentGetter
         _write('(${_b.modelType} model) => [');
         {
@@ -681,13 +673,28 @@ class Writer {
                   .property}.add(child), ');
         }
         _writeln('cascade: cascade);');
+      } else if (p is PreloadManyToMany) {
+        _writeln('for(${_b.modelType} model in models) {');
+        _writeln(
+            'var temp = await ${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
+        _writeln('if(model.${p.property} == null) model.${p.property} = temp;');
+        _writeln('else {');
+        _writeln('model.${p.property}.clear();');
+        _writeln('model.${p.property}.addAll(temp);');
+        _writeln('}');
+        _writeln('}');
       }
     }
     _writeln('}');
   }
 
-  void _writePreloadBeans() {
+  void _writeBeans() {
+    final written = Set<String>();
+
     for (Preload p in _b.preloads) {
+      if (written.contains(p.beanInstanceName)) continue;
+      written.add(p.beanInstanceName);
+
       _write(p.beanName);
       _write(' get ');
       _write(p.beanInstanceName);
@@ -703,9 +710,25 @@ class Writer {
 
     for (FindByForeignBean f in _b.getByForeign.values) {
       if (f.belongsToMany) {
+        if (written.contains(f.beanInstanceName)) continue;
+        written.add(f.beanInstanceName);
+
         _write(f.beanName);
         _write(' get ');
         _write(f.beanInstanceName);
+        _writeln(';');
+      }
+    }
+
+    for (Field f in _b.fields.values) {
+      if (f.foreign is ForeignBeaned) {
+        ForeignBeaned fb = f.foreign;
+        if (written.contains(fb.beanInstanceName)) continue;
+        written.add(fb.beanInstanceName);
+
+        _write(fb.beanName);
+        _write(' get ');
+        _write(fb.beanInstanceName);
         _writeln(';');
       }
     }

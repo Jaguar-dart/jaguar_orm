@@ -8,8 +8,13 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'package:jaguar_orm_gen/src/model/model.dart';
 
-class ParsedBean {
-  static WriterInfo detect(ClassElement clazz, {bool doRelations: true}) {
+class _BeanGetter {
+  final ConstantReader reader;
+  final DartType model;
+
+  _BeanGetter(this.reader, this.model);
+
+  static _BeanGetter get(ClassElement clazz) {
     if (!isBean.isAssignableFromType(clazz.type)) {
       throw new Exception("Beans must implement Bean interface!");
     }
@@ -23,9 +28,24 @@ class ParsedBean {
       throw new Exception("Don't support Model of type dynamic!");
     }
 
-    final genBean = new ConstantReader(clazz.metadata
+    ConstantReader reader = new ConstantReader(clazz.metadata
         .firstWhere((m) => isGenBean.isExactlyType(m.constantValue.type))
         .constantValue);
+
+    return new _BeanGetter(reader, model);
+  }
+}
+
+class ParsedBean {
+  static WriterInfo detect(ClassElement clazz, {bool doRelations: true}) {
+    ConstantReader genBean;
+    DartType model;
+
+    {
+      final getter = _BeanGetter.get(clazz);
+      genBean = getter.reader;
+      model = getter.model;
+    }
 
     final ClassElement modelClass = model.element;
 
@@ -110,6 +130,7 @@ class ParsedBean {
         if (val.primary) primaries.add(val);
       } else {
         if (isPropRelation(field)) {
+          print('here');
           preloads.add(_relation(clazz.type, field, doRelations));
         } else {
           final vf = new Field(field.type.name, field.name, field.name);
@@ -192,7 +213,7 @@ class ParsedBean {
       }
     }
 
-    final ret = new WriterInfo(clazz.name, model.name, fields, primaries,
+    final ret = WriterInfo(clazz.name, model.name, fields, primaries,
         findByForeign, {} /* TODO*/, preloads);
 
     if (doRelations) {
