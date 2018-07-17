@@ -3,41 +3,17 @@
 
 import 'dart:async';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
+import 'model.dart';
 
 /// The adapter
-PgAdapter _adapter =
-    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
-
-// The model
-class Post {
-  Post();
-
-  Post.make(this.id, this.msg, this.author);
-
-  int id;
-
-  String msg;
-
-  String author;
-
-  String toString() => '$id $msg $author';
-}
+PgAdapter adapter =
+    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 /// The bean
-class PostBean {
-  /// Field DSL for id column
-  final IntField id = new IntField('_id');
+class PostBean1 extends PostBean {
+  PostBean1(Adapter adapter) : super(adapter);
 
-  /// Field DSL for msg column
-  final StrField msg = new StrField('msg');
-
-  /// Field DSL for author column
-  final StrField author = new StrField('author');
-
-  /// Table name for the model this bean manages
-  String get tableName => 'posts';
-
-  Future<Null> createTable() async {
+  Future<void> createTable() async {
     final st = new Create()
         .named(tableName)
         .ifNotExists()
@@ -45,131 +21,68 @@ class PostBean {
         .addNullStr('msg')
         .addNullStr('author');
 
-    await _adapter.createTable(st);
+    await adapter.createTable(st);
+  }
+
+  @override
+  List<SetColumn> toSetColumns(Post model,
+      {bool update = false, Set<String> only}) {
+    final ret = <SetColumn>[];
+
+    ret.add(msg.set(model.msg));
+    ret.add(author.set(model.author));
+
+    return ret;
   }
 
   /// Inserts a new post into table
-  Future insert(Post post) async {
-    Insert inserter = Sql.insert(tableName)
-        .set(id, post.id)
-        .set(msg, post.msg)
-        .set(author, post.author)
-        .id('_id');
-
-    return await _adapter.insert(inserter);
-  }
-
-  /// Updates a post
-  Future<int> update(int id, String author) async {
-    Update updater = new Update()..into(tableName);
-    updater.where(this.id.eq(id));
-
-    updater.set(this.author, author);
-
-    return await _adapter.update(updater);
-  }
-
-  /// Finds one post by [id]
-  Future<Post> findOne(int id) async {
-    Find updater = new Find()..from(tableName);
-
-    updater.where(this.id.eq(id));
-
-    Map map = await _adapter.findOne(updater);
-
-    Post post = new Post();
-    post.id = map['_id'];
-    post.msg = map['msg'];
-    post.author = map['author'];
-
-    return post;
-  }
-
-  /// Finds all posts
-  Future<List<Post>> findAll() async {
-    Find finder = new Find()..from(tableName);
-
-    List<Map> maps = await (await _adapter.find(finder)).toList();
-
-    List<Post> posts = new List<Post>();
-
-    for (Map map in maps) {
-      Post post = new Post();
-
-      post.id = map['_id'];
-      post.msg = map['msg'];
-      post.author = map['author'];
-
-      posts.add(post);
-    }
-
-    return posts;
-  }
-
-  /// Deletes a post by [id]
-  Future<int> delete(int id) async {
-    Remove deleter = new Remove()..from(tableName);
-
-    deleter.where(this.id.eq(id));
-
-    return await _adapter.remove(deleter);
-  }
-
-  /// Deletes all posts
-  Future<int> deleteAll() async {
-    Remove deleter = new Remove()..from(tableName);
-
-    return await _adapter.remove(deleter);
+  Future<dynamic> insert(Post post) async {
+    Insert st = inserter.setMany(toSetColumns(post));
+    st.id('_id');
+    return adapter.insert(st);
   }
 }
 
 main() async {
   // Connect
-  await _adapter.connect();
+  await adapter.connect();
 
-  final bean = new PostBean();
+  final bean = PostBean1(adapter);
 
-  await _adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
+  await adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
 
   await bean.createTable();
 
-  // Delete all
-  await bean.deleteAll();
-
   // Insert some posts
-  final id1 = await bean.insert(new Post.make(1, 'Whatever 1', 'mark'));
-  final id2 = await bean.insert(new Post.make(2, 'Whatever 2', 'bob'));
+  final id1 = await bean.insert(Post.make(msg: 'Whatever 1', author: 'mark'));
+  final id2 = await bean.insert(Post.make(msg: 'Whatever 2', author: 'bob'));
 
   // Find one post
-  Post post = await bean.findOne(id1);
+  Post post = await bean.findById(id1);
   print(post);
 
   print('Fetching all:');
   print('-------------');
 
   // Find all posts
-  List<Post> posts = await bean.findAll();
+  List<Post> posts = await bean.getAll();
   print(posts);
 
   // Update a post
-  print(await bean.update(id1, 'rowling'));
+  await bean.updateAuthor(id1, 'rowling');
 
   // Check that the post is updated
-  post = await bean.findOne(id1);
+  post = await bean.findById(id1);
   print(post);
 
   // Delete some posts
-  print(await bean.delete(id1));
-  print(await bean.delete(id2));
+  await bean.remove(id1);
+  await bean.remove(id2);
 
   // Find a post when none exists
-  try {
-    post = await bean.findOne(1);
-    print(post);
-  } on JaguarOrmException catch (e) {
-    print(e);
-  }
+  post = await bean.findById(1);
+  print(post);
 
   // Close connection
-  await _adapter.close();
+  await adapter.close();
 }
