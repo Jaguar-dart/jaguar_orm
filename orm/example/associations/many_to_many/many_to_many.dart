@@ -18,8 +18,6 @@ class Category {
   @ManyToMany(PivotBean, TodoListBean)
   List<TodoList> todolists;
 
-  static const String tableName = 'category';
-
   String toString() => "Category($id, $name, $todolists)";
 }
 
@@ -33,8 +31,6 @@ class TodoList {
   @ManyToMany(PivotBean, CategoryBean)
   List<Category> categories;
 
-  static String tableName = 'todolist';
-
   String toString() => "Post($id, $description, $categories)";
 }
 
@@ -44,8 +40,6 @@ class Pivot {
 
   @BelongsToMany(CategoryBean, length: 50)
   String categoryId;
-
-  static String tableName = 'pivot';
 }
 
 @GenBean()
@@ -65,6 +59,8 @@ class TodoListBean extends Bean<TodoList> with _TodoListBean {
     _categoryBean ??= new CategoryBean(adapter);
     return _categoryBean;
   }
+
+  String get tableName => 'mtm_simple_todolist';
 }
 
 @GenBean()
@@ -77,6 +73,8 @@ class CategoryBean extends Bean<Category> with _CategoryBean {
       : pivotBean = new PivotBean(adapter),
         todoListBean = new TodoListBean(adapter),
         super(adapter);
+
+  String get tableName => 'mtm_simple_category';
 }
 
 @GenBean()
@@ -96,6 +94,8 @@ class PivotBean extends Bean<Pivot> with _PivotBean {
     _todoListBean ??= new TodoListBean(adapter);
     return _todoListBean;
   }
+
+  String get tableName => 'mtm_simple_pivot';
 }
 
 /// The adapter

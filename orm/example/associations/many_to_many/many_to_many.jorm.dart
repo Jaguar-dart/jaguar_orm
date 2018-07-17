@@ -7,11 +7,9 @@ part of example.many_to_many;
 // **************************************************************************
 
 abstract class _TodoListBean implements Bean<TodoList> {
-  String get tableName => TodoList.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
-
-  final StrField description = new StrField('description');
+  final description = StrField('description');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -43,16 +41,16 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(description.name, length: 50);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(TodoList model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    var retId = await execInsert(insert);
+    var retId = await adapter.insert(insert);
     if (cascade) {
       TodoList newModel;
       if (model.categories != null) {
@@ -71,7 +69,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    final ret = execUpdate(update);
+    final ret = adapter.update(update);
     if (cascade) {
       TodoList newModel;
       if (model.categories != null) {
@@ -86,7 +84,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
   Future<TodoList> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    final TodoList model = await execFindOne(find);
+    final TodoList model = await findOne(find);
     if (preload) {
       await this.preload(model, cascade: cascade);
     }
@@ -99,7 +97,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
       await pivotBean.detachTodoList(newModel);
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<TodoList> models) async {
@@ -107,25 +105,34 @@ abstract class _TodoListBean implements Bean<TodoList> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
-  Future preload(TodoList model, {bool cascade: false}) async {
+  Future<void> preload(TodoList model, {bool cascade: false}) async {
     model.categories = await pivotBean.fetchByTodoList(model);
   }
 
-  Future preloadAll(List<TodoList> models, {bool cascade: false}) async {}
+  Future<void> preloadAll(List<TodoList> models, {bool cascade: false}) async {
+    for (TodoList model in models) {
+      var temp = await pivotBean.fetchByTodoList(model);
+      if (model.categories == null)
+        model.categories = temp;
+      else {
+        model.categories.clear();
+        model.categories.addAll(temp);
+      }
+    }
+  }
+
   PivotBean get pivotBean;
 
   CategoryBean get categoryBean;
 }
 
 abstract class _CategoryBean implements Bean<Category> {
-  String get tableName => Category.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
-
-  final StrField name = new StrField('name');
+  final name = StrField('name');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -156,16 +163,16 @@ abstract class _CategoryBean implements Bean<Category> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(name.name, length: 50);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Category model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    var retId = await execInsert(insert);
+    var retId = await adapter.insert(insert);
     if (cascade) {
       Category newModel;
       if (model.todolists != null) {
@@ -184,7 +191,7 @@ abstract class _CategoryBean implements Bean<Category> {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    final ret = execUpdate(update);
+    final ret = adapter.update(update);
     if (cascade) {
       Category newModel;
       if (model.todolists != null) {
@@ -199,7 +206,7 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<Category> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Category model = await execFindOne(find);
+    final Category model = await findOne(find);
     if (preload) {
       await this.preload(model, cascade: cascade);
     }
@@ -212,7 +219,7 @@ abstract class _CategoryBean implements Bean<Category> {
       await pivotBean.detachCategory(newModel);
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<Category> models) async {
@@ -220,25 +227,34 @@ abstract class _CategoryBean implements Bean<Category> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
-  Future preload(Category model, {bool cascade: false}) async {
+  Future<void> preload(Category model, {bool cascade: false}) async {
     model.todolists = await pivotBean.fetchByCategory(model);
   }
 
-  Future preloadAll(List<Category> models, {bool cascade: false}) async {}
+  Future<void> preloadAll(List<Category> models, {bool cascade: false}) async {
+    for (Category model in models) {
+      var temp = await pivotBean.fetchByCategory(model);
+      if (model.todolists == null)
+        model.todolists = temp;
+      else {
+        model.todolists.clear();
+        model.todolists.addAll(temp);
+      }
+    }
+  }
+
   PivotBean get pivotBean;
 
   TodoListBean get todoListBean;
 }
 
 abstract class _PivotBean implements Bean<Pivot> {
-  String get tableName => Pivot.tableName;
+  final todolistId = StrField('todolist_id');
 
-  final StrField todolistId = new StrField('todolist_id');
-
-  final StrField categoryId = new StrField('category_id');
+  final categoryId = StrField('category_id');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -271,40 +287,40 @@ abstract class _PivotBean implements Bean<Pivot> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(todolistId.name,
-        foreignTable: TodoList.tableName, foreignCol: 'id', length: 50);
+        foreignTable: todoListBean.tableName, foreignCol: 'id', length: 50);
     st.addStr(categoryId.name,
-        foreignTable: Category.tableName, foreignCol: 'id', length: 50);
-    return execCreateTable(st);
+        foreignTable: categoryBean.tableName, foreignCol: 'id', length: 50);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Pivot model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    return execInsert(insert);
+    return adapter.insert(insert);
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.todolistId.eq(todolistId));
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   Future<List<Pivot>> findByCategory(String categoryId,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.categoryId.eq(categoryId));
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   Future<int> removeByTodoList(String todolistId) async {
     final Remove rm = remover.where(this.todolistId.eq(todolistId));
-    return await execRemove(rm);
+    return await adapter.remove(rm);
   }
 
   Future<int> removeByCategory(String categoryId) async {
     final Remove rm = remover.where(this.categoryId.eq(categoryId));
-    return await execRemove(rm);
+    return await adapter.remove(rm);
   }
 
   Future<List<Pivot>> findByTodoListList(List<TodoList> models,
@@ -313,7 +329,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     for (TodoList model in models) {
       find.or(this.todolistId.eq(model.id));
     }
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   Future<List<Pivot>> findByCategoryList(List<Category> models,
@@ -322,7 +338,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     for (Category model in models) {
       find.or(this.categoryId.eq(model.id));
     }
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   void associateTodoList(Pivot child, TodoList parent) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.6
+
++ Improvements to relations helper
+
+## 2.1.5
+
++ Added `name` to `GenBean`
+
 ## 2.1.2
 
 + Upgraded to `jaguar_query` `2.1.5`

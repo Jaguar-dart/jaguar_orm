@@ -7,11 +7,9 @@ part of example.has_one;
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  String get tableName => User.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
-
-  final StrField name = new StrField('name');
+  final name = StrField('name');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -42,16 +40,16 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(name.name, length: 50);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(User model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    var retId = await execInsert(insert);
+    var retId = await adapter.insert(insert);
     if (cascade) {
       User newModel;
       if (model.address != null) {
@@ -68,7 +66,7 @@ abstract class _UserBean implements Bean<User> {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    final ret = execUpdate(update);
+    final ret = adapter.update(update);
     if (cascade) {
       User newModel;
       if (model.address != null) {
@@ -85,7 +83,7 @@ abstract class _UserBean implements Bean<User> {
   Future<User> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    final User model = await execFindOne(find);
+    final User model = await findOne(find);
     if (preload) {
       await this.preload(model, cascade: cascade);
     }
@@ -98,7 +96,7 @@ abstract class _UserBean implements Bean<User> {
       await addressBean.removeByUser(newModel.id);
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<User> models) async {
@@ -106,16 +104,16 @@ abstract class _UserBean implements Bean<User> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
-  Future preload(User model, {bool cascade: false}) async {
+  Future<void> preload(User model, {bool cascade: false}) async {
     model.address = await addressBean.findByUser(model.id,
         preload: cascade, cascade: cascade);
   }
 
-  Future preloadAll(List<User> models, {bool cascade: false}) async {
-    await PreloadHelper.preload<User, Address>(
+  Future<void> preloadAll(List<User> models, {bool cascade: false}) async {
+    await OneToXHelper.preloadAll<User, Address>(
         models,
         (User model) => [model.id],
         addressBean.findByUserList,
@@ -128,13 +126,11 @@ abstract class _UserBean implements Bean<User> {
 }
 
 abstract class _AddressBean implements Bean<Address> {
-  String get tableName => Address.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
+  final street = StrField('street');
 
-  final StrField street = new StrField('street');
-
-  final StrField userId = new StrField('user_id');
+  final userId = StrField('user_id');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -169,35 +165,35 @@ abstract class _AddressBean implements Bean<Address> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(street.name, length: 150);
-    st.addStr(userId.name, foreignTable: User.tableName, foreignCol: 'id');
-    return execCreateTable(st);
+    st.addStr(userId.name, foreignTable: userBean.tableName, foreignCol: 'id');
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Address model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    return execInsert(insert);
+    return adapter.insert(insert);
   }
 
   Future<int> update(Address model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    return execUpdate(update);
+    return adapter.update(update);
   }
 
   Future<Address> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await execFindOne(find);
+    return await findOne(find);
   }
 
   Future<int> remove(String id) async {
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<Address> models) async {
@@ -205,18 +201,18 @@ abstract class _AddressBean implements Bean<Address> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<Address> findByUser(String userId,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.userId.eq(userId));
-    return await execFindOne(find);
+    return findOne(find);
   }
 
   Future<int> removeByUser(String userId) async {
     final Remove rm = remover.where(this.userId.eq(userId));
-    return await execRemove(rm);
+    return await adapter.remove(rm);
   }
 
   Future<List<Address>> findByUserList(List<User> models,
@@ -225,10 +221,12 @@ abstract class _AddressBean implements Bean<Address> {
     for (User model in models) {
       find.or(this.userId.eq(model.id));
     }
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   void associateUser(Address child, User parent) {
     child.userId = parent.id;
   }
+
+  UserBean get userBean;
 }

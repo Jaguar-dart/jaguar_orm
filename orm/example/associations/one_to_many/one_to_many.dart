@@ -19,8 +19,6 @@ class Author {
 
   List<Post> posts;
 
-  static const String tableName = 'author';
-
   String toString() => "Author($id, $name, $posts)";
 }
 
@@ -30,8 +28,6 @@ class Post {
   String message;
 
   String authorId;
-
-  static String tableName = 'post';
 
   String toString() => "Post($id, $authorId, $message)";
 }
@@ -56,8 +52,10 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
     final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('name', length: 50);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
+
+  String get tableName => 'otm_simple_author';
 }
 
 @GenBean(
@@ -68,6 +66,9 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
   },
 )
 class PostBean extends Bean<Post> with _PostBean {
+  AuthorBean _authorBean;
+  AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);
+
   PostBean(Adapter adapter) : super(adapter);
 
   Future createTable() {
@@ -75,9 +76,11 @@ class PostBean extends Bean<Post> with _PostBean {
         .addStr('id', primary: true, length: 50)
         .addStr('message', length: 150)
         .addStr('author_id',
-            length: 50, foreignTable: Author.tableName, foreignCol: 'id');
-    return execCreateTable(st);
+            length: 50, foreignTable: authorBean.tableName, foreignCol: 'id');
+    return adapter.createTable(st);
   }
+
+  String get tableName => 'otm_simple_post';
 }
 
 /// The adapter

@@ -1,19 +1,17 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of example.basic;
+part of 'simple.dart';
 
 // **************************************************************************
 // BeanGenerator
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  String get tableName => User.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
+  final name = StrField('name');
 
-  final StrField name = new StrField('name');
-
-  final IntField age = new IntField('age');
+  final age = IntField('age');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -48,35 +46,35 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true);
     st.addStr(name.name);
     st.addInt(age.name);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(User model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    return execInsert(insert);
+    return adapter.insert(insert);
   }
 
   Future<int> update(User model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    return execUpdate(update);
+    return adapter.update(update);
   }
 
   Future<User> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await execFindOne(find);
+    return await findOne(find);
   }
 
   Future<int> remove(String id) async {
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<User> models) async {
@@ -84,6 +82,6 @@ abstract class _UserBean implements Bean<User> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 }

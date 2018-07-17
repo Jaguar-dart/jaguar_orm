@@ -7,11 +7,9 @@ part of example.one_to_many;
 // **************************************************************************
 
 abstract class _AuthorBean implements Bean<Author> {
-  String get tableName => Author.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
-
-  final StrField name = new StrField('name');
+  final name = StrField('name');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -42,16 +40,16 @@ abstract class _AuthorBean implements Bean<Author> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(name.name, length: 50);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Author model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    var retId = await execInsert(insert);
+    var retId = await adapter.insert(insert);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
@@ -70,7 +68,7 @@ abstract class _AuthorBean implements Bean<Author> {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    final ret = execUpdate(update);
+    final ret = adapter.update(update);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
@@ -89,7 +87,7 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<Author> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Author model = await execFindOne(find);
+    final Author model = await findOne(find);
     if (preload) {
       await this.preload(model, cascade: cascade);
     }
@@ -102,7 +100,7 @@ abstract class _AuthorBean implements Bean<Author> {
       await postBean.removeByAuthor(newModel.id);
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<Author> models) async {
@@ -110,17 +108,17 @@ abstract class _AuthorBean implements Bean<Author> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
-  Future preload(Author model, {bool cascade: false}) async {
+  Future<void> preload(Author model, {bool cascade: false}) async {
     model.posts = await postBean.findByAuthor(model.id,
         preload: cascade, cascade: cascade);
   }
 
-  Future preloadAll(List<Author> models, {bool cascade: false}) async {
+  Future<void> preloadAll(List<Author> models, {bool cascade: false}) async {
     models.forEach((Author model) => model.posts ??= []);
-    await PreloadHelper.preload<Author, Post>(
+    await OneToXHelper.preloadAll<Author, Post>(
         models,
         (Author model) => [model.id],
         postBean.findByAuthorList,
@@ -133,13 +131,11 @@ abstract class _AuthorBean implements Bean<Author> {
 }
 
 abstract class _PostBean implements Bean<Post> {
-  String get tableName => Post.tableName;
+  final id = StrField('id');
 
-  final StrField id = new StrField('id');
+  final authorId = StrField('author_id');
 
-  final StrField authorId = new StrField('author_id');
-
-  final StrField message = new StrField('message');
+  final message = StrField('message');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -174,36 +170,36 @@ abstract class _PostBean implements Bean<Post> {
     return ret;
   }
 
-  Future createTable() async {
+  Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(id.name, primary: true, length: 50);
     st.addStr(authorId.name,
-        foreignTable: Author.tableName, foreignCol: 'id', length: 50);
+        foreignTable: authorBean.tableName, foreignCol: 'id', length: 50);
     st.addStr(message.name, length: 150);
-    return execCreateTable(st);
+    return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Post model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
-    return execInsert(insert);
+    return adapter.insert(insert);
   }
 
   Future<int> update(Post model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
-    return execUpdate(update);
+    return adapter.update(update);
   }
 
   Future<Post> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await execFindOne(find);
+    return await findOne(find);
   }
 
   Future<int> remove(String id) async {
     final Remove remove = remover.where(this.id.eq(id));
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<int> removeMany(List<Post> models) async {
@@ -211,18 +207,18 @@ abstract class _PostBean implements Bean<Post> {
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return execRemove(remove);
+    return adapter.remove(remove);
   }
 
   Future<List<Post>> findByAuthor(String authorId,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.authorId.eq(authorId));
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   Future<int> removeByAuthor(String authorId) async {
     final Remove rm = remover.where(this.authorId.eq(authorId));
-    return await execRemove(rm);
+    return await adapter.remove(rm);
   }
 
   Future<List<Post>> findByAuthorList(List<Author> models,
@@ -231,10 +227,12 @@ abstract class _PostBean implements Bean<Post> {
     for (Author model in models) {
       find.or(this.authorId.eq(model.id));
     }
-    return await (await execFind(find)).toList();
+    return findMany(find);
   }
 
   void associateAuthor(Post child, Author parent) {
     child.authorId = parent.id;
   }
+
+  AuthorBean get authorBean;
 }
