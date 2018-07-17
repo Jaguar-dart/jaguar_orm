@@ -8,14 +8,6 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:sqflite/sqflite.dart' as sqf;
 import 'package:jaguar_query_sqflite/composer.dart';
 
-abstract class JaguarOrmException {}
-
-class NoRecordFound implements JaguarOrmException {
-  const NoRecordFound();
-
-  String toString() => 'No record found!';
-}
-
 class SqfliteAdapter implements Adapter<sqf.Database> {
   sqf.Database _connection;
 
@@ -46,18 +38,15 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     String stStr = composeFind(st);
     List<Map<String, dynamic>> stream = await _connection.rawQuery(stStr);
 
-    if (stream.length == 0) {
-      throw const NoRecordFound();
-    }
+    if (stream.length == 0) return null;
 
     return stream.first;
   }
 
   // Finds many records in the table
-  Future<Stream<Map>> find(Find st) async {
+  Future<List<Map>> find(Find st) async {
     String stStr = composeFind(st);
-    List<Map<String, dynamic>> stream = await _connection.rawQuery(stStr);
-    return Stream.fromIterable(stream);
+    return _connection.rawQuery(stStr);
   }
 
   /// Inserts a record into the table

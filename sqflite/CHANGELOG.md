@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.10
+
++ Removed `NoRecordFound` exception
+
+## 2.1.9
+
++ `find` now returns `List`
+
 ## 2.1.8
 
 + Remove 'AUTOINCREMENT'

@@ -161,12 +161,8 @@ main() async {
   await bean.remove(2);
 
   // Find a post when none exists
-  try {
-    post = await bean.findOne(1);
-    print(post);
-  } on JaguarOrmException catch (e) {
-    print(e);
-  }
+  post = await bean.findOne(1);
+  print(post);
 
   // Close connection
   await _adapter.close();
