@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.10
+
++ Bug fixes
+
 ## 2.1.9
 
 + Bug fix in `findOne`

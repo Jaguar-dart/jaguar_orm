@@ -95,7 +95,7 @@ class CreateInt extends CreateColumn<int> {
   bool get autoIncrement => _autoIncrement;
 }
 
-class CreateDouble extends CreateColumn<int> {
+class CreateDouble extends CreateColumn<double> {
   bool _nullable = false;
 
   String _colName;
@@ -184,7 +184,7 @@ class CreateBool extends CreateColumn<bool> {
   Unique get unique => _unique;
 }
 
-class CreateDateTime extends CreateColumn<bool> {
+class CreateDateTime extends CreateColumn<DateTime> {
   bool _nullable = false;
 
   String _colName;
@@ -280,7 +280,7 @@ class Create implements Statement {
   bool _ifNotExists = false;
 
   Create() {
-    _info = new QueryCreateInfo(this);
+    _info = QueryCreateInfo(this);
   }
 
   Create named(String tableName) {
@@ -452,8 +452,7 @@ class QueryCreateInfo {
   final Create _inner;
 
   QueryCreateInfo(this._inner)
-      : columns =
-            new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
+      : columns = UnmodifiableMapView<String, CreateColumn>(_inner._columns);
 
   String get tableName => _inner._tableName;
 
