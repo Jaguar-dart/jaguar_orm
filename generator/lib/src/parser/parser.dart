@@ -326,7 +326,7 @@ class ParsedBean {
       final DartType bean = obj.getField('bean').toTypeValue();
 
       if (!isBean.isAssignableFromType(bean)) {
-        throw Exception("Non-bean type provided!");
+        throw new Exception("Non-bean type provided!");
       }
 
       BelongsToAssociation g;
@@ -335,7 +335,7 @@ class ParsedBean {
             new ParsedBean(bean.element, doRelations: false).detect();
         g = info.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation)
-          throw Exception('Association $bean not found! Field ${f.name}.');
+          throw new Exception('Association $bean not found! Field ${f.name}.');
       }
 
       final bool hasMany = isHasMany.isExactlyType(obj.type);
@@ -347,11 +347,11 @@ class ParsedBean {
       final DartType target = obj.getField('targetBean').toTypeValue();
 
       if (!isBean.isAssignableFromType(pivot)) {
-        throw Exception("Non-bean type provided!");
+        throw new Exception("Non-bean type provided!");
       }
 
       if (!isBean.isAssignableFromType(target)) {
-        throw Exception("Non-bean type provided!");
+        throw new Exception("Non-bean type provided!");
       }
 
       BelongsToAssociation g;
@@ -360,7 +360,7 @@ class ParsedBean {
             new ParsedBean(pivot.element, doRelations: false).detect();
         g = beanInfo.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation) {
-          throw Exception('Association $curBean not found! Field ${f.name}.');
+          throw new Exception('Association $curBean not found! Field ${f.name}.');
         }
         final WriterInfo targetInfo =
             new ParsedBean(target.element, doRelations: false).detect();
@@ -396,7 +396,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     final String table = obj.getField('table').toStringValue();
     final String refCol = obj.getField('refCol').toStringValue();
 
-    Foreign fore = TableForeign(table, refCol);
+    Foreign fore = new TableForeign(table, refCol);
 
     return new Field(f.type.name, f.name, colName,
         nullable: nullable,
@@ -410,7 +410,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     final bool toMany = obj.getField('toMany').toBoolValue();
 
     if (!isBean.isAssignableFromType(bean)) {
-      throw Exception("Non-bean type provided!");
+      throw new Exception("Non-bean type provided!");
     }
 
     Foreign fore = new BelongsToForeign(bean, refCol, byHasMany, toMany);
@@ -421,5 +421,5 @@ Field parseColumn(FieldElement f, DartObject obj) {
         length: length);
   }
 
-  throw FieldException(f.name, 'Invalid ColumnBase type!');
+  throw new FieldException(f.name, 'Invalid ColumnBase type!');
 }
