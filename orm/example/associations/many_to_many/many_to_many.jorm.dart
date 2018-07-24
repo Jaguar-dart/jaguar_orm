@@ -7,10 +7,8 @@ part of example.many_to_many;
 // **************************************************************************
 
 abstract class _TodoListBean implements Bean<TodoList> {
-  final id = StrField('id');
-
-  final description = StrField('description');
-
+  final id = new StrField('id');
+  final description = new StrField('description');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -130,10 +128,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
 }
 
 abstract class _CategoryBean implements Bean<Category> {
-  final id = StrField('id');
-
-  final name = StrField('name');
-
+  final id = new StrField('id');
+  final name = new StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -252,10 +248,8 @@ abstract class _CategoryBean implements Bean<Category> {
 }
 
 abstract class _PivotBean implements Bean<Pivot> {
-  final todolistId = StrField('todolist_id');
-
-  final categoryId = StrField('category_id');
-
+  final todolistId = new StrField('todolist_id');
+  final categoryId = new StrField('category_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         todolistId.name: todolistId,
@@ -307,22 +301,6 @@ abstract class _PivotBean implements Bean<Pivot> {
     return findMany(find);
   }
 
-  Future<List<Pivot>> findByCategory(String categoryId,
-      {bool preload: false, bool cascade: false}) async {
-    final Find find = finder.where(this.categoryId.eq(categoryId));
-    return findMany(find);
-  }
-
-  Future<int> removeByTodoList(String todolistId) async {
-    final Remove rm = remover.where(this.todolistId.eq(todolistId));
-    return await adapter.remove(rm);
-  }
-
-  Future<int> removeByCategory(String categoryId) async {
-    final Remove rm = remover.where(this.categoryId.eq(categoryId));
-    return await adapter.remove(rm);
-  }
-
   Future<List<Pivot>> findByTodoListList(List<TodoList> models,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder;
@@ -332,21 +310,13 @@ abstract class _PivotBean implements Bean<Pivot> {
     return findMany(find);
   }
 
-  Future<List<Pivot>> findByCategoryList(List<Category> models,
-      {bool preload: false, bool cascade: false}) async {
-    final Find find = finder;
-    for (Category model in models) {
-      find.or(this.categoryId.eq(model.id));
-    }
-    return findMany(find);
+  Future<int> removeByTodoList(String todolistId) async {
+    final Remove rm = remover.where(this.todolistId.eq(todolistId));
+    return await adapter.remove(rm);
   }
 
   void associateTodoList(Pivot child, TodoList parent) {
     child.todolistId = parent.id;
-  }
-
-  void associateCategory(Pivot child, Category parent) {
-    child.categoryId = parent.id;
   }
 
   Future<int> detachTodoList(TodoList model) async {
@@ -359,6 +329,39 @@ abstract class _PivotBean implements Bean<Pivot> {
     return await categoryBean.removeWhere(exp);
   }
 
+  Future<List<Category>> fetchByTodoList(TodoList model) async {
+    final pivots = await findByTodoList(model.id);
+    final exp = new Or();
+    for (final t in pivots) {
+      exp.or(categoryBean.id.eq(t.categoryId));
+    }
+    return await categoryBean.findWhere(exp);
+  }
+
+  Future<List<Pivot>> findByCategory(String categoryId,
+      {bool preload: false, bool cascade: false}) async {
+    final Find find = finder.where(this.categoryId.eq(categoryId));
+    return findMany(find);
+  }
+
+  Future<List<Pivot>> findByCategoryList(List<Category> models,
+      {bool preload: false, bool cascade: false}) async {
+    final Find find = finder;
+    for (Category model in models) {
+      find.or(this.categoryId.eq(model.id));
+    }
+    return findMany(find);
+  }
+
+  Future<int> removeByCategory(String categoryId) async {
+    final Remove rm = remover.where(this.categoryId.eq(categoryId));
+    return await adapter.remove(rm);
+  }
+
+  void associateCategory(Pivot child, Category parent) {
+    child.categoryId = parent.id;
+  }
+
   Future<int> detachCategory(Category model) async {
     final dels = await findByCategory(model.id);
     await removeByCategory(model.id);
@@ -367,15 +370,6 @@ abstract class _PivotBean implements Bean<Pivot> {
       exp.or(todoListBean.id.eq(t.todolistId));
     }
     return await todoListBean.removeWhere(exp);
-  }
-
-  Future<List<Category>> fetchByTodoList(TodoList model) async {
-    final pivots = await findByTodoList(model.id);
-    final exp = new Or();
-    for (final t in pivots) {
-      exp.or(categoryBean.id.eq(t.categoryId));
-    }
-    return await categoryBean.findWhere(exp);
   }
 
   Future<List<TodoList>> fetchByCategory(Category model) async {

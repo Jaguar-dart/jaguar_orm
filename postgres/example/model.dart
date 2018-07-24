@@ -19,13 +19,13 @@ class Post {
 /// The bean
 class PostBean extends Bean<Post> {
   /// Field DSL for id column
-  final IntField id = IntField('_id');
+  final IntField id = new IntField('_id');
 
   /// Field DSL for msg column
-  final StrField msg = StrField('msg');
+  final StrField msg = new StrField('msg');
 
   /// Field DSL for author column
-  final StrField author = StrField('author');
+  final StrField author = new StrField('author');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -53,7 +53,7 @@ class PostBean extends Bean<Post> {
   String get tableName => 'posts';
 
   Post fromMap(Map map) {
-    Post post = Post();
+    var post = new Post();
 
     post.id = map['_id'];
     post.msg = map['msg'];

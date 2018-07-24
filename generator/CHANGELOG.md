@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.15
+
++ Relations without associations
+
 ## 2.1.14
 
 + Generate `preloadAll` for many-to-many relations

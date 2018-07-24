@@ -7,10 +7,8 @@ part of example.has_one;
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  final id = StrField('id');
-
-  final name = StrField('name');
-
+  final id = new StrField('id');
+  final name = new StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -126,12 +124,9 @@ abstract class _UserBean implements Bean<User> {
 }
 
 abstract class _AddressBean implements Bean<Address> {
-  final id = StrField('id');
-
-  final street = StrField('street');
-
-  final userId = StrField('user_id');
-
+  final id = new StrField('id');
+  final street = new StrField('street');
+  final userId = new StrField('user_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -210,11 +205,6 @@ abstract class _AddressBean implements Bean<Address> {
     return findOne(find);
   }
 
-  Future<int> removeByUser(String userId) async {
-    final Remove rm = remover.where(this.userId.eq(userId));
-    return await adapter.remove(rm);
-  }
-
   Future<List<Address>> findByUserList(List<User> models,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder;
@@ -222,6 +212,11 @@ abstract class _AddressBean implements Bean<Address> {
       find.or(this.userId.eq(model.id));
     }
     return findMany(find);
+  }
+
+  Future<int> removeByUser(String userId) async {
+    final Remove rm = remover.where(this.userId.eq(userId));
+    return await adapter.remove(rm);
   }
 
   void associateUser(Address child, User parent) {

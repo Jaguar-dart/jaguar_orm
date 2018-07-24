@@ -7,10 +7,8 @@ part of example.one_to_many;
 // **************************************************************************
 
 abstract class _AuthorBean implements Bean<Author> {
-  final id = StrField('id');
-
-  final name = StrField('name');
-
+  final id = new StrField('id');
+  final name = new StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -131,12 +129,9 @@ abstract class _AuthorBean implements Bean<Author> {
 }
 
 abstract class _PostBean implements Bean<Post> {
-  final id = StrField('id');
-
-  final authorId = StrField('author_id');
-
-  final message = StrField('message');
-
+  final id = new StrField('id');
+  final authorId = new StrField('author_id');
+  final message = new StrField('message');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -216,11 +211,6 @@ abstract class _PostBean implements Bean<Post> {
     return findMany(find);
   }
 
-  Future<int> removeByAuthor(String authorId) async {
-    final Remove rm = remover.where(this.authorId.eq(authorId));
-    return await adapter.remove(rm);
-  }
-
   Future<List<Post>> findByAuthorList(List<Author> models,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder;
@@ -228,6 +218,11 @@ abstract class _PostBean implements Bean<Post> {
       find.or(this.authorId.eq(model.id));
     }
     return findMany(find);
+  }
+
+  Future<int> removeByAuthor(String authorId) async {
+    final Remove rm = remover.where(this.authorId.eq(authorId));
+    return await adapter.remove(rm);
   }
 
   void associateAuthor(Post child, Author parent) {

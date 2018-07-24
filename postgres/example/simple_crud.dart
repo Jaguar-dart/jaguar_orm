@@ -7,19 +7,19 @@ import 'model.dart';
 
 /// The adapter
 PgAdapter adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect
   await adapter.connect();
 
-  final bean = PostBean(adapter);
+  final bean = new PostBean(adapter);
 
   await bean.createTable();
 
   // Insert some posts
-  await bean.insert(Post.make(id: 1, msg: 'Whatever 1', author: 'mark'));
-  await bean.insert(Post.make(id: 2, msg: 'Whatever 2', author: 'bob'));
+  await bean.insert(new Post.make(id: 1, msg: 'Whatever 1', author: 'mark'));
+  await bean.insert(new Post.make(id: 2, msg: 'Whatever 2', author: 'bob'));
 
   // Find one post
   Post post = await bean.findById(1);

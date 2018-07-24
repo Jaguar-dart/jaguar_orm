@@ -35,10 +35,10 @@ class TodoList {
 }
 
 class Pivot {
-  @BelongsToMany(TodoListBean, length: 50)
+  @BelongsTo.many(TodoListBean, length: 50)
   String todolistId;
 
-  @BelongsToMany(CategoryBean, length: 50)
+  @BelongsTo.many(CategoryBean, length: 50)
   String categoryId;
 }
 

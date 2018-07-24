@@ -7,12 +7,9 @@ part of 'simple.dart';
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  final id = StrField('id');
-
-  final name = StrField('name');
-
-  final age = IntField('age');
-
+  final id = new StrField('id');
+  final name = new StrField('name');
+  final age = new IntField('age');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,

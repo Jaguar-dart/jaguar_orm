@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.15
+
++ Relations without associations
+
 ## 2.1.6
 
 + Improvements to relations helper

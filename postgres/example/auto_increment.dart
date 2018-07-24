@@ -7,7 +7,7 @@ import 'model.dart';
 
 /// The adapter
 PgAdapter adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 /// The bean
 class PostBean1 extends PostBean {

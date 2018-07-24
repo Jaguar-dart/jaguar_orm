@@ -9,15 +9,15 @@ import '../../model/associations/one_to_one/simple.dart';
 
 /// The adapter
 final adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database
   await adapter.connect();
 
   // Create beans
-  final userBean = UserBean(adapter);
-  final addressBean = AddressBean(adapter);
+  final userBean = new UserBean(adapter);
+  final addressBean = new AddressBean(adapter);
 
   // Drop old tables
   await addressBean.drop();

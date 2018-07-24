@@ -59,13 +59,9 @@ class PrimaryKey implements ColumnBase {
       {this.col, this.nullable: false, this.autoIncrement: false, this.length});
 }
 
-abstract class ForeignBase implements ColumnBase {
-  String get refCol;
-}
+abstract class ForeignBase implements ColumnBase {}
 
-class ForeignKey implements ColumnBase {
-  final Type bean;
-
+class ForeignKey implements ForeignBase {
   /// Name of the column in database
   final String col;
 
@@ -81,11 +77,10 @@ class ForeignKey implements ColumnBase {
   final String refCol;
 
   const ForeignKey(this.table,
-      {this.col, this.nullable: false, this.length, this.refCol: 'id'})
-      : bean = null;
+      {this.col, this.nullable: false, this.length, this.refCol: 'id'});
 }
 
-class BelongsTo implements ForeignKey {
+class BelongsTo implements ForeignBase {
   final Type bean;
 
   /// Name of the column in database
@@ -97,32 +92,26 @@ class BelongsTo implements ForeignKey {
 
   final int length;
 
-  final String table = null;
-
   /// The field/column in the foreign bean
   final String refCol;
+
+  final bool byHasMany;
+
+  final bool toMany;
 
   const BelongsTo(this.bean,
-      {this.col, this.nullable: false, this.length, this.refCol: 'id'});
-}
+      {this.col,
+      this.nullable: false,
+      this.length,
+      this.refCol: 'id',
+      this.byHasMany})
+      : toMany = false;
 
-class BelongsToMany implements ForeignKey {
-  final Type bean;
-
-  /// Name of the column in database
-  final String col;
-
-  final bool nullable;
-
-  final bool autoIncrement = false;
-
-  final int length;
-
-  final String table = null;
-
-  /// The field/column in the foreign bean
-  final String refCol;
-
-  const BelongsToMany(this.bean,
-      {this.col, this.nullable: false, this.length, this.refCol: 'id'});
+  const BelongsTo.many(this.bean,
+      {this.col,
+      this.nullable: false,
+      this.length,
+      this.refCol: 'id',
+      this.byHasMany})
+      : toMany = true;
 }

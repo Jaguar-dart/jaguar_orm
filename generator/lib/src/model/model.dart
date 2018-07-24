@@ -1,84 +1,10 @@
 library jaguar_orm.generator.model;
 
 import 'package:analyzer/dart/element/type.dart';
-
 import 'package:jaguar_orm_gen/src/common/common.dart';
 
-abstract class FindByForeign {
-  List<Field> get fields;
-
-  bool get isMany;
-}
-
-/// Model that contains information to write find method by foreign relation
-class FindByForeignBean implements FindByForeign {
-  final DartType bean;
-
-  final DartType model;
-
-  final List<Field> fields;
-
-  final List<Field> foreignFields;
-
-  bool get isMany => other.hasMany;
-
-  bool get belongsToMany => other is PreloadManyToMany;
-
-  final WriterInfo beanInfo;
-
-  final Preload other;
-
-  FindByForeignBean(
-      this.bean, this.fields, this.foreignFields, this.beanInfo, this.other)
-      : model = getModelForBean(bean);
-
-  String get beanName => bean.name;
-
-  String get modelName => model.name;
-
-  String get beanInstanceName => uncap(modelName) + 'Bean';
-}
-
-class FindByForeignTable implements FindByForeign {
-  final List<Field> fields;
-
-  final bool isMany;
-
-  final String table;
-
-  FindByForeignTable(this.fields, this.isMany, this.table);
-}
-
-abstract class Foreign {
-  String get refCol;
-}
-
-class ForeignBeaned implements Foreign {
-  final DartType bean;
-
-  final String refCol;
-
-  final DartType model;
-
-  final bool belongsToMany;
-
-  ForeignBeaned(this.bean, this.refCol, this.belongsToMany)
-      : model = getModelForBean(bean);
-
-  String get beanName => bean.name;
-
-  String get modelName => model.name;
-
-  String get beanInstanceName => uncap(modelName) + 'Bean';
-}
-
-class ForeignTabled implements Foreign {
-  final String table;
-
-  final String refCol;
-
-  ForeignTabled(this.table, this.refCol);
-}
+part 'association.dart';
+part 'foreign.dart';
 
 class Field {
   final String type;
@@ -89,7 +15,7 @@ class Field {
     try {
       return getValType(type);
     } catch (e) {
-      throw new FieldException(field, e.toString());
+      throw FieldException(field, e.toString());
     }
   }
 
@@ -125,11 +51,14 @@ class WriterInfo {
 
   final List<Field> primary;
 
-  /// A map of bean to [FindByForeign]
-  final Map<DartType, FindByForeignBean> getByForeign;
+  /// A map of bean to [BelongsToAssociation]
+  final Map<DartType, BelongsToAssociation> belongTos;
 
-  /// A map of association to [FindByForeign]
-  final Map<String, FindByForeignTable> getByForeignTabled;
+  /// A map of association to [BeanedForeignAssociation]
+  final Map<DartType, BeanedForeignAssociation> beanedForeignAssociations;
+
+  /// A map of association to [ForeignKey]
+  // TODO final Map<String, BaseForeignKey> getByForeignTabled;
 
   final List<Preload> preloads;
 
@@ -137,21 +66,23 @@ class WriterInfo {
       .firstWhere((Field f) => f.colName == colName, orElse: () => null);
 
   WriterInfo(this.name, this.modelType, this.fields, this.primary,
-      this.getByForeign, this.getByForeignTabled, this.preloads);
+      this.belongTos, this.beanedForeignAssociations, this.preloads);
 
   Preload findHasXByAssociation(DartType association) {
-    final found =
-        preloads.firstWhere((p) => p.bean == association, orElse: () => null);
+    return preloads.firstWhere((p) => p.bean == association,
+        orElse: () => null);
 
+    /*
     if (found == null) {
       throw new Exception('Association not found!');
     }
 
     return found;
+    */
   }
 
-  FindByForeignBean getMatchingManyToMany(FindByForeignBean val) {
-    for (FindByForeignBean f in getByForeign.values) {
+  BelongsToAssociation getMatchingManyToMany(BelongsToAssociation val) {
+    for (BelongsToAssociation f in belongTos.values) {
       if (!f.belongsToMany) continue;
 
       if (f == val) continue;
@@ -175,7 +106,7 @@ String getValType(String type) {
     return 'DateTimeField';
   }
 
-  throw new Exception('Field type not recognised!');
+  throw new Exception('Field type not recognised: $type!');
 }
 
 /// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships

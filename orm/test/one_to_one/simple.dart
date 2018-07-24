@@ -3,12 +3,12 @@ import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 import '../../example/model/associations/one_to_one/simple.dart';
 
 final adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 void main() {
   group('OneToOne', () {
-    final userBean = UserBean(adapter);
-    final addressBean = AddressBean(adapter);
+    final userBean = new UserBean(adapter);
+    final addressBean = new AddressBean(adapter);
 
     setUpAll(() async {
       await adapter.connect();
@@ -28,9 +28,9 @@ void main() {
     test('InsertNoCascade', () async {
       List<User> users = await userBean.getAll();
       expect(users, []);
-      final insert1 = User(id: '1', name: 'teja');
-      final insert2 = User(id: '2', name: 'kleak');
-      final insert3 = User(id: '3', name: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja');
+      final insert2 = new User(id: '2', name: 'kleak');
+      final insert3 = new User(id: '3', name: 'lejard');
       await userBean.insert(insert1);
       await userBean.insert(insert2);
       await userBean.insert(insert3);
@@ -43,12 +43,12 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final addr1 = Address(id: '1', street: 'teja');
-      final addr2 = Address(id: '2', street: 'kleak');
-      final addr3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addr1);
-      final insert2 = User(id: '2', name: 'kleak', address: addr2);
-      final insert3 = User(id: '3', name: 'lejard', address: addr3);
+      final addr1 = new Address(id: '1', street: 'teja');
+      final addr2 = new Address(id: '2', street: 'kleak');
+      final addr3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addr1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addr2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addr3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -64,12 +64,12 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final addrInsert1 = Address(id: '1', street: 'teja');
-      final addrInsert2 = Address(id: '2', street: 'kleak');
-      final addrInsert3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addrInsert1);
-      final insert2 = User(id: '2', name: 'kleak', address: addrInsert2);
-      final insert3 = User(id: '3', name: 'lejard', address: addrInsert3);
+      final addrInsert1 = new Address(id: '1', street: 'teja');
+      final addrInsert2 = new Address(id: '2', street: 'kleak');
+      final addrInsert3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addrInsert1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addrInsert2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addrInsert3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -87,11 +87,11 @@ void main() {
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
       expect(addresses, []);
-      final addrInsert1 = Address(id: '1', street: 'teja');
-      final addrInsert3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addrInsert1);
-      final insert2 = User(id: '2', name: 'kleak');
-      final insert3 = User(id: '3', name: 'lejard', address: addrInsert3);
+      final addrInsert1 = new Address(id: '1', street: 'teja');
+      final addrInsert3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addrInsert1);
+      final insert2 = new User(id: '2', name: 'kleak');
+      final insert3 = new User(id: '3', name: 'lejard', address: addrInsert3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -109,12 +109,12 @@ void main() {
       List<User> users = await userBean.getAll();
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
-      final addrInsert1 = Address(id: '1', street: 'teja');
-      final addrInsert2 = Address(id: '2', street: 'kleak');
-      final addrInsert3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addrInsert1);
-      final insert2 = User(id: '2', name: 'kleak', address: addrInsert2);
-      final insert3 = User(id: '3', name: 'lejard', address: addrInsert3);
+      final addrInsert1 = new Address(id: '1', street: 'teja');
+      final addrInsert2 = new Address(id: '2', street: 'kleak');
+      final addrInsert3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addrInsert1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addrInsert2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addrInsert3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -133,9 +133,9 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final insert1 = User(id: '1', name: 'teja');
-      final insert2 = User(id: '2', name: 'kleak');
-      final insert3 = User(id: '3', name: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja');
+      final insert2 = new User(id: '2', name: 'kleak');
+      final insert3 = new User(id: '3', name: 'lejard');
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -152,12 +152,12 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final addrInsert1 = Address(id: '1', street: 'teja');
-      final addrInsert2 = Address(id: '2', street: 'kleak');
-      final addrInsert3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addrInsert1);
-      final insert2 = User(id: '2', name: 'kleak', address: addrInsert2);
-      final insert3 = User(id: '3', name: 'lejard', address: addrInsert3);
+      final addrInsert1 = new Address(id: '1', street: 'teja');
+      final addrInsert2 = new Address(id: '2', street: 'kleak');
+      final addrInsert3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addrInsert1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addrInsert2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addrInsert3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -176,12 +176,12 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final addrInsert1 = Address(id: '1', street: 'teja');
-      final addrInsert2 = Address(id: '2', street: 'kleak');
-      final addrInsert3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addrInsert1);
-      final insert2 = User(id: '2', name: 'kleak', address: addrInsert2);
-      final insert3 = User(id: '3', name: 'lejard', address: addrInsert3);
+      final addrInsert1 = new Address(id: '1', street: 'teja');
+      final addrInsert2 = new Address(id: '2', street: 'kleak');
+      final addrInsert3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addrInsert1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addrInsert2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addrInsert3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
@@ -198,12 +198,12 @@ void main() {
       expect(users, []);
       List<Address> addresses = await addressBean.getAll();
       expect(addresses, []);
-      final addr1 = Address(id: '1', street: 'teja');
-      final addr2 = Address(id: '2', street: 'kleak');
-      final addr3 = Address(id: '3', street: 'lejard');
-      final insert1 = User(id: '1', name: 'teja', address: addr1);
-      final insert2 = User(id: '2', name: 'kleak', address: addr2);
-      final insert3 = User(id: '3', name: 'lejard', address: addr3);
+      final addr1 = new Address(id: '1', street: 'teja');
+      final addr2 = new Address(id: '2', street: 'kleak');
+      final addr3 = new Address(id: '3', street: 'lejard');
+      final insert1 = new User(id: '1', name: 'teja', address: addr1);
+      final insert2 = new User(id: '2', name: 'kleak', address: addr2);
+      final insert3 = new User(id: '3', name: 'lejard', address: addr3);
       await userBean.insert(insert1, cascade: true);
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);

@@ -280,7 +280,7 @@ class Create implements Statement {
   bool _ifNotExists = false;
 
   Create() {
-    _info = QueryCreateInfo(this);
+    _info = new QueryCreateInfo(this);
   }
 
   Create named(String tableName) {
@@ -452,7 +452,7 @@ class QueryCreateInfo {
   final Create _inner;
 
   QueryCreateInfo(this._inner)
-      : columns = UnmodifiableMapView<String, CreateColumn>(_inner._columns);
+      : columns = new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
 
   String get tableName => _inner._tableName;
 

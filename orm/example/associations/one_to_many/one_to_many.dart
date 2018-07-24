@@ -67,7 +67,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 )
 class PostBean extends Bean<Post> with _PostBean {
   AuthorBean _authorBean;
-  AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);
+  AuthorBean get authorBean => _authorBean ??= new AuthorBean(adapter);
 
   PostBean(Adapter adapter) : super(adapter);
 

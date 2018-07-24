@@ -62,9 +62,9 @@ class OneToXHelper {
     for (Parent parent in parents) {
       final List key = parentAssociationGetter(parent);
       if (args == null) {
-        args = List.filled(key.length, [], growable: false);
+        args = new List.filled(key.length, [], growable: false);
       }
-      map[HashableValues(key)] = parent;
+      map[new HashableValues(key)] = parent;
       for (int i = 0; i < key.length; i++) {
         args[i].add(key[i]);
       }
@@ -74,7 +74,7 @@ class OneToXHelper {
         await childFetcher(parents, preload: cascade, cascade: cascade);
 
     for (Child child in children) {
-      final key = HashableValues(childAssociationGetter(child));
+      final key = new HashableValues(childAssociationGetter(child));
       final Parent parent = map[key];
       if (parent == null) continue;
       setter(parent, child);

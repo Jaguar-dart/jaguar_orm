@@ -1,22 +1,23 @@
 name: jaguar_orm
 description: Source-generated ORM with relations (one-to-one, one-to-many, many-to-many), preloading, cascading, polymorphic relations, etc
-version: 2.1.6
+version: 2.1.8
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
 environment:
-  sdk: '>=2.0.0-dev.55.0 <2.0.0'
+  sdk: '>=2.0.0-dev.58.0 <2.0.0'
 
 dependencies:
   jaguar_query: ^2.1.9
   quiver_hashcode: ^1.0.0
+  path: ^1.6.0
 
 dev_dependencies:
   test: ^1.0.0
   jaguar_query_postgres: # ^0.2.5
     path: ../postgres
-  build_runner: ^0.9.0
+  build_runner: ^0.8.7
   jaguar_orm_gen:
     path: ../generator

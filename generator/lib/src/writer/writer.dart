@@ -29,9 +29,11 @@ class Writer {
 
   void _generate() {
     _w.writeln('abstract class _${_b.name} implements Bean<${_b.modelType}> {');
-    _w.writeln();
 
-    _b.fields.values.forEach(_writeField);
+    for (Field field in _b.fields.values) {
+      _writeln(
+          "final ${field.field} = new ${field.vType}('${camToSnak(field.colName)}');");
+    }
 
     _writeFieldsMap();
 
@@ -47,29 +49,25 @@ class Writer {
 
     // TODO remove by foreign for non-beaned
 
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean)
-        .forEach(_writeGetOneByForeign);
+    for (BelongsToAssociation ass in _b.belongTos.values) {
+      _writeFindOneByBeanedAssociation(ass);
+      _writeFindListByBeanedAssociationList(ass);
+      _removeByForeign(ass);
 
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean)
-        .forEach(_removeByForeign);
+      _writeAssociate(ass);
 
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean)
-        .forEach(_writeFindByForeignList);
+      if (ass.belongsToMany) {
+        _writeDetach(ass);
+        _writeFetchOther(ass);
+      }
+    }
 
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean)
-        .forEach(_writeAssociate);
+    for (BeanedForeignAssociation ass in _b.beanedForeignAssociations.values) {
+      _writeFindOneByBeanedAssociation(ass);
+      _writeFindListByBeanedAssociationList(ass);
+      // TODO remove
+    }
 
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean && f.belongsToMany)
-        .forEach(_writeDetach);
-
-    _b.getByForeign.values
-        .where((FindByForeign f) => f is FindByForeignBean && f.belongsToMany)
-        .forEach(_writeFetchOther);
     _writeAttach();
 
     _writePreload();
@@ -79,12 +77,6 @@ class Writer {
     _writeBeans();
 
     _w.writeln('}');
-  }
-
-  void _writeField(Field field) {
-    _writeln(
-        "final ${field.field} = ${field.vType}('${camToSnak(field.colName)}');");
-    _w.writeln();
   }
 
   void _writeFieldsMap() {
@@ -140,7 +132,7 @@ class Writer {
 
       if (f.foreign != null) {
         final foreign = f.foreign;
-        if (foreign is ForeignBeaned) {
+        if (foreign is BelongsToForeign) {
           _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
           _write(", foreignCol: '${foreign.refCol}'");
         } else {
@@ -215,8 +207,8 @@ class Writer {
     }
 
     if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
-      _w.writeln('Future<dynamic> insert(${_b
-              .modelType} model, {bool cascade: false}) async {');
+      _w.writeln(
+          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln(
           '.setMany(toSetColumns(model))..id(${_b.primary.first.colName});');
@@ -265,8 +257,8 @@ class Writer {
       return;
     }
 
-    _w.writeln('Future<dynamic> insert(${_b
-              .modelType} model, {bool cascade: false}) async {');
+    _w.writeln(
+        'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
     _w.write('final Insert insert = inserter');
     _w.writeln('.setMany(toSetColumns(model));');
     _w.writeln('var retId = await adapter.insert(insert);');
@@ -475,8 +467,8 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeGetOneByForeign(FindByForeignBean m) {
-    if (!m.isMany) {
+  void _writeFindOneByBeanedAssociation(BeanedAssociation m) {
+    if (!m.byHasMany) {
       _w.write('Future<${_b.modelType}>');
     } else {
       _w.write('Future<List<${_b.modelType}>>');
@@ -496,7 +488,7 @@ class Writer {
     _w.writeln(';');
 
     if (_b.preloads.length > 0) {
-      if (!m.isMany) {
+      if (!m.byHasMany) {
         _write('final ${_b.modelType} model = await ');
         _writeln('findOne(find);');
 
@@ -517,7 +509,7 @@ class Writer {
       }
     } else {
       _write('return ');
-      if (!m.isMany) {
+      if (!m.byHasMany) {
         _writeln('findOne(find);');
       } else {
         _writeln('findMany(find);');
@@ -545,7 +537,7 @@ class Writer {
     return;
   }
 
-  void _removeByForeign(FindByForeignBean m) {
+  void _removeByForeign(BelongsToAssociation m) {
     _w.write('Future<int>');
     _w.write(' removeBy${_cap(m.modelName)}(');
     final String args =
@@ -564,7 +556,7 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindByForeignList(FindByForeignBean m) {
+  void _writeFindListByBeanedAssociationList(BeanedAssociation m) {
     _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}List(');
     _write('List<${m.modelName}> models');
     _write(', {bool preload: false, bool cascade: false}');
@@ -633,8 +625,8 @@ class Writer {
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
-          _writeln('models.forEach((${_b.modelType} model) => model.${p
-                  .property} ??= []);');
+          _writeln(
+              'models.forEach((${_b.modelType} model) => model.${p.property} ??= []);');
         }
 
         _write('await OneToXHelper.');
@@ -666,11 +658,11 @@ class Writer {
         _write('], ');
         //Arg5: Setter
         if (!p.hasMany) {
-          _write('(${_b.modelType} model, ${p.modelName} child) => model.${p
-              .property} = child, ');
+          _write(
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = child, ');
         } else {
-          _write('(${_b.modelType} model, ${p.modelName} child) => model.${p
-                  .property}.add(child), ');
+          _write(
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property}.add(child), ');
         }
         _writeln('cascade: cascade);');
       } else if (p is PreloadManyToMany) {
@@ -689,7 +681,7 @@ class Writer {
   }
 
   void _writeBeans() {
-    final written = Set<String>();
+    final written = new Set<String>();
 
     for (Preload p in _b.preloads) {
       if (written.contains(p.beanInstanceName)) continue;
@@ -708,7 +700,7 @@ class Writer {
       }
     }
 
-    for (FindByForeignBean f in _b.getByForeign.values) {
+    for (BelongsToAssociation f in _b.belongTos.values) {
       if (f.belongsToMany) {
         if (written.contains(f.beanInstanceName)) continue;
         written.add(f.beanInstanceName);
@@ -721,8 +713,8 @@ class Writer {
     }
 
     for (Field f in _b.fields.values) {
-      if (f.foreign is ForeignBeaned) {
-        ForeignBeaned fb = f.foreign;
+      if (f.foreign is BelongsToForeign) {
+        BelongsToForeign fb = f.foreign;
         if (written.contains(fb.beanInstanceName)) continue;
         written.add(fb.beanInstanceName);
 
@@ -734,7 +726,7 @@ class Writer {
     }
   }
 
-  void _writeAssociate(FindByForeignBean m) {
+  void _writeAssociate(BelongsToAssociation m) {
     _write('void associate${_cap(m.modelName)}(');
     _write('${_b.modelType} child, ');
     _write('${m.modelName} parent');
@@ -748,7 +740,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeDetach(FindByForeignBean m) {
+  void _writeDetach(BelongsToAssociation m) {
     _writeln(
         'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
@@ -762,7 +754,7 @@ class Writer {
     _writeln('final exp = new Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
-    FindByForeignBean o = _b.getMatchingManyToMany(m);
+    BelongsToAssociation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -777,7 +769,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeFetchOther(FindByForeignBean m) {
+  void _writeFetchOther(BelongsToAssociation m) {
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
     final String targetModel = (m.other as PreloadManyToMany).targetModelName;
@@ -789,7 +781,7 @@ class Writer {
     _writeln('final exp = new Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
-    FindByForeignBean o = _b.getMatchingManyToMany(m);
+    BelongsToAssociation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -805,12 +797,13 @@ class Writer {
   }
 
   void _writeAttach() {
-    final FindByForeignBean m = _b.getByForeign.values.firstWhere(
-        (FindByForeign f) => f is FindByForeignBean && f.belongsToMany,
+    final BelongsToAssociation m = _b.belongTos.values.firstWhere(
+        (BelongsToAssociation f) =>
+            f is BelongsToAssociation && f.belongsToMany,
         orElse: () => null);
     if (m == null) return;
 
-    final FindByForeignBean m1 = _b.getMatchingManyToMany(m);
+    final BelongsToAssociation m1 = _b.getMatchingManyToMany(m);
 
     _writeln('Future<dynamic> attach(');
     if (m.modelName.compareTo(m1.modelName) > 0) {
