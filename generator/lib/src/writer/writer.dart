@@ -5,7 +5,7 @@ import 'package:jaguar_orm_gen/src/model/model.dart';
 class Writer {
   final StringBuffer _w = new StringBuffer();
 
-  final WriterInfo _b;
+  final WriterModel _b;
 
   Writer(this._b) {
     _generate();

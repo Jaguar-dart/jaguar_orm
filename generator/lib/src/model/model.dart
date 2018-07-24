@@ -42,7 +42,7 @@ class Field {
       : colName = colName ?? field;
 }
 
-class WriterInfo {
+class WriterModel {
   final String name;
 
   final String modelType;
@@ -65,7 +65,7 @@ class WriterInfo {
   Field fieldByColName(String colName) => fields.values
       .firstWhere((Field f) => f.colName == colName, orElse: () => null);
 
-  WriterInfo(this.name, this.modelType, this.fields, this.primary,
+  WriterModel(this.name, this.modelType, this.fields, this.primary,
       this.belongTos, this.beanedForeignAssociations, this.preloads);
 
   Preload findHasXByAssociation(DartType association) {
@@ -157,9 +157,9 @@ class PreloadManyToMany extends Preload {
 
   final String property;
 
-  final WriterInfo targetInfo;
+  final WriterModel targetInfo;
 
-  final WriterInfo beanInfo;
+  final WriterModel beanInfo;
 
   final List<Field> fields = <Field>[];
 

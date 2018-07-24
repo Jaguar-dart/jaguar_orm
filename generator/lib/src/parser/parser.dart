@@ -8,17 +8,33 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'package:jaguar_orm_gen/src/model/model.dart';
 
+/// Parses the `@GenBean()` into `WriterModel` so that `ModelModel` can be used
+/// to generate the code by `Writer`.
 class ParsedBean {
+  /// Should connect relations?
+  ///
+  /// Set this false to avoid connecting relations. Since connecting relations
+  /// is recursive, this avoids infinite recursion. This shall be set only for
+  /// the `Bean` being generated.
   final bool doRelations;
 
+  /// The [ClassElement] element of the `GenBean` spec.
   final ClassElement clazz;
 
+  /// The model of the Bean
   DartType model;
 
+  /// Constant reader used to read fields from the `GenBean`
   ConstantReader reader;
 
+  /// Parsed fields are stored here while being parsed.
+  ///
+  /// This is part of the state of the parser.
   final fields = <String, Field>{};
 
+  /// Parsed preloads are stored here while being parsed.
+  ///
+  /// This is part of the state of the parser.
   final preloads = <Preload>[];
 
   final primaries = <Field>[];
@@ -29,7 +45,7 @@ class ParsedBean {
 
   ParsedBean(this.clazz, {this.doRelations: true});
 
-  WriterInfo detect() {
+  WriterModel detect() {
     _getModel();
 
     _parseFields();
@@ -42,7 +58,7 @@ class ParsedBean {
       final DartType bean = foreign.bean;
       BelongsToAssociation current = beanedAssociations[bean];
 
-      final WriterInfo info =
+      final WriterModel info =
           new ParsedBean(bean.element, doRelations: false).detect();
 
       final Preload other = info.findHasXByAssociation(clazz.type);
@@ -81,7 +97,7 @@ class ParsedBean {
       final DartType bean = foreign.bean;
 
       {
-        final WriterInfo info =
+        final WriterModel info =
             new ParsedBean(bean.element, doRelations: false).detect();
         final Preload other = info.findHasXByAssociation(clazz.type);
         if (other != null) continue;
@@ -136,7 +152,7 @@ class ParsedBean {
     }
 
     for (BelongsToAssociation m in beanedAssociations.values) {
-      final WriterInfo info =
+      final WriterModel info =
           new ParsedBean(m.bean.element, doRelations: false).detect();
 
       for (Field f in m.fields) {
@@ -150,7 +166,7 @@ class ParsedBean {
     }
 
     for (BeanedForeignAssociation m in beanedForeignAssociations.values) {
-      final WriterInfo info =
+      final WriterModel info =
           new ParsedBean(m.bean.element, doRelations: false).detect();
 
       for (Field f in m.fields) {
@@ -163,7 +179,7 @@ class ParsedBean {
       }
     }
 
-    final ret = new WriterInfo(clazz.name, model.name, fields, primaries,
+    final ret = new WriterModel(clazz.name, model.name, fields, primaries,
         beanedAssociations, beanedForeignAssociations, preloads);
 
     if (doRelations) {
@@ -331,7 +347,7 @@ class ParsedBean {
 
       BelongsToAssociation g;
       if (doRelations) {
-        final WriterInfo info =
+        final WriterModel info =
             new ParsedBean(bean.element, doRelations: false).detect();
         g = info.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation)
@@ -356,13 +372,13 @@ class ParsedBean {
 
       BelongsToAssociation g;
       if (doRelations) {
-        final WriterInfo beanInfo =
+        final WriterModel beanInfo =
             new ParsedBean(pivot.element, doRelations: false).detect();
         g = beanInfo.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation) {
           throw new Exception('Association $curBean not found! Field ${f.name}.');
         }
-        final WriterInfo targetInfo =
+        final WriterModel targetInfo =
             new ParsedBean(target.element, doRelations: false).detect();
         preloads.add(new PreloadManyToMany(
             pivot, target, f.name, targetInfo, beanInfo, g?.fields));

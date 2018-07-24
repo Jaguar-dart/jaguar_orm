@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.16
+
++ Dart2 fixes
+
 ## 2.1.15
 
 + Relations without associations
