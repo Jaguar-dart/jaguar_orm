@@ -62,12 +62,12 @@ DartType getModelForBean(DartType bean) {
   return i.typeArguments[0];
 }
 
-class FieldException {
+class FieldSpecException {
   String name;
 
   String message;
 
-  FieldException(this.name, this.message);
+  FieldSpecException(this.name, this.message);
 
   String toString() => 'Field $name has exception: $message';
 }

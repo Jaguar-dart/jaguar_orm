@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.17
+
++ Better exception printing for field parse exceptions
+
 ## 2.1.16
 
 + Dart2 fixes

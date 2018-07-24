@@ -15,7 +15,7 @@ class Field {
     try {
       return getValType(type);
     } catch (e) {
-      throw FieldException(field, e.toString());
+      throw new FieldSpecException(field, e.toString());
     }
   }
 

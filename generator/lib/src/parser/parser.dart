@@ -8,6 +8,29 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'package:jaguar_orm_gen/src/model/model.dart';
 
+class FieldParseException implements Exception {
+  dynamic inner;
+
+  String fieldName;
+
+  String message;
+
+  StackTrace trace;
+
+  FieldParseException(this.fieldName, this.inner, this.trace, {this.message});
+
+  String toString() {
+    var sb = new StringBuffer();
+    sb.writeln('Exception while parsing field: $fieldName!');
+    if (message != null) {
+      sb.writeln("Message: $message");
+    }
+    sb.writeln(inner);
+    sb.writeln(trace);
+    return sb.toString();
+  }
+}
+
 /// Parses the `@GenBean()` into `WriterModel` so that `ModelModel` can be used
 /// to generate the code by `Writer`.
 class ParsedBean {
@@ -270,35 +293,39 @@ class ParsedBean {
     }
 
     for (FieldElement field in modelClass.fields) {
-      if (fields.containsKey(field.name)) continue;
-      if (relations.contains(field.name)) continue;
-      if (ignores.contains(field.name)) continue;
+      try {
+        if (fields.containsKey(field.name)) continue;
+        if (relations.contains(field.name)) continue;
+        if (ignores.contains(field.name)) continue;
 
-      //If IgnoreField is present, skip!
-      {
-        int ignore = field.metadata
-            .map((ElementAnnotation annot) => annot.computeConstantValue())
-            .where((DartObject inst) => isIgnore.isExactlyType(inst.type))
-            .length;
+        //If IgnoreField is present, skip!
+        {
+          int ignore = field.metadata
+              .map((ElementAnnotation annot) => annot.computeConstantValue())
+              .where((DartObject inst) => isIgnore.isExactlyType(inst.type))
+              .length;
 
-        if (ignore != 0) {
-          ignores.add(field.name);
-          continue;
+          if (ignore != 0) {
+            ignores.add(field.name);
+            continue;
+          }
         }
-      }
 
-      if (field.isStatic) continue;
+        if (field.isStatic) continue;
 
-      final val = _makeField(field);
+        final val = _makeField(field);
 
-      if (val is Field) {
-        fields[val.field] = val;
-        if (val.primary) primaries.add(val);
-      } else {
-        if (!_relation(clazz.type, field)) {
-          final vf = new Field(field.type.name, field.name, field.name);
-          fields[vf.field] = vf;
+        if (val is Field) {
+          fields[val.field] = val;
+          if (val.primary) primaries.add(val);
+        } else {
+          if (!_relation(clazz.type, field)) {
+            final vf = new Field(field.type.name, field.name, field.name);
+            fields[vf.field] = vf;
+          }
         }
+      } catch (e, s) {
+        throw new FieldParseException(field.name, e, s);
       }
     }
   }
@@ -376,7 +403,8 @@ class ParsedBean {
             new ParsedBean(pivot.element, doRelations: false).detect();
         g = beanInfo.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation) {
-          throw new Exception('Association $curBean not found! Field ${f.name}.');
+          throw new Exception(
+              'Association $curBean not found! Field ${f.name}.');
         }
         final WriterModel targetInfo =
             new ParsedBean(target.element, doRelations: false).detect();
@@ -437,5 +465,5 @@ Field parseColumn(FieldElement f, DartObject obj) {
         length: length);
   }
 
-  throw new FieldException(f.name, 'Invalid ColumnBase type!');
+  throw new FieldSpecException(f.name, 'Invalid ColumnBase type!');
 }
