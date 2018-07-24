@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.20
+
++ `IgnoreColumn` on getters fix
+
 ## 2.1.17
 
 + Better exception printing for field parse exceptions

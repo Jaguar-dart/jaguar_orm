@@ -452,7 +452,8 @@ class QueryCreateInfo {
   final Create _inner;
 
   QueryCreateInfo(this._inner)
-      : columns = new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
+      : columns =
+            new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
 
   String get tableName => _inner._tableName;
 

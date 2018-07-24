@@ -18,7 +18,8 @@ class Post {
 }
 
 main() {
-  Create st = Sql.create('post')
+  Create st = Sql
+      .create('post')
       .addStr('_id', primary: true)
       .addStr('authorId', foreignTable: 'author', foreignCol: '_id')
       .addStr('author')

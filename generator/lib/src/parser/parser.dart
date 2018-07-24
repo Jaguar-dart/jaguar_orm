@@ -298,18 +298,25 @@ class ParsedBean {
         if (relations.contains(field.name)) continue;
         if (ignores.contains(field.name)) continue;
 
-        //If IgnoreField is present, skip!
-        {
-          int ignore = field.metadata
-              .map((ElementAnnotation annot) => annot.computeConstantValue())
-              .where((DartObject inst) => isIgnore.isExactlyType(inst.type))
-              .length;
+        if (field.displayName == 'hashCode' ||
+            field.displayName == 'runtimeType') continue;
 
-          if (ignore != 0) {
+        // Must have both getter and setter
+        if (field.getter == null || field.setter == null) continue;
+
+        bool ignore = false;
+
+        // If IgnoreField is present, skip!
+        for (ElementAnnotation annot in field.metadata) {
+          DartObject annotObj = annot.computeConstantValue();
+          if (isIgnore.isExactlyType(annotObj.type)) {
             ignores.add(field.name);
-            continue;
+            ignore = true;
+            break;
           }
         }
+
+        if (ignore) continue;
 
         if (field.isStatic) continue;
 

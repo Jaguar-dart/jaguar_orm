@@ -57,7 +57,8 @@ main() async {
   }
 
   {
-    final st = Sql.find(Post.tableName)
+    final st = Sql
+        .find(Post.tableName)
         .fullJoin(Author.tableName)
         .joinOn(eq('author._id', 1))
         .where(eqCol('post.authorid', col('_id', 'author')));

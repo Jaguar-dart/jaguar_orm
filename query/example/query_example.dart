@@ -5,7 +5,8 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 
 main() {
-  Find find = Sql.find('posts')
+  Find find = Sql
+      .find('posts')
       .sel('message')
       .where(col('likes').eq(10) & Col.int('replies').eq(5))
       .where(eq('author', 'teja') | like('author', 'kleak*'))
@@ -15,7 +16,8 @@ main() {
 
   print(composeFind(find));
 
-  Insert insert = Sql.insert('posts')
+  Insert insert = Sql
+      .insert('posts')
       .setIdValue('id', 1)
       .setValue('message', 'How are you?')
       .setValue('author', 'teja')
@@ -35,7 +37,8 @@ main() {
 
   print(composeUpdate(update1));
 
-  Find find1 = Sql.find('posts')
+  Find find1 = Sql
+      .find('posts')
       .where(eqCol('author', col('id', 'authors')))
       .orderBy('author', true)
       .limit(10)

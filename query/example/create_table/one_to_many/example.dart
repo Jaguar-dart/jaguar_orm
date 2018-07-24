@@ -63,7 +63,8 @@ Future<void> dropTables() async {
 
 Future<void> createTables() async {
   {
-    await Sql.create('author')
+    await Sql
+        .create('author')
         .ifNotExists()
         .addInt('_id', primary: true, autoIncrement: true)
         .addStr('name', length: 100)
@@ -71,7 +72,8 @@ Future<void> createTables() async {
   }
 
   {
-    await Sql.create('post')
+    await Sql
+        .create('post')
         .ifNotExists()
         .addInt('_id', primary: true, autoIncrement: true)
         .addInt('authorId', foreignTable: 'author', foreignCol: '_id')
@@ -114,24 +116,26 @@ Future<void> removeAuthors() async {
   await adapter.remove(st);
 }
 
-Future<int> insertPost(int authorId, String message, int likes) =>
-    Sql.insert('post')
-        .id('_id')
-        .setInt('authorId', authorId)
-        .setString('message', message)
-        .setInt('likes', likes)
-        .exec(adapter);
+Future<int> insertPost(int authorId, String message, int likes) => Sql
+    .insert('post')
+    .id('_id')
+    .setInt('authorId', authorId)
+    .setString('message', message)
+    .setInt('likes', likes)
+    .exec(adapter);
 
 Future<List<Post>> getPosts() =>
     Sql.find('post').exec(adapter).manyMapped(postSerializer);
 
-Future<Post> getPostById(int id) => Sql.find('post')
+Future<Post> getPostById(int id) => Sql
+    .find('post')
     .where(col('_id').eq(id))
     .exec(adapter)
     .oneMapped(postSerializer);
 
 Future<Post> getPostByIdRelated(int id) async {
-  Find st = Sql.find('post')
+  Find st = Sql
+      .find('post')
       .sel('post.*')
       .selManyPrefixed('author', ['_id', 'name'])
       .innerJoin('author', 'author')
@@ -150,7 +154,8 @@ Future<Post> getPostByIdRelated(int id) async {
   return post;
 }
 
-Future<List<Post>> getPostsByAuthorId(int authorId) => Sql.find('post')
+Future<List<Post>> getPostsByAuthorId(int authorId) => Sql
+    .find('post')
     .where(col('authorId').eq(authorId))
     .exec(adapter)
     .manyMapped(postSerializer);
