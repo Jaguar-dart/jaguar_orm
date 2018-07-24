@@ -3,6 +3,7 @@ library query.compose;
 import 'package:jaguar_query/jaguar_query.dart';
 
 part 'insert.dart';
+part 'insert_many.dart';
 part 'create.dart';
 part 'delete.dart';
 part 'expression.dart';

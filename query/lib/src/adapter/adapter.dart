@@ -23,6 +23,9 @@ abstract class Adapter<ConnType> {
   /// inserted row
   Future<T> insert<T>(Insert statement);
 
+  /// Executes the insert statement for many element
+  Future<void> insertMany<T>(InsertMany statement);
+
   /// Updates the row and returns the number of rows updated
   Future<int> update(Update statement);
 

@@ -24,6 +24,7 @@ part 'statement/statements.dart';
 part 'statement/alter.dart';
 part 'statement/find.dart';
 part 'statement/insert.dart';
+part 'statement/insert_many.dart';
 part 'statement/update.dart';
 part 'statement/remove.dart';
 part 'statement/create.dart';
@@ -42,6 +43,9 @@ class Sql {
 
   /// Creates a new [Insert] statement
   static Insert insert(String table) => new Insert().into(table);
+
+  /// Creates a new [InsertMany] statement
+  static InsertMany insertMany(String table) => new InsertMany().into(table);
 
   /// Creates a new [Update] statement
   static Update update(String table) => new Update().into(table);

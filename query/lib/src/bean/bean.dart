@@ -27,6 +27,9 @@ abstract class Bean<ModelType> {
   /// Creates a 'insert' query
   Insert get inserter => Sql.insert(tableName);
 
+  /// Creates a 'insertMany' query
+  InsertMany get inserters => Sql.insertMany(tableName);
+
   /// Returns a list of rows found by executing [statement]
   Future<ModelType> findOne(Find statement) async {
     Map row = await adapter.findOne(statement);

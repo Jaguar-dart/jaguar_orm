@@ -190,6 +190,7 @@ class Writer {
 
   void _writeCrud() {
     _writeInsert();
+    _writeInsertMany();
     _writeUpdate();
     _writeFind();
     _writeRemove();
@@ -306,6 +307,14 @@ class Writer {
     }
     _w.writeln('}');
     _w.writeln('return retId;');
+    _w.writeln('}');
+  }
+
+  void _writeInsertMany() {
+    _w.writeln('Future<void> insertMany(List<${_b.modelType}> models) async {');
+    _w.write('final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
+    _w.writeln('final InsertMany insert = inserters.bulk(data);');
+    _w.writeln('return adapter.insertMany(insert);');
     _w.writeln('}');
   }
 
