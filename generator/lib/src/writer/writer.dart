@@ -211,7 +211,7 @@ class Writer {
           'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln(
-          '.setMany(toSetColumns(model))..id(${_b.primary.first.colName});');
+          '.setMany(toSetColumns(model))..id(${_b.primary.first.colName}.name);');
       _w.writeln('final ret = await adapter.insert(insert);');
 
       _w.writeln('if(cascade) {');
