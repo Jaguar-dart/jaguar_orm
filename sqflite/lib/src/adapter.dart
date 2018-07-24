@@ -55,6 +55,12 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     return _connection.rawInsert(strSt) as Future<T>;
   }
 
+  /// Inserts many records into the table
+  Future<void> insertMany<T>(InsertMany st) {
+    String strSt = composeInsertMany(st);
+    return _connection.rawQuery(strSt);
+  }
+
   /// Updates a record in the table
   Future<int> update(Update st) {
     String strSt = composeUpdate(st);
@@ -111,4 +117,5 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
       throw new Exception("Invalid type $T!");
     }
   }
+
 }
