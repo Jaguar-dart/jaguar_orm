@@ -311,10 +311,30 @@ class Writer {
   }
 
   void _writeInsertMany() {
-    _w.writeln('Future<void> insertMany(List<${_b.modelType}> models) async {');
+    var cascade = '';
+    if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
+      cascade = ', {bool cascade: false}';
+    }
+    _w.writeln('Future<void> insertMany(List<${_b.modelType}> models${cascade}) async {');
+    if(cascade.isNotEmpty) {
+      _w.write('if(cascade)  {');
+      _w.write('final List<Future> futures = [];');
+      _w.write('for (var model in models) {');
+      _w.write('futures.add(insert(model, cascade: cascade));');
+      _w.write('}');
+      _w.writeln('return Future.wait(futures);');
+      _w.write('}');
+      _w.write('else {');
+    }
+
     _w.write('final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
     _w.writeln('final InsertMany insert = inserters.bulk(data);');
     _w.writeln('return adapter.insertMany(insert);');
+
+    if(cascade.isNotEmpty) {
+      _w.writeln('}');
+    }
+
     _w.writeln('}');
   }
 
