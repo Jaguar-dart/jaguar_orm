@@ -137,7 +137,7 @@ Future<Post> getPostByIdRelated(int id) async {
   Find st = Sql
       .find('post')
       .sel('post.*')
-      .selManyPrefixed('author', ['_id', 'name'])
+      .selManyIn('author', ['_id', 'name'])
       .innerJoin('author', 'author')
       .joinOn(Col('authorId', 'post').eqC(Col('_id', 'author')))
       .where(Col('_id', 'post').eq(id));

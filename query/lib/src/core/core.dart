@@ -22,7 +22,7 @@ part 'operators/comparision.dart';
 
 part 'statement/statements.dart';
 part 'statement/alter.dart';
-part 'statement/find.dart';
+part 'statement/find/find.dart';
 part 'statement/insert.dart';
 part 'statement/insert_many.dart';
 part 'statement/update.dart';

@@ -1,5 +1,17 @@
 part of query;
 
+/// Table selector
+abstract class Table {}
+
+/// TableName
+class TableName implements Table {
+  final String tableName;
+
+  final String alias;
+
+  TableName(this.tableName, [this.alias]);
+}
+
 /// A SQL join type that can be used in 'SELECT' statements
 class JoinType {
   /// Identification code for this join type
@@ -24,18 +36,6 @@ class JoinType {
 
   /// 'CROSS JOIN' join type
   static const JoinType CrossJoin = const JoinType._(4, 'CROSS JOIN');
-}
-
-/// Table selector
-abstract class Table {}
-
-/// TableName
-class TableName implements Table {
-  final String tableName;
-
-  final String alias;
-
-  TableName(this.tableName, [this.alias]);
 }
 
 class JoinedTable implements Table {

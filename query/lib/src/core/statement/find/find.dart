@@ -1,15 +1,6 @@
 part of query;
 
-typedef MappedExpression<T> = Expression Function(T value);
-
-class OrderBy {
-  final String columnName;
-
-  final bool ascending;
-
-  const OrderBy(this.columnName, [this.ascending = false]);
-}
-
+/// Select SQL statement builder.
 class Find implements Statement {
   final _column = <SelColumn>[];
 
@@ -33,91 +24,112 @@ class Find implements Statement {
     _immutable = new ImmutableFindStatement(this);
   }
 
+  /// Table from which to find the rows. Use [alias] to alias the table name.
   Find from(String tableName, [String alias]) {
-    if (_from != null) {
-      throw new Exception('From table already specified!');
-    }
+    if (_from != null) throw new Exception('Table name already specified!');
+
     _from = new TableName(tableName, alias);
     return this;
   }
 
-  Find join(JoinedTable join) {
-    if (join == null) {
-      throw new Exception('Join cannot be null!');
-    }
+  /// Adds a 'join' clause to the select statement
+  Find addJoin(JoinedTable join) {
+    if (join == null) throw new Exception('Join cannot be null!');
+
     _curJoin = join;
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds a 'inner join' clause to the select statement.
   Find innerJoin(String tableName, [String alias]) {
     _curJoin = new JoinedTable.innerJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds a 'left join' clause to the select statement.
   Find leftJoin(String tableName, [String alias]) {
     _curJoin = new JoinedTable.leftJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds a 'right join' clause to the select statement.
   Find rightJoin(String tableName, [String alias]) {
     _curJoin = new JoinedTable.rightJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds a 'full join' clause to the select statement.
   Find fullJoin(String tableName, [String alias]) {
     _curJoin = new JoinedTable.fullJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds 'cross join' clause to the select statement.
   Find crossJoin(String tableName, [String alias]) {
     _curJoin = new JoinedTable.crossJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
+  /// Adds the condition with which to perform joins.
   Find joinOn(Expression exp) {
-    if (_curJoin == null) {
-      throw new Exception('No joins in the join stack!');
-    }
+    if (_curJoin == null) throw new Exception('No joins in the join stack!');
+
     _curJoin.joinOn(exp);
     return this;
   }
 
-  Find sel(String columnName, [String alias]) {
-    _column.add(new SelColumn(columnName, alias));
+  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
+  Find sel(String column, [String alias]) {
+    _column.add(new SelColumn(column, alias));
     return this;
   }
 
-  Find selPrefixed(String prefix, String columnName) {
-    final String name = prefix + '.' + columnName;
-    _column.add(new SelColumn(name, name));
-    return this;
-  }
-
-  Find selManyPrefixed(String prefix, List<String> columnNames) {
-    for (String columnName in columnNames) {
-      final String name = prefix + '.' + columnName;
-      _column.add(new SelColumn(name, name));
+  /// Selects many [columns] to be fetched. Use [alias] to alias the column name.
+  Find selMany(Iterable<String> columns, [String alias]) {
+    for (String columnName in columns) {
+      final String name = columnName;
+      _column.add(new SelColumn(name));
     }
     return this;
   }
 
-  Find count(String columnName, {String alias, bool isDistinct: false}) {
-    _column.add(
-        new CountSelColumn(columnName, alias: alias, isDistinct: isDistinct));
+  /// Selects a [column] to be fetched from the [table]. Use [alias] to alias
+  /// the column name.
+  Find selIn(String table, String column, [String alias]) {
+    final String name = table + '.' + column;
+    _column.add(new SelColumn(name, alias));
     return this;
   }
 
-  Find or(Expression exp) {
-    _where = _where.or(exp);
+  /// Selects many [columns] to be fetched in the given [table]. Use [alias] to
+  /// alias the column name.
+  Find selManyIn(String table, List<String> columns) {
+    for (String columnName in columns) {
+      final String name = table + '.' + columnName;
+      _column.add(new SelColumn(name));
+    }
     return this;
   }
 
+  Find count(String column, {String alias, bool isDistinct: false}) {
+    _column
+        .add(new CountSelColumn(column, alias: alias, isDistinct: isDistinct));
+    return this;
+  }
+
+  /// Adds an 'or' [expression] to 'where' clause.
+  Find or(Expression expression) {
+    _where = _where.or(expression);
+    return this;
+  }
+
+  /// Adds an 'and' [expression] to 'where' clause.
   Find and(Expression exp) {
     _where = _where.and(exp);
     return this;
@@ -139,29 +151,38 @@ class Find implements Statement {
     return this;
   }
 
-  Find where(Expression exp) {
-    _where = _where.and(exp);
+  /// Adds an to 'where' [expression] clause.
+  Find where(Expression expression) {
+    _where = _where.and(expression);
     return this;
   }
 
+  /// Adds an '=' [expression] to 'where' clause.
   Find eq<T>(String column, T val) => and(q.eq<T>(column, val));
 
+  /// Adds an '<>' [expression] to 'where' clause.
   Find ne<T>(String column, T val) => and(q.ne<T>(column, val));
 
+  /// Adds an '>' [expression] to 'where' clause.
   Find gt<T>(String column, T val) => and(q.gt<T>(column, val));
 
+  /// Adds an '>=' [expression] to 'where' clause.
   Find gtEq<T>(String column, T val) => and(q.gtEq<T>(column, val));
 
+  /// Adds an '<=' [expression] to 'where' clause.
   Find ltEq<T>(String column, T val) => and(q.ltEq<T>(column, val));
 
+  /// Adds an '<' [expression] to 'where' clause.
   Find lt<T>(String column, T val) => and(q.lt<T>(column, val));
 
+  /// Adds an '%' [expression] to 'where' clause.
   Find like(String column, String val) => and(q.like(column, val));
 
-  Find eqCol<T>(String column, T val) => and(q.eq<T>(column, val));
-
+  /// Adds an 'between' [expression] to 'where' clause.
   Find between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
+
+  Find eqCol<T>(String column, Col<T> val) => and(q.eqCol<T>(column, val));
 
   Find orderBy(String column, [bool ascending = false]) {
     _orderBy.add(new OrderBy(column, ascending));
@@ -204,10 +225,6 @@ class Find implements Statement {
   FindExecutor<ConnType> exec<ConnType>(Adapter<ConnType> adapter) =>
       new FindExecutor<ConnType>(adapter, this);
 
-  String compose(Adapter adapter) {
-
-  }
-
   ImmutableFindStatement _immutable;
 
   ImmutableFindStatement get asImmutable => _immutable;
@@ -238,4 +255,14 @@ class ImmutableFindStatement {
   int get limit => _find._limit;
 
   int get offset => _find._offset;
+}
+
+typedef MappedExpression<T> = Expression Function(T value);
+
+class OrderBy {
+  final String columnName;
+
+  final bool ascending;
+
+  const OrderBy(this.columnName, [this.ascending = false]);
 }

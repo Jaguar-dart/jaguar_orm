@@ -58,17 +58,18 @@ main() async {
   }).exec(adapter);
 
   final data = await Sql.find(Post.tableName)
-      .fullJoin(Author.tableName)
-      .joinOn(eq('author.id', 1))
-      .where(eqCol('post.authorid', Col('id', 'author')))
+      .innerJoin(Author.tableName)
+      .joinOn(eqCol('post.authorid', Col('id', 'author')))
+      .selMany(['*', 'author.*'])
+      .where(eq('author.id', 1))
       .exec(adapter)
       .one();
   print(data);
 
   var st = Sql.find(Post.tableName)
-      .fullJoin(Author.tableName)
-      .joinOn(eq('author.id', 1))
-      .where(eqCol('post.authorid', Col('id', 'author')));
+      .innerJoin(Author.tableName)
+      .joinOn(eqCol('post.authorid', Col('id', 'author')))
+      .where(eq('author.id', 1));
   print(composeFind(st));
 
   exit(0);
