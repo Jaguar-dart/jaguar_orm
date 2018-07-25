@@ -66,9 +66,9 @@ class PostBean extends Bean<Post> {
     final st = new Create()
         .named(tableName)
         .ifNotExists()
-        .addNullInt('_id', primary: true)
-        .addNullStr('msg')
-        .addNullStr('author');
+        .addInt('_id', primary: true)
+        .addStr('msg')
+        .addStr('author');
 
     await adapter.createTable(st);
   }

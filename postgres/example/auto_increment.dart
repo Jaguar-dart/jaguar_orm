@@ -18,8 +18,8 @@ class PostBean1 extends PostBean {
         .named(tableName)
         .ifNotExists()
         .addInt('_id', primary: true, autoIncrement: true)
-        .addNullStr('msg')
-        .addNullStr('author');
+        .addStr('msg')
+        .addStr('author');
 
     await adapter.createTable(st);
   }

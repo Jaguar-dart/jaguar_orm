@@ -16,3 +16,7 @@ dependencies:
 
 dev_dependencies:
   test: ^1.2.0
+
+dependency_overrides:
+  jaguar_query:
+    path: ../query

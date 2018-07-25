@@ -2,7 +2,7 @@ part of query.compose;
 
 String composeCreateColumn(final CreateColumn col) {
   final sb = new StringBuffer();
-  sb.write(col.colName);
+  sb.write(col.name);
 
   if (col is CreateInt) {
     if (col.autoIncrement) {
@@ -28,7 +28,7 @@ String composeCreateColumn(final CreateColumn col) {
 }
 
 String composeCreate(final Create create) {
-  final QueryCreateInfo info = create.info;
+  final ImmutableCreateStatement info = create.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('CREATE TABLE');
@@ -39,12 +39,11 @@ String composeCreate(final Create create) {
 
   sb.write(info.columns.values.map(composeCreateColumn).join(', '));
 
-  final List<CreateColumn> primaries = info.columns.values
-      .where((CreateColumn col) => col.isPrimaryKey)
-      .toList();
+  final List<CreateColumn> primaries =
+      info.columns.values.where((CreateColumn col) => col.isPrimary).toList();
   if (primaries.length != 0) {
     sb.write(', PRIMARY KEY (');
-    sb.write(primaries.map((CreateColumn col) => col.colName).join(','));
+    sb.write(primaries.map((CreateColumn col) => col.name).join(','));
     sb.write(')');
   }
 
@@ -57,16 +56,15 @@ String composeCreate(final Create create) {
         if (!foreigns.containsKey(col.foreignKey.table)) {
           foreigns[col.foreignKey.table] = <String, String>{};
         }
-        foreigns[col.foreignKey.table][col.colName] = col.foreignKey.col;
+        foreigns[col.foreignKey.table][col.name] = col.foreignKey.col;
       }
 
-      if (col.unique.unique) {
-        if (col.unique.group == null) {
+      if (col.uniqueGroup != null) {
+        if (col.uniqueGroup.isEmpty) {
           uniques.add(col);
         } else {
-          compositeUniques[col.unique.group] =
-              (compositeUniques[col.unique.group] ?? <CreateColumn>[])
-                ..add(col);
+          compositeUniques[col.uniqueGroup] =
+              (compositeUniques[col.uniqueGroup] ?? <CreateColumn>[])..add(col);
         }
       }
     }
@@ -82,12 +80,12 @@ String composeCreate(final Create create) {
     }
 
     for (CreateColumn col in uniques) {
-      sb.write(', UNIQUE(${col.colName})');
+      sb.write(', UNIQUE(${col.name})');
     }
 
     for (String group in compositeUniques.keys) {
       final String str = compositeUniques[group]
-          .map((CreateColumn col) => col.colName)
+          .map((CreateColumn col) => col.name)
           .join(', ');
       sb.write(', UNIQUE($str)');
     }
@@ -98,4 +96,4 @@ String composeCreate(final Create create) {
   return sb.toString();
 }
 
-String composeCreateDb(final CreateDb st) => "CREATE DATABASE ${st.dbName}";
+String composeCreateDb(final CreateDb st) => "CREATE DATABASE ${st.name}";

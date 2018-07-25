@@ -1,15 +1,26 @@
 part of query;
 
+/// Insert many SQL statement builder.
+///
+/// Use `into` method to set the table to insert into.
+/// Use `add`, `addAll`, `addMap` and `addAllMap` to set column values.
+///
+/// Use `exec` statement or `Adapter` to execute the statement against a
+/// database.
 class InsertMany implements Statement {
   String _tableName;
 
   final List<Map<String, dynamic>> _bulkValues = [];
 
-  InsertMany() {
-    _info = new QueryInsertManyInfo(this);
+  InsertMany([/* Iterable<SetColumn> | Iterable<Iterable<SetColumn>> */ rows]) {
+    _immutable = new ImmutableInsertManyStatement(this);
+
+    if (rows is Iterable<Iterable<SetColumn>>) {
+      addAll(rows);
+    } else if (rows is Iterable<SetColumn>) add(rows);
   }
 
-  String get tableName => _tableName;
+  String get table => _tableName;
 
   InsertMany into(String tableName) {
     if (_tableName != null) {
@@ -19,40 +30,54 @@ class InsertMany implements Statement {
     return this;
   }
 
-  InsertMany bulk(List<List<SetColumn>> items) {
-    _bulkValues.clear();
-    _bulkValues.addAll(items.map(toMap));
+  /// Adds a single [row] to be inserted.
+  InsertMany add(Iterable<SetColumn> row) {
+    _bulkValues.add(_convertColsToMap(row));
     return this;
   }
 
-  Map<String, dynamic> toMap(List<SetColumn> data) {
-    final map = Map<String, dynamic>();
-    for (var d in data) {
-      map[d.getColumn] = d.getValue;
-    }
+  /// Adds many [rows] to be inserted.
+  InsertMany addAll(Iterable<Iterable<SetColumn>> rows) {
+    for (Iterable<SetColumn> row in rows)
+      _bulkValues.add(_convertColsToMap(row));
+    return this;
+  }
+
+  Map<String, dynamic> _convertColsToMap(Iterable<SetColumn> row) {
+    final map = <String, dynamic>{};
+    for (SetColumn d in row) map[d.getColumn] = d.getValue;
     return map;
   }
 
-  InsertMany bulkFromMap(List<Map<String, dynamic>> items) {
-    _bulkValues.clear();
-    _bulkValues.addAll(items);
+  /// Adds a single [row] to be inserted.
+  InsertMany addMap(Map<String, dynamic> row) {
+    _bulkValues.add(row);
     return this;
   }
 
+  /// Adds many [rows] to be inserted.
+  InsertMany addAllMap(Iterable<Map<String, dynamic>> rows) {
+    _bulkValues.addAll(rows);
+    return this;
+  }
+
+  /// Executes the statement with the given adapter.
   Future<T> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
 
-  QueryInsertManyInfo _info;
+  ImmutableInsertManyStatement _immutable;
 
-  QueryInsertManyInfo get info => _info;
+  /// Read-only representation of this statement.
+  ImmutableInsertManyStatement get asImmutable => _immutable;
 }
 
-class QueryInsertManyInfo {
+class ImmutableInsertManyStatement {
   final InsertMany _inner;
 
-  QueryInsertManyInfo(this._inner)
-      : values = new UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(_inner._bulkValues.map((values) => UnmodifiableMapView(values)));
+  ImmutableInsertManyStatement(this._inner)
+      : values = new UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
+            _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 
-  String get tableName => _inner.tableName;
+  String get table => _inner.table;
 
   final UnmodifiableListView<UnmodifiableMapView<String, dynamic>> values;
 }

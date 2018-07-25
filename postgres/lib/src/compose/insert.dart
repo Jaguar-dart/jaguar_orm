@@ -1,11 +1,11 @@
 part of query.compose;
 
 String composeInsert(final Insert st) {
-  final QueryInsertInfo info = st.info;
+  final ImmutableInsertStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('INSERT INTO ');
-  sb.write(info.tableName);
+  sb.write(info.table);
   sb.write('(');
 
   sb.write(info.values.keys.join(', '));
@@ -34,6 +34,8 @@ String composeValue(dynamic val) {
     return "$val"; //TODO
   } else if (val is bool) {
     return val ? 'TRUE' : 'FALSE';
+  } else if (val is Col) {
+    return composeCol(val);
   } else {
     throw new Exception("Invalid type ${val.runtimeType}!");
   }

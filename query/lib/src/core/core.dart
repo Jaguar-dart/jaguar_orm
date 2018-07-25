@@ -27,7 +27,8 @@ part 'statement/insert.dart';
 part 'statement/insert_many.dart';
 part 'statement/update.dart';
 part 'statement/remove.dart';
-part 'statement/create.dart';
+part 'statement/create/create.dart';
+part 'statement/create/column.dart';
 part 'statement/create_db.dart';
 part 'statement/drop.dart';
 
@@ -61,4 +62,6 @@ class Sql {
 
   /// Returns a new [CreateDb] statement
   static CreateDb createDb(String database) => new CreateDb(database);
+
+  static DropDb dropDb(String database) => new DropDb(database);
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
+import 'package:jaguar_query_postgres/composer.dart';
 import 'package:jaguar_query/jaguar_query.dart';
 
 class Author {
@@ -8,8 +9,6 @@ class Author {
   int id;
 
   String name;
-
-  String penName;
 
   static String tableName = 'author';
 }
@@ -23,8 +22,6 @@ class Post {
 
   int likes;
 
-  int replies;
-
   static String tableName = 'post';
 }
 
@@ -33,39 +30,46 @@ main() async {
       new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
   await adapter.connect();
 
-  await adapter.remove(Sql.remove(Post.tableName));
-  await adapter.remove(Sql.remove(Author.tableName));
+  await Sql.drop(Post.tableName).exec(adapter);
+  await Sql.drop(Author.tableName).exec(adapter);
 
-  {
-    final ins = new Insert();
-    ins.into(Author.tableName).setValues(<String, dynamic>{
-      "_id": '1',
-      "name": "Ho",
-    });
-    await adapter.insert(ins);
-  }
+  await Sql.create(Author.tableName)
+      .addPrimaryInt('id')
+      .addStr('name', length: 50)
+      .exec(adapter);
 
-  {
-    final ins = new Insert();
-    ins.into(Post.tableName).setValues(<String, dynamic>{
-      "_id": 9,
-      "authorid": 1,
-      "message": "Message 9 from 3!",
-      "likes": 13,
-    });
-    await adapter.insert(ins);
-  }
+  await Sql.create(Post.tableName)
+      .addPrimaryInt('id')
+      .addInt('authorId', foreignTable: 'author', foreignCol: 'id')
+      .addStr('message', length: 150)
+      .addInt('likes')
+      .exec(adapter);
 
-  {
-    final st = Sql
-        .find(Post.tableName)
-        .fullJoin(Author.tableName)
-        .joinOn(eq('author._id', 1))
-        .where(eqCol('post.authorid', col('_id', 'author')));
+  await Sql.insert(Author.tableName).setValues(<String, dynamic>{
+    "id": '1',
+    "name": "Ho",
+  }).exec(adapter);
 
-    List<Map> res = await (await adapter.find(st)).toList();
-    print(res);
-  }
+  await Sql.insert(Post.tableName).setValues(<String, dynamic>{
+    "id": 9,
+    "authorid": 1,
+    "message": "Message 9 from 3!",
+    "likes": 13,
+  }).exec(adapter);
+
+  final data = await Sql.find(Post.tableName)
+      .fullJoin(Author.tableName)
+      .joinOn(eq('author.id', 1))
+      .where(eqCol('post.authorid', Col('id', 'author')))
+      .exec(adapter)
+      .one();
+  print(data);
+
+  var st = Sql.find(Post.tableName)
+      .fullJoin(Author.tableName)
+      .joinOn(eq('author.id', 1))
+      .where(eqCol('post.authorid', Col('id', 'author')));
+  print(composeFind(st));
 
   exit(0);
 }

@@ -29,12 +29,8 @@ class Find implements Statement {
 
   int _offset;
 
-  QueryFindInfo _info;
-
-  QueryFindInfo get info => _info;
-
   Find() {
-    _info = new QueryFindInfo(this);
+    _immutable = new ImmutableFindStatement(this);
   }
 
   Find from(String tableName, [String alias]) {
@@ -207,12 +203,20 @@ class Find implements Statement {
 
   FindExecutor<ConnType> exec<ConnType>(Adapter<ConnType> adapter) =>
       new FindExecutor<ConnType>(adapter, this);
+
+  String compose(Adapter adapter) {
+
+  }
+
+  ImmutableFindStatement _immutable;
+
+  ImmutableFindStatement get asImmutable => _immutable;
 }
 
-class QueryFindInfo {
+class ImmutableFindStatement {
   Find _find;
 
-  QueryFindInfo(this._find)
+  ImmutableFindStatement(this._find)
       : selects = new UnmodifiableListView<SelColumn>(_find._column),
         joins = new UnmodifiableListView<JoinedTable>(_find._joins),
         orderBy = new UnmodifiableListView<OrderBy>(_find._orderBy),

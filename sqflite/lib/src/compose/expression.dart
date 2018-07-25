@@ -52,3 +52,22 @@ String composeExpression(final Expression exp) {
 
 String composeCol(final Col col) =>
     (col.tableAlias != null ? col.tableAlias + '.' : '') + col.field;
+
+String composeValue(dynamic val) {
+  if (val == null) return null;
+  if (val is int) {
+    return "$val";
+  } else if (val is String) {
+    return "'$val'";
+  } else if (val is double || val is num) {
+    return "$val";
+  } else if (val is DateTime) {
+    return '"$val"';
+  } else if (val is bool) {
+    return val ? "1" : "0";
+  } else if (val is Col) {
+    return composeCol(val);
+  } else {
+    throw new Exception("Invalid type ${val.runtimeType}!");
+  }
+}

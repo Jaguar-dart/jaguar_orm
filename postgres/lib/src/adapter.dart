@@ -71,6 +71,11 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
     return ret.first.first;
   }
 
+  @override
+  Future<void> insertMany<T>(InsertMany statement) {
+    throw new UnimplementedError('InsertMany is not implemented yet!');
+  }
+
   /// Updates a record in the table
   Future<int> update(Update st) => _connection.execute(composeUpdate(st));
 

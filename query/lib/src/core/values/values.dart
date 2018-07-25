@@ -28,6 +28,3 @@ class Col<ValType> {
   static Col<core.bool> bool(String field, [String tableName]) =>
       new Col<core.bool>(field, tableName);
 }
-
-Col<ValType> col<ValType>(String field, [String tableName]) =>
-    new Col<ValType>(field, tableName);

@@ -64,7 +64,7 @@ String composeOrderBy(final OrderBy orderBy) =>
     '${orderBy.columnName} ' + (orderBy.ascending ? 'ASC' : 'DESC');
 
 String composeFind(final Find find) {
-  final QueryFindInfo info = find.info;
+  final ImmutableFindStatement info = find.asImmutable;
   final sb = new StringBuffer();
   sb.write('SELECT ');
 

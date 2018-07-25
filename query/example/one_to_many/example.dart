@@ -94,7 +94,7 @@ Future<List<Author>> getAuthors() async =>
         .toList();
 
 Future<Author> getAuthorId(int id) async {
-  Find st = Sql.find('author').where(col('_id').eq(id));
+  Find st = Sql.find('author').where(Col('_id').eq(id));
   Map map = await adapter.findOne(st);
   return new Author()
     ..id = map['_id']
@@ -129,7 +129,7 @@ Future<List<Post>> getPosts() =>
 
 Future<Post> getPostById(int id) => Sql
     .find('post')
-    .where(col('_id').eq(id))
+    .where(Col('_id').eq(id))
     .exec(adapter)
     .oneMapped(postSerializer);
 
@@ -139,8 +139,8 @@ Future<Post> getPostByIdRelated(int id) async {
       .sel('post.*')
       .selManyPrefixed('author', ['_id', 'name'])
       .innerJoin('author', 'author')
-      .joinOn(col('authorId', 'post').eqC(col('_id', 'author')))
-      .where(col('_id', 'post').eq(id));
+      .joinOn(Col('authorId', 'post').eqC(Col('_id', 'author')))
+      .where(Col('_id', 'post').eq(id));
   Map map = await adapter.findOne(st);
 
   final post = new Post()
@@ -156,7 +156,7 @@ Future<Post> getPostByIdRelated(int id) async {
 
 Future<List<Post>> getPostsByAuthorId(int authorId) => Sql
     .find('post')
-    .where(col('authorId').eq(authorId))
+    .where(Col('authorId').eq(authorId))
     .exec(adapter)
     .manyMapped(postSerializer);
 
@@ -184,7 +184,7 @@ main() async {
   print(await getAuthors());
 
   final int post1Id = await insertPost(author1Id, 'Message 1', 10);
-  final int post2Id = await insertPost(author1Id, 'Message 2', 15);
+  await insertPost(author1Id, 'Message 2', 15);
 
   print(await getPosts());
 

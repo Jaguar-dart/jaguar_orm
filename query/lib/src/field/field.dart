@@ -27,7 +27,7 @@ class Field<ValType> {
   ///     Field<int> author = new Field<int>('age');
   ///     find.where(age.eq(20));
   Cond<ValType> eq(ValType value, {String tableAlias}) =>
-      Cond.eq<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.eq<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns a "not equal to" condition
   ///
@@ -35,7 +35,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ne(20));
   Cond<ValType> ne(ValType value, {String tableAlias}) =>
-      Cond.ne<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.ne<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns a "greater than" condition
   ///
@@ -43,7 +43,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gt(20));
   Cond<ValType> gt(ValType value, {String tableAlias}) =>
-      Cond.gt<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.gt<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns a "greater than equal to" condition
   ///
@@ -51,7 +51,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtEq(20));
   Cond<ValType> gtEq(ValType value, {String tableAlias}) =>
-      Cond.gtEq<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.gtEq<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns a "less than equal to" condition
   ///
@@ -59,7 +59,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltEq(20));
   Cond<ValType> ltEq(ValType value, {String tableAlias}) =>
-      Cond.ltEq<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.ltEq<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns a "less than" condition
   ///
@@ -67,7 +67,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.lt(20));
   Cond<ValType> lt(ValType value, {String tableAlias}) =>
-      Cond.lt<ValType>(col<ValType>(name, tableAlias), value);
+      Cond.lt<ValType>(new Col<ValType>(name, tableAlias), value);
 
   /// Returns an "in between" condition
   ///
@@ -75,7 +75,9 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.between(20, 30));
   Between<ValType> between(ValType low, ValType high, {String tableAlias}) =>
-      Cond.between<ValType>(col<ValType>(name, tableAlias), low, high);
+      Cond.between<ValType>(new Col<ValType>(name, tableAlias), low, high);
+
+  Col<ValType> asCol([String tableAlias]) => new Col<ValType>(name, tableAlias);
 
   /// Returns an "is equal to" condition
   ///
@@ -83,7 +85,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.eqCol(col('age', 'employee')));
   CondCol<ValType> eqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.eq<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.eq<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns a "not equal to" condition
   ///
@@ -91,7 +93,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.neCol(col('age', 'employee')));
   CondCol<ValType> neCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.ne<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.ne<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns a "greater than" condition
   ///
@@ -99,7 +101,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtCol(col('age', 'employee')));
   CondCol<ValType> gtCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.gt<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.gt<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns a "greater than equal to" condition
   ///
@@ -107,7 +109,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtEqCol(col('age', 'employee')));
   CondCol<ValType> gtEqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.gtEq<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.gtEq<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns a "less than equal to" condition
   ///
@@ -115,7 +117,7 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltEqCol(col('age', 'employee')));
   CondCol<ValType> ltEqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.ltEq<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.ltEq<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns a "less than" condition
   ///
@@ -123,12 +125,12 @@ class Field<ValType> {
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltCol(col('age', 'employee')));
   CondCol<ValType> ltCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.lt<ValType>(col<ValType>(name, tableAlias), rhs);
+      CondCol.lt<ValType>(new Col<ValType>(name, tableAlias), rhs);
 
   /// Returns an "in between" condition
   InBetweenCol<ValType> inBetweenCol(Col<ValType> low, Col<ValType> high,
           {String tableAlias}) =>
-      CondCol.between<ValType>(col<ValType>(name, tableAlias), low, high);
+      CondCol.between<ValType>(new Col<ValType>(name, tableAlias), low, high);
 
   /// Returns a "set column" clause
   ///
@@ -162,29 +164,17 @@ class IntField extends Field<int> {
   void create(Create statement,
       {bool autoIncrement: false,
       bool primary: false,
+      bool isNullable: false,
       String foreignTable,
       String foreignCol,
-      Unique unique: const Unique.Not()}) {
+      String uniqueGroup}) {
     statement.addInt(name,
+        isNullable: isNullable,
         autoIncrement: autoIncrement,
         primary: primary,
         foreignTable: foreignTable,
         foreignCol: foreignCol,
-        unique: unique);
-  }
-
-  /// Adds the field to create statement
-  void createNullable(Create statement,
-      {bool autoIncrement: false,
-      bool primary: false,
-      String foreignTable,
-      String foreignCol,
-      Unique unique: const Unique.Not()}) {
-    statement.addNullInt(name,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        unique: unique);
+        uniqueGroup: uniqueGroup);
   }
 }
 
@@ -193,30 +183,17 @@ class DoubleField extends Field<double> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool autoIncrement: false,
+      {bool isNullable: false,
       bool primary: false,
       String foreignTable,
       String foreignCol,
-      Unique unique: const Unique.Not()}) {
+      String uniqueGroup}) {
     statement.addDouble(name,
-        autoIncrement: autoIncrement,
+        isNullable: isNullable,
         primary: primary,
         foreignTable: foreignTable,
         foreignCol: foreignCol,
-        unique: unique);
-  }
-
-  /// Adds the field to create statement
-  void createNullable(Create statement,
-      {bool primary: false,
-      String foreignTable,
-      String foreignCol,
-      Unique unique: const Unique.Not()}) {
-    statement.addNullDouble(name,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        unique: unique);
+        uniqueGroup: uniqueGroup);
   }
 }
 
@@ -234,36 +211,23 @@ class StrField extends Field<String> {
   ///     Field<String> author = new Field<String>('author');
   ///     find.where(author.like('%Mark%'));
   Cond<String> like(String value, {String tableAlias}) =>
-      Cond.like(col<String>(name, tableAlias), value);
+      Cond.like(new Col<String>(name, tableAlias), value);
 
   /// Adds the field to create statement
   void create(Create statement,
-      {int length: 20,
+      {bool isNullable: false,
+      int length: 20,
       bool primary: false,
       String foreignTable,
       String foreignCol,
-      Unique unique: const Unique.Not()}) {
+      String uniqueGroup}) {
     statement.addStr(name,
+        isNullable: isNullable,
         length: length,
         primary: primary,
         foreignTable: foreignTable,
         foreignCol: foreignCol,
-        unique: unique);
-  }
-
-  /// Adds the field to create statement
-  void createNullable(Create statement,
-      {int length: 20,
-      bool primary: false,
-      String foreignTable,
-      String foreignCol,
-      Unique unique: const Unique.Not()}) {
-    statement.addNullStr(name,
-        length: length,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        unique: unique);
+        uniqueGroup: uniqueGroup);
   }
 }
 
@@ -271,13 +235,9 @@ class DateTimeField extends Field<DateTime> {
   DateTimeField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {Unique unique: const Unique.Not()}) {
-    statement.addDateTime(name, unique: unique);
-  }
-
-  /// Adds the field to create statement
-  void createNullable(Create statement, {Unique unique: const Unique.Not()}) {
-    statement.addNullDateTime(name, unique: unique);
+  void create(Create statement, {bool isNullable, String uniqueGroup}) {
+    statement.addDateTime(name,
+        isNullable: isNullable, uniqueGroup: uniqueGroup);
   }
 }
 
@@ -285,12 +245,7 @@ class BoolField extends Field<bool> {
   BoolField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {Unique unique: const Unique.Not()}) {
-    statement.addBool(name, unique: unique);
-  }
-
-  /// Adds the field to create statement
-  void createNullable(Create statement, {Unique unique: const Unique.Not()}) {
-    statement.addNullBool(name, unique: unique);
+  void create(Create statement, {bool isNullable: false, String uniqueGroup}) {
+    statement.addBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
   }
 }
