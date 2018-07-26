@@ -620,7 +620,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future<void> preload(${_b.modelType} model, {bool cascade: false}) async {');
+        'Future<${_b.modelType}> preload(${_b.modelType} model, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       _write('model.');
       _write(p.property);
@@ -643,6 +643,7 @@ class Writer {
         _write('${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
       }
     }
+    _writeln('return model;');
     _writeln('}');
   }
 
@@ -650,7 +651,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future<void> preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
+        'Future<List<${_b.modelType}>> preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
@@ -706,6 +707,7 @@ class Writer {
         _writeln('}');
       }
     }
+    _writeln('return models;');
     _writeln('}');
   }
 
