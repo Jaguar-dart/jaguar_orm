@@ -45,7 +45,7 @@ class InsertMany implements Statement {
 
   Map<String, dynamic> _convertColsToMap(Iterable<SetColumn> row) {
     final map = <String, dynamic>{};
-    for (SetColumn d in row) map[d.getColumn] = d.getValue;
+    for (SetColumn d in row) map[d.name] = d.value;
     return map;
   }
 

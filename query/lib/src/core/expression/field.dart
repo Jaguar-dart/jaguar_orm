@@ -1,144 +1,185 @@
-library jaguar_query.field;
-
-import 'package:jaguar_query/jaguar_query.dart';
-
-class Range<ValType> {
-  final ValType low;
-
-  final ValType high;
-
-  const Range(this.low, this.high);
-}
-
-Range<ValType> range<ValType>(ValType low, ValType high) =>
-    new Range(low, high);
+part of query;
 
 /// Field is a convenience DSL used to construct queries in a concise and
 /// understandable way.
+///
+/// Example:
+///
+///     final age = IntField(age);
+///     var value = await Find()
+///             .from('user')
+///             .where(age > 30)  // Simplifies query expressions
+///             .exec(adapter).one();
 class Field<ValType> {
   /// Name of the field
   final String name;
 
-  const Field(this.name);
+  final String tableName;
+
+  const Field(this.name) : tableName = null;
+
+  const Field.inTable(this.tableName, this.name);
 
   /// Returns an "is equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> author = new Field<int>('age');
   ///     find.where(age.eq(20));
-  Cond<ValType> eq(ValType value, {String tableAlias}) =>
-      Cond.eq<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> eq(ValType value) => Cond.eq<ValType>(this, value);
 
   /// Returns a "not equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ne(20));
-  Cond<ValType> ne(ValType value, {String tableAlias}) =>
-      Cond.ne<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> ne(ValType value) => Cond.ne<ValType>(this, value);
 
   /// Returns a "greater than" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gt(20));
-  Cond<ValType> gt(ValType value, {String tableAlias}) =>
-      Cond.gt<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> gt(ValType value) => Cond.gt<ValType>(this, value);
 
   /// Returns a "greater than equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtEq(20));
-  Cond<ValType> gtEq(ValType value, {String tableAlias}) =>
-      Cond.gtEq<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> gtEq(ValType value) => Cond.gtEq<ValType>(this, value);
 
   /// Returns a "less than equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltEq(20));
-  Cond<ValType> ltEq(ValType value, {String tableAlias}) =>
-      Cond.ltEq<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> ltEq(ValType value) => Cond.ltEq<ValType>(this, value);
 
   /// Returns a "less than" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.lt(20));
-  Cond<ValType> lt(ValType value, {String tableAlias}) =>
-      Cond.lt<ValType>(new Col<ValType>(name, tableAlias), value);
+  Cond<ValType> lt(ValType value) => Cond.lt<ValType>(this, value);
 
   /// Returns an "in between" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.between(20, 30));
-  Between<ValType> between(ValType low, ValType high, {String tableAlias}) =>
-      Cond.between<ValType>(new Col<ValType>(name, tableAlias), low, high);
+  Between<ValType> between(ValType low, ValType high) =>
+      Cond.between<ValType>(this, low, high);
 
-  Col<ValType> asCol([String tableAlias]) => new Col<ValType>(name, tableAlias);
+  Field<ValType> aliasAs(String tableAlias) =>
+      new Field<ValType>.inTable(tableAlias, name);
 
   /// Returns an "is equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.eqCol(col('age', 'employee')));
-  CondCol<ValType> eqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.eq<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> eqField(Field<ValType> rhs) =>
+      CondCol.eq<ValType>(this, rhs);
 
   /// Returns a "not equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.neCol(col('age', 'employee')));
-  CondCol<ValType> neCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.ne<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> neField(Field<ValType> rhs) =>
+      CondCol.ne<ValType>(this, rhs);
 
   /// Returns a "greater than" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtCol(col('age', 'employee')));
-  CondCol<ValType> gtCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.gt<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> gtField(Field<ValType> rhs) =>
+      CondCol.gt<ValType>(this, rhs);
 
   /// Returns a "greater than equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.gtEqCol(col('age', 'employee')));
-  CondCol<ValType> gtEqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.gtEq<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> gtEqField(Field<ValType> rhs) =>
+      CondCol.gtEq<ValType>(this, rhs);
 
   /// Returns a "less than equal to" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltEqCol(col('age', 'employee')));
-  CondCol<ValType> ltEqCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.ltEq<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> ltEqField(Field<ValType> rhs) =>
+      CondCol.ltEq<ValType>(this, rhs);
 
   /// Returns a "less than" condition
   ///
   ///     FindStatement find = new FindStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     find.where(age.ltCol(col('age', 'employee')));
-  CondCol<ValType> ltCol(Col<ValType> rhs, {String tableAlias}) =>
-      CondCol.lt<ValType>(new Col<ValType>(name, tableAlias), rhs);
+  CondCol<ValType> ltField(Field<ValType> rhs) =>
+      CondCol.lt<ValType>(this, rhs);
 
   /// Returns an "in between" condition
-  InBetweenCol<ValType> inBetweenCol(Col<ValType> low, Col<ValType> high,
-          {String tableAlias}) =>
-      CondCol.between<ValType>(new Col<ValType>(name, tableAlias), low, high);
+  InBetweenCol<ValType> inBetweenFields(
+          Field<ValType> low, Field<ValType> high) =>
+      CondCol.between<ValType>(this, low, high);
+
+  /// Returns an "is equal to" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.eqCol(col('age', 'employee')));
+  CondCol<ValType> eqF(String name, {String table}) =>
+      CondCol.eq<ValType>(this, Field<ValType>.inTable(table, name));
+
+  /// Returns a "not equal to" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.neCol(col('age', 'employee')));
+  CondCol<ValType> neF(String name, {String table}) =>
+      CondCol.ne<ValType>(this, Field<ValType>.inTable(table, name));
+
+  /// Returns a "greater than" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.gtCol(col('age', 'employee')));
+  CondCol<ValType> gtF(String name, {String table}) =>
+      CondCol.gt<ValType>(this, Field<ValType>.inTable(table, name));
+
+  /// Returns a "greater than equal to" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.gtEqCol(col('age', 'employee')));
+  CondCol<ValType> gtEqF(String name, {String table}) =>
+      CondCol.gtEq<ValType>(this, Field<ValType>.inTable(table, name));
+
+  /// Returns a "less than equal to" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.ltEqCol(col('age', 'employee')));
+  CondCol<ValType> ltEqF(String name, {String table}) =>
+      CondCol.ltEq<ValType>(this, Field<ValType>.inTable(table, name));
+
+  /// Returns a "less than" condition
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> age = new Field<int>('age');
+  ///     find.where(age.ltCol(col('age', 'employee')));
+  CondCol<ValType> ltF(String name, {String table}) =>
+      CondCol.lt<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "set column" clause
   ///
   ///     UpdateStatement update = new UpdateStatement();
   ///     Field<int> age = new Field<int>('age');
   ///     update.set(age.set(20));
-  SetColumn<ValType> set(ValType value) =>
-      new SetColumn<ValType>().column(name).set(value);
+  SetColumn<ValType> set(ValType value) => new SetColumn<ValType>(name, value);
 
   Cond<ValType> operator <(ValType other) {
     return lt(other);
@@ -157,6 +198,16 @@ class Field<ValType> {
   }
 }
 
+/// IntField is a convenience DSL used to construct queries in a concise and
+/// understandable way.
+///
+/// Example:
+///
+///     final age = IntField(age);
+///     var value = await Find()
+///             .from('user')
+///             .where(age > 30)  // Simplifies query expressions
+///             .exec(adapter).one();
 class IntField extends Field<int> {
   IntField(String name) : super(name);
 
@@ -178,6 +229,16 @@ class IntField extends Field<int> {
   }
 }
 
+/// DoubleField is a convenience DSL used to construct queries in a concise and
+/// understandable way.
+///
+/// Example:
+///
+///     final score = DoubleField('age');
+///     var value = await Find()
+///             .from('user')
+///             .where(score > 90.0)  // Simplifies query expressions
+///             .exec(adapter).one();
 class DoubleField extends Field<double> {
   DoubleField(String name) : super(name);
 
@@ -197,6 +258,16 @@ class DoubleField extends Field<double> {
   }
 }
 
+/// StrField is a convenience DSL used to construct queries in a concise and
+/// understandable way.
+///
+/// Example:
+///
+///     final name = DoubleField('name');
+///     var value = await Find()
+///             .from('user')
+///             .where(name.eq('teja'))  // Simplifies query expressions
+///             .exec(adapter).one();
 class StrField extends Field<String> {
   StrField(String name) : super(name);
 
@@ -210,8 +281,7 @@ class StrField extends Field<String> {
   ///     FindStatement find = new FindStatement();
   ///     Field<String> author = new Field<String>('author');
   ///     find.where(author.like('%Mark%'));
-  Cond<String> like(String value, {String tableAlias}) =>
-      Cond.like(new Col<String>(name, tableAlias), value);
+  Cond<String> like(String value) => Cond.like(this, value);
 
   /// Adds the field to create statement
   void create(Create statement,
@@ -231,6 +301,8 @@ class StrField extends Field<String> {
   }
 }
 
+/// DateTimeField is a convenience DSL used to construct queries in a concise and
+/// understandable way.
 class DateTimeField extends Field<DateTime> {
   DateTimeField(String name) : super(name);
 
@@ -241,6 +313,8 @@ class DateTimeField extends Field<DateTime> {
   }
 }
 
+/// BoolField is a convenience DSL used to construct queries in a concise and
+/// understandable way.
 class BoolField extends Field<bool> {
   BoolField(String name) : super(name);
 

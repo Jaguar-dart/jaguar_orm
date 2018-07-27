@@ -9,5 +9,4 @@ library query;
 export 'src/adapter/adapter.dart';
 export 'src/bean/bean.dart';
 export 'src/core/core.dart';
-export 'src/field/field.dart';
 export 'src/operators/operators.dart';

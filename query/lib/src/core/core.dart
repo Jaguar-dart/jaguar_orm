@@ -10,11 +10,11 @@ import 'dart:collection';
 
 import 'package:jaguar_query/src/operators/operators.dart' as q;
 import 'package:jaguar_query/src/adapter/adapter.dart';
-import 'package:jaguar_query/src/field/field.dart';
 
 part 'expression/and.dart';
 part 'expression/condition.dart';
 part 'expression/expressions.dart';
+part 'expression/field.dart';
 part 'expression/in_between.dart';
 part 'expression/or.dart';
 
@@ -33,8 +33,6 @@ part 'statement/create_db.dart';
 part 'statement/drop.dart';
 
 part 'table/table.dart';
-
-part 'values/values.dart';
 
 /// Main DSL class to create SQL statements
 class Sql {

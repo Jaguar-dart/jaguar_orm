@@ -15,26 +15,19 @@ class CountSelColumn extends SelColumn {
       : super(name, alias);
 }
 
+/// name:value pair used to set a column named [name] to [value]. Used during
+/// inserts and updates.
 class SetColumn<ValType> {
-  String _column;
+  /// Name of the column to set
+  final String name;
 
-  ValType _value;
+  /// Value of the column
+  final ValType value;
 
-  SetColumn();
+  SetColumn(this.name, this.value);
 
-  SetColumn<ValType> column(String column) {
-    _column = column;
-    return this;
-  }
-
-  SetColumn<ValType> set(ValType value) {
-    _value = value;
-    return this;
-  }
-
-  String get getColumn => _column;
-
-  ValType get getValue => _value;
+  /// Returns a new [SetColumn] that sets the current column to new [value].
+  SetColumn<ValType> setTo(ValType value) => SetColumn<ValType>(name, value);
 }
 
 abstract class Statement {}

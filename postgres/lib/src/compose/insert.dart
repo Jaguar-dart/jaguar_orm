@@ -34,8 +34,8 @@ String composeValue(dynamic val) {
     return "$val"; //TODO
   } else if (val is bool) {
     return val ? 'TRUE' : 'FALSE';
-  } else if (val is Col) {
-    return composeCol(val);
+  } else if (val is Field) {
+    return composeField(val);
   } else {
     throw new Exception("Invalid type ${val.runtimeType}!");
   }

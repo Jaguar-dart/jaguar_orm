@@ -50,7 +50,7 @@ class Insert implements Statement {
   /// Sets many [columns] with a single call.
   Insert setMany(Iterable<SetColumn> columns) {
     for (SetColumn col in columns) {
-      _values[col._column] = col._value;
+      _values[col.name] = col.value;
     }
     return this;
   }

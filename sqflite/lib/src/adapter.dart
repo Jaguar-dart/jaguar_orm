@@ -36,11 +36,11 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
   /// Finds one record in the table
   Future<Map> findOne(Find st) async {
     String stStr = composeFind(st);
-    List<Map<String, dynamic>> stream = await _connection.rawQuery(stStr);
+    List<Map<String, dynamic>> list = await _connection.rawQuery(stStr);
 
-    if (stream.length == 0) return null;
+    if (list.length == 0) return null;
 
-    return stream.first;
+    return list.first;
   }
 
   // Finds many records in the table

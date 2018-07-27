@@ -46,12 +46,20 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   /// Finds one record in the table
   Future<Map> findOne(Find st) async {
     String stStr = composeFind(st);
-    List<Map<String, Map<String, dynamic>>> stream =
+    List<Map<String, Map<String, dynamic>>> rows =
         await _connection.mappedResultsQuery(stStr);
 
-    if (stream.length == 0) return null;
+    if (rows.isEmpty) return null;
 
-    return stream.first.values.first;
+    Map<String, Map<String, dynamic>> row = rows.first;
+
+    if(row.length == 0) return {};
+
+    if(row.length == 1) return rows.first.values.first;
+
+    final ret = <String, dynamic>{};
+    for(Map<String,dynamic> table in row.values) ret.addAll(table);
+    return ret;
   }
 
   // Finds many records in the table

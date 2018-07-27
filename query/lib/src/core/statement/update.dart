@@ -26,7 +26,7 @@ class Update implements Statement {
 
   Update setMany(List<SetColumn> columns) {
     columns.forEach((SetColumn column) {
-      setValue(column._column, column._value);
+      setValue(column.name, column.value);
     });
     return this;
   }

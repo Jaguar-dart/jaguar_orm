@@ -54,14 +54,6 @@ abstract class Bean<ModelType> {
   /// Removes all rows in table/document
   Future<int> removeAll() => adapter.remove(remover);
 
-  /// Creates a model from the map
-  ModelType fromMap(Map map);
-
-  /// Creates list of 'set' column from model to be used in update or insert
-  /// query
-  List<SetColumn> toSetColumns(ModelType model,
-      {bool update = false, Set<String> only});
-
   Future<ModelType> findOneWhere(
       /* Expression | ExpressionMaker<ModelType> */ exp) async {
     final Find find = finder.where(exp);
@@ -80,8 +72,6 @@ abstract class Bean<ModelType> {
     return adapter.remove(remover.where(where));
   }
 
-  Map<String, Field> get fields;
-
   Future<int> updateFields(
       /* Expression | ExpressionMaker<ModelType> */ where,
       Map<String, dynamic> values) async {
@@ -94,4 +84,17 @@ abstract class Bean<ModelType> {
     }
     return adapter.update(st);
   }
+
+  //>>    Implement these  <<//
+
+  /// Map of fields in the table
+  Map<String, Field> get fields;
+
+  /// Creates a model from the map
+  ModelType fromMap(Map map);
+
+  /// Creates list of 'set' column from model to be used in update or insert
+  /// query
+  List<SetColumn> toSetColumns(ModelType model,
+      {bool update = false, Set<String> only});
 }

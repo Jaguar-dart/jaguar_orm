@@ -48,11 +48,6 @@ abstract class Adapter<ConnType> {
   T parseValue<T>(dynamic v);
 }
 
-/// Used to convert [Map] to model [ModelType]
-abstract class Mapper<ModelType> {
-  ModelType fromMap(Map map);
-}
-
 /// Convenience class to execute `Find` statement using [adapter]
 class FindExecutor<ConnType> {
   /// The adapter used to execute find statement
@@ -69,12 +64,12 @@ class FindExecutor<ConnType> {
   Future<List<Map>> many() async => await adapter.find(_st);
 
   /// Returns a row found by executing [statement]
-  Future<T> oneMapped<T>(Mapper<T> mapper) async {
+  Future<T> oneTo<T>(T converter(Map v)) async {
     final Map map = await adapter.findOne(_st);
-    return mapper.fromMap(map);
+    return converter(map);
   }
 
   /// Returns a row found by executing [statement]
-  Future<List<T>> manyMapped<T>(Mapper<T> mapper) async =>
-      (await adapter.find(_st)).map(mapper.fromMap).toList();
+  Future<List<T>> manyTo<T>(T converter(Map v)) async =>
+      (await adapter.find(_st)).map(converter).toList();
 }

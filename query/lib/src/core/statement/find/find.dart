@@ -90,6 +90,18 @@ class Find implements Statement {
     return this;
   }
 
+  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
+  Find selAll() {
+    _column.add(new SelColumn('*'));
+    return this;
+  }
+
+  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
+  Find selAllFromTable(String table) {
+    _column.add(new SelColumn('$table.*'));
+    return this;
+  }
+
   /// Selects many [columns] to be fetched. Use [alias] to alias the column name.
   Find selMany(Iterable<String> columns, [String alias]) {
     for (String columnName in columns) {
@@ -182,7 +194,7 @@ class Find implements Statement {
   Find between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
-  Find eqCol<T>(String column, Col<T> val) => and(q.eqCol<T>(column, val));
+  // TODO Find eqCol<T>(String column, Col<T> val) => and(q.eqCol<T>(column, val));
 
   Find orderBy(String column, [bool ascending = false]) {
     _orderBy.add(new OrderBy(column, ascending));

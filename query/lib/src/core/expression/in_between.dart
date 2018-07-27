@@ -3,7 +3,7 @@ part of query;
 /// An in-between conditional expression
 class Between<ValType> extends Expression {
   /// The field/column of the condition
-  final Col<ValType> field;
+  final Field<ValType> field;
 
   /// The low value of the in-between condition
   final ValType low;
@@ -32,13 +32,13 @@ class Between<ValType> extends Expression {
 /// An in-between conditional expression
 class InBetweenCol<ValType> extends Expression {
   /// The field/column of the condition
-  final Col<ValType> field;
+  final Field<ValType> field;
 
   /// The low value of the in-between condition
-  final Col<ValType> low;
+  final Field<ValType> low;
 
   /// The high value of the in-between condition
-  final Col<ValType> high;
+  final Field<ValType> high;
 
   const InBetweenCol(this.field, this.low, this.high);
 
