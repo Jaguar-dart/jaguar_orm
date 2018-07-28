@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
+import 'package:jaguar_query_postgres/composer.dart';
 
 class Author {
   int id;
@@ -47,6 +48,7 @@ final PgAdapter adapter =
 
 Future<void> dropTables() async {
   final st = new Drop(['post', 'author'], onlyIfExists: true);
+  print(composeDrop(st));
   await adapter.dropTable(st);
 }
 

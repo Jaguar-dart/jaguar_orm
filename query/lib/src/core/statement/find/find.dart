@@ -4,7 +4,7 @@ part of query;
 class Find implements Statement {
   final _column = <SelColumn>[];
 
-  TableName _from;
+  final TableName from;
 
   final _joins = <JoinedTable>[];
 
@@ -20,16 +20,10 @@ class Find implements Statement {
 
   int _offset;
 
-  Find() {
+  Find(String tableName, {String alias, Expression where})
+      : from = new TableName(tableName, alias) {
+    if(where != null) this.where(where);
     _immutable = new ImmutableFindStatement(this);
-  }
-
-  /// Table from which to find the rows. Use [alias] to alias the table name.
-  Find from(String tableName, [String alias]) {
-    if (_from != null) throw new Exception('Table name already specified!');
-
-    _from = new TableName(tableName, alias);
-    return this;
   }
 
   /// Adds a 'join' clause to the select statement
@@ -194,8 +188,6 @@ class Find implements Statement {
   Find between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
-  // TODO Find eqCol<T>(String column, Col<T> val) => and(q.eqCol<T>(column, val));
-
   Find orderBy(String column, [bool ascending = false]) {
     _orderBy.add(new OrderBy(column, ascending));
     return this;
@@ -251,7 +243,7 @@ class ImmutableFindStatement {
         orderBy = new UnmodifiableListView<OrderBy>(_find._orderBy),
         groupBy = new UnmodifiableListView<String>(_find._groupBy);
 
-  TableName get from => _find._from;
+  TableName get from => _find.from;
 
   final UnmodifiableListView<SelColumn> selects;
 
