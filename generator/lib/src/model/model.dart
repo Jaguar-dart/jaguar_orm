@@ -1,5 +1,6 @@
 library jaguar_orm.generator.model;
 
+import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 
@@ -21,24 +22,25 @@ class Field {
 
   final String colName;
 
-  final bool nullable;
+  final bool isNullable;
 
   final bool autoIncrement;
 
   final int length;
 
-  final bool primary;
+  final bool isPrimary;
 
   final Foreign foreign;
 
-  // TODO unique
+  final String unique;
 
   Field(this.type, this.field, String colName,
-      {this.nullable: false,
-      this.autoIncrement: false,
-      this.length,
-      this.primary: false,
-      this.foreign})
+      {@required this.isNullable,
+      @required this.autoIncrement,
+      @required this.length,
+      @required this.isPrimary,
+      @required this.foreign,
+      @required this.unique})
       : colName = colName ?? field;
 }
 

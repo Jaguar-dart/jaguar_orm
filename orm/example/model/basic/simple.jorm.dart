@@ -45,15 +45,22 @@ abstract class _UserBean implements Bean<User> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true);
-    st.addStr(name.name);
-    st.addInt(age.name);
+    st.addStr(id.name, primary: true, isNullable: false);
+    st.addStr(name.name, isNullable: false);
+    st.addInt(age.name, isNullable: true);
     return adapter.createTable(st);
   }
 
   Future<dynamic> insert(User model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
+  }
+
+  Future<void> insertMany(List<User> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(User model, {Set<String> only}) async {

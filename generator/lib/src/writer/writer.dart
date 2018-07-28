@@ -11,28 +11,12 @@ class Writer {
     _generate();
   }
 
-  String toString() => _w.toString();
-
-  String camToSnak(String str) {
-    final sb = new StringBuffer();
-
-    for (int i = 0; i < str.length; i++) {
-      final int code = str.codeUnitAt(i);
-      if (code >= 65 && code <= 90) {
-        sb.write('_');
-      }
-      sb.writeCharCode(code);
-    }
-
-    return sb.toString().toLowerCase();
-  }
-
   void _generate() {
     _w.writeln('abstract class _${_b.name} implements Bean<${_b.modelType}> {');
 
     for (Field field in _b.fields.values) {
       _writeln(
-          "final ${field.field} = new ${field.vType}('${camToSnak(field.colName)}');");
+          "final ${field.field} = new ${field.vType}('${_camToSnak(field.colName)}');");
     }
 
     _writeFieldsMap();
@@ -96,7 +80,7 @@ class Writer {
 
     _b.fields.values.forEach((Field field) {
       _w.writeln(
-          "model.${field.field} = adapter.parseValue(map['${camToSnak(field.colName)}']);");
+          "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
     });
 
     _w.writeln();
@@ -117,7 +101,7 @@ class Writer {
       } else if (f.type == 'int') {
         _write('Int');
       } else if (f.type == 'num' || f.type == 'double') {
-        _write('Int');
+        _write('Double');
       } else if (f.type == 'DateTime') {
         _write('DateTime');
       } else {
@@ -126,7 +110,7 @@ class Writer {
       _write('(');
       _write('${f.field}.name');
 
-      if (f.primary) {
+      if (f.isPrimary) {
         _write(', primary: true');
       }
 
@@ -153,6 +137,10 @@ class Writer {
         }
         _write(", length: ${f.length}");
       }
+
+      _write(', isNullable: ${f.isNullable}');
+
+      if (f.unique != null) _write(', uniqueGroup: "${f.unique}"');
 
       _writeln(');');
     }
@@ -315,8 +303,9 @@ class Writer {
     if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
       cascade = ', {bool cascade: false}';
     }
-    _w.writeln('Future<void> insertMany(List<${_b.modelType}> models${cascade}) async {');
-    if(cascade.isNotEmpty) {
+    _w.writeln(
+        'Future<void> insertMany(List<${_b.modelType}> models${cascade}) async {');
+    if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
       _w.write('for (var model in models) {');
@@ -327,11 +316,12 @@ class Writer {
       _w.write('else {');
     }
 
-    _w.write('final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
-    _w.writeln('final InsertMany insert = inserters.bulk(data);');
+    _w.write(
+        'final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
+    _w.writeln('final InsertMany insert = inserters.addAll(data);');
     _w.writeln('return adapter.insertMany(insert);');
 
-    if(cascade.isNotEmpty) {
+    if (cascade.isNotEmpty) {
       _w.writeln('}');
     }
 
@@ -869,9 +859,25 @@ class Writer {
   void _write(String str) => _w.write(str);
 
   void _writeln(String str) => _w.writeln(str);
+
+  String toString() => _w.toString();
 }
 
 String _cap(String str) => str.substring(0, 1).toUpperCase() + str.substring(1);
 
 String _uncap(String str) =>
     str.substring(0, 1).toLowerCase() + str.substring(1);
+
+String _camToSnak(String str) {
+  final sb = new StringBuffer();
+
+  for (int i = 0; i < str.length; i++) {
+    final int code = str.codeUnitAt(i);
+    if (code >= 65 && code <= 90) {
+      sb.write('_');
+    }
+    sb.writeCharCode(code);
+  }
+
+  return sb.toString().toLowerCase();
+}

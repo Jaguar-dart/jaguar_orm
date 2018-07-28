@@ -1,6 +1,6 @@
 library jaguar_orm.annotation;
 
-export 'package:jaguar_query/jaguar_query.dart' show OrderBy;
+export 'package:jaguar_query/jaguar_query.dart';
 
 part 'property.dart';
 part 'relations.dart';

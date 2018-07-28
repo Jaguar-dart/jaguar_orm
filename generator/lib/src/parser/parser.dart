@@ -288,10 +288,11 @@ class ParsedBean {
         final val = parseColumn(field, spec);
 
         fields[val.field] = val;
-        if (val.primary) primaries.add(val);
+        if (val.isPrimary) primaries.add(val);
       }
     }
 
+    /// Parse getters, setters and fields in model
     for (FieldElement field in modelClass.fields) {
       try {
         if (fields.containsKey(field.name)) continue;
@@ -324,10 +325,16 @@ class ParsedBean {
 
         if (val is Field) {
           fields[val.field] = val;
-          if (val.primary) primaries.add(val);
+          if (val.isPrimary) primaries.add(val);
         } else {
           if (!_relation(clazz.type, field)) {
-            final vf = new Field(field.type.name, field.name, field.name);
+            final vf = new Field(field.type.name, field.name, field.name,
+                unique: null,
+                length: null,
+                autoIncrement: false,
+                isNullable: false,
+                foreign: null,
+                isPrimary: false);
             fields[vf.field] = vf;
           }
         }
@@ -430,30 +437,40 @@ class ParsedBean {
 }
 
 Field parseColumn(FieldElement f, DartObject obj) {
-  final String colName = obj.getField('col').toStringValue();
-  final bool nullable = obj.getField('nullable').toBoolValue();
-  final bool autoIncrement = obj.getField('autoIncrement').toBoolValue();
+  final String colName = obj.getField('name').toStringValue();
+  final bool isNullable = obj.getField('isNullable').toBoolValue();
+  final String unique = obj.getField('uniqueGroup').toStringValue();
+  final bool autoIncrement = obj.getField('auto').toBoolValue();
   final int length = obj.getField('length').toIntValue();
   if (isColumn.isExactlyType(obj.type)) {
     return new Field(f.type.name, f.name, colName,
-        nullable: nullable, autoIncrement: autoIncrement, length: length);
+        isNullable: isNullable,
+        autoIncrement: autoIncrement,
+        length: length,
+        foreign: null,
+        isPrimary: false,
+        unique: unique);
   } else if (isPrimaryKey.isExactlyType(obj.type)) {
     return new Field(f.type.name, f.name, colName,
-        nullable: nullable,
-        primary: true,
+        isNullable: isNullable,
+        isPrimary: true,
         autoIncrement: autoIncrement,
-        length: length);
+        length: length,
+        foreign: null,
+        unique: unique);
   } else if (isForeignKey.isAssignableFromType(obj.type)) {
-    final String table = obj.getField('table').toStringValue();
+    final String table = obj.getField('toTable').toStringValue();
     final String refCol = obj.getField('refCol').toStringValue();
 
     Foreign fore = new TableForeign(table, refCol);
 
     return new Field(f.type.name, f.name, colName,
-        nullable: nullable,
+        isNullable: isNullable,
+        isPrimary: false,
         foreign: fore,
         autoIncrement: autoIncrement,
-        length: length);
+        length: length,
+        unique: unique);
   } else if (isBelongsTo.isAssignableFromType(obj.type)) {
     final DartType bean = obj.getField('bean').toTypeValue();
     final String refCol = obj.getField('refCol').toStringValue();
@@ -466,10 +483,12 @@ Field parseColumn(FieldElement f, DartObject obj) {
 
     Foreign fore = new BelongsToForeign(bean, refCol, byHasMany, toMany);
     return new Field(f.type.name, f.name, colName,
-        nullable: nullable,
+        isNullable: isNullable,
+        isPrimary: false,
         foreign: fore,
         autoIncrement: autoIncrement,
-        length: length);
+        length: length,
+        unique: unique);
   }
 
   throw new FieldSpecException(f.name, 'Invalid ColumnBase type!');

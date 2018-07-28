@@ -3,24 +3,26 @@ part of jaguar_orm.annotation;
 /// Interface for annotation on/for model property
 abstract class ColumnBase {
   /// Name of the column in database
-  String get col;
+  String get name;
 
-  bool get nullable;
+  bool get isNullable;
 
-  /// Valid only in the context of integer types
-  bool get autoIncrement;
+  String get uniqueGroup;
 
-  /// Valid only in the context of text types
+  bool get auto;
+
   int get length;
 }
 
 /// Annotation on model property to ignore it
 class IgnoreColumn implements ColumnBase {
-  final String col = null;
+  final String name = null;
 
-  final bool nullable = true;
+  final bool isNullable = false;
 
-  final bool autoIncrement = false;
+  final String uniqueGroup = null;
+
+  final bool auto = false;
 
   final int length = 0;
 
@@ -32,63 +34,82 @@ class IgnoreColumn implements ColumnBase {
 /// In general, all model properties are used as
 class Column implements ColumnBase {
   /// Name of the column in database
-  final String col;
+  final String name;
 
-  final bool nullable;
+  final bool isNullable;
 
-  final bool autoIncrement;
+  final String uniqueGroup;
+
+  final bool auto;
 
   final int length;
 
   const Column(
-      {this.col, this.nullable: false, this.autoIncrement: false, this.length});
+      {this.name,
+      this.isNullable: false,
+      this.uniqueGroup,
+      this.auto: false,
+      this.length});
 }
 
 /// Annotation to declare a model property as primary key in database table
 class PrimaryKey implements ColumnBase {
   /// Name of the column in database
-  final String col;
+  final String name;
 
-  final bool nullable;
+  final bool isNullable;
 
-  final bool autoIncrement;
+  final String uniqueGroup;
+
+  final bool auto;
 
   final int length;
 
   const PrimaryKey(
-      {this.col, this.nullable: false, this.autoIncrement: false, this.length});
+      {this.name,
+      this.isNullable: false,
+      this.uniqueGroup,
+      this.auto: false,
+      this.length});
 }
 
 abstract class ForeignBase implements ColumnBase {}
 
 class ForeignKey implements ForeignBase {
   /// Name of the column in database
-  final String col;
+  final String name;
 
-  final bool nullable;
+  final bool isNullable;
 
-  final bool autoIncrement = false;
+  final String uniqueGroup;
+
+  final String toTable;
+
+  final String refCol;
+
+  final bool auto = false;
 
   final int length;
 
-  final String table;
-
-  /// The field/column in the foreign bean
-  final String refCol;
-
-  const ForeignKey(this.table,
-      {this.col, this.nullable: false, this.length, this.refCol: 'id'});
+  const ForeignKey(this.toTable,
+      {this.name,
+      this.isNullable: false,
+      this.uniqueGroup,
+      this.refCol: 'id',
+      this.length});
 }
 
 class BelongsTo implements ForeignBase {
   final Type bean;
 
   /// Name of the column in database
-  final String col;
+  final String name;
 
-  final bool nullable;
+  final bool isNullable;
 
-  final bool autoIncrement = false;
+  final String uniqueGroup;
+
+  final bool auto = false;
 
   final int length;
 
@@ -100,16 +121,18 @@ class BelongsTo implements ForeignBase {
   final bool toMany;
 
   const BelongsTo(this.bean,
-      {this.col,
-      this.nullable: false,
+      {this.name,
+      this.isNullable: false,
+      this.uniqueGroup,
       this.length,
       this.refCol: 'id',
       this.byHasMany})
       : toMany = false;
 
   const BelongsTo.many(this.bean,
-      {this.col,
-      this.nullable: false,
+      {this.name,
+      this.isNullable: false,
+      this.uniqueGroup,
       this.length,
       this.refCol: 'id',
       this.byHasMany})

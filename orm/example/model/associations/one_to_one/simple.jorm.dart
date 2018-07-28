@@ -40,8 +40,8 @@ abstract class _UserBean implements Bean<User> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(name.name, length: 50);
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -57,6 +57,13 @@ abstract class _UserBean implements Bean<User> {
       }
     }
     return retId;
+  }
+
+  Future<void> insertMany(List<User> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(User model,
@@ -105,12 +112,14 @@ abstract class _UserBean implements Bean<User> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(User model, {bool cascade: false}) async {
+  Future<User> preload(User model, {bool cascade: false}) async {
     model.address = await addressBean.findByUser(model.id,
         preload: cascade, cascade: cascade);
+    return model;
   }
 
-  Future<void> preloadAll(List<User> models, {bool cascade: false}) async {
+  Future<List<User>> preloadAll(List<User> models,
+      {bool cascade: false}) async {
     await OneToXHelper.preloadAll<User, Address>(
         models,
         (User model) => [model.id],
@@ -118,6 +127,7 @@ abstract class _UserBean implements Bean<User> {
         (Address model) => [model.userId],
         (User model, Address child) => model.address = child,
         cascade: cascade);
+    return models;
   }
 
   AddressBean get addressBean;
@@ -162,15 +172,23 @@ abstract class _AddressBean implements Bean<Address> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(street.name, length: 150);
-    st.addStr(userId.name, foreignTable: userBean.tableName, foreignCol: 'id');
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(street.name, length: 150, isNullable: false);
+    st.addStr(userId.name,
+        foreignTable: userBean.tableName, foreignCol: 'id', isNullable: false);
     return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Address model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
+  }
+
+  Future<void> insertMany(List<Address> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(Address model, {Set<String> only}) async {

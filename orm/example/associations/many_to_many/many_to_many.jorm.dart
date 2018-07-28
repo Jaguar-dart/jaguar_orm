@@ -41,8 +41,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(description.name, length: 50);
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(description.name, length: 50, isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -60,6 +60,13 @@ abstract class _TodoListBean implements Bean<TodoList> {
       }
     }
     return retId;
+  }
+
+  Future<void> insertMany(List<TodoList> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(TodoList model,
@@ -106,11 +113,13 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(TodoList model, {bool cascade: false}) async {
+  Future<TodoList> preload(TodoList model, {bool cascade: false}) async {
     model.categories = await pivotBean.fetchByTodoList(model);
+    return model;
   }
 
-  Future<void> preloadAll(List<TodoList> models, {bool cascade: false}) async {
+  Future<List<TodoList>> preloadAll(List<TodoList> models,
+      {bool cascade: false}) async {
     for (TodoList model in models) {
       var temp = await pivotBean.fetchByTodoList(model);
       if (model.categories == null)
@@ -120,6 +129,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
         model.categories.addAll(temp);
       }
     }
+    return models;
   }
 
   PivotBean get pivotBean;
@@ -161,8 +171,8 @@ abstract class _CategoryBean implements Bean<Category> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(name.name, length: 50);
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -180,6 +190,13 @@ abstract class _CategoryBean implements Bean<Category> {
       }
     }
     return retId;
+  }
+
+  Future<void> insertMany(List<Category> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(Category model,
@@ -226,11 +243,13 @@ abstract class _CategoryBean implements Bean<Category> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(Category model, {bool cascade: false}) async {
+  Future<Category> preload(Category model, {bool cascade: false}) async {
     model.todolists = await pivotBean.fetchByCategory(model);
+    return model;
   }
 
-  Future<void> preloadAll(List<Category> models, {bool cascade: false}) async {
+  Future<List<Category>> preloadAll(List<Category> models,
+      {bool cascade: false}) async {
     for (Category model in models) {
       var temp = await pivotBean.fetchByCategory(model);
       if (model.todolists == null)
@@ -240,6 +259,7 @@ abstract class _CategoryBean implements Bean<Category> {
         model.todolists.addAll(temp);
       }
     }
+    return models;
   }
 
   PivotBean get pivotBean;
@@ -284,15 +304,28 @@ abstract class _PivotBean implements Bean<Pivot> {
   Future<void> createTable() async {
     final st = Sql.create(tableName);
     st.addStr(todolistId.name,
-        foreignTable: todoListBean.tableName, foreignCol: 'id', length: 50);
+        foreignTable: todoListBean.tableName,
+        foreignCol: 'id',
+        length: 50,
+        isNullable: false);
     st.addStr(categoryId.name,
-        foreignTable: categoryBean.tableName, foreignCol: 'id', length: 50);
+        foreignTable: categoryBean.tableName,
+        foreignCol: 'id',
+        length: 50,
+        isNullable: false);
     return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Pivot model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
+  }
+
+  Future<void> insertMany(List<Pivot> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,

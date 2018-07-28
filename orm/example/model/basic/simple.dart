@@ -9,6 +9,7 @@ class User {
 
   String name;
 
+  @Column(isNullable: true)
   int age;
 
   User({this.id, this.name, this.age});

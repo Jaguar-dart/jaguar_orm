@@ -40,8 +40,8 @@ abstract class _AuthorBean implements Bean<Author> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
-    st.addStr(name.name, length: 50);
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -59,6 +59,13 @@ abstract class _AuthorBean implements Bean<Author> {
       }
     }
     return retId;
+  }
+
+  Future<void> insertMany(List<Author> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(Author model,
@@ -109,12 +116,14 @@ abstract class _AuthorBean implements Bean<Author> {
     return adapter.remove(remove);
   }
 
-  Future<void> preload(Author model, {bool cascade: false}) async {
+  Future<Author> preload(Author model, {bool cascade: false}) async {
     model.posts = await postBean.findByAuthor(model.id,
         preload: cascade, cascade: cascade);
+    return model;
   }
 
-  Future<void> preloadAll(List<Author> models, {bool cascade: false}) async {
+  Future<List<Author>> preloadAll(List<Author> models,
+      {bool cascade: false}) async {
     models.forEach((Author model) => model.posts ??= []);
     await OneToXHelper.preloadAll<Author, Post>(
         models,
@@ -123,6 +132,7 @@ abstract class _AuthorBean implements Bean<Author> {
         (Post model) => [model.authorId],
         (Author model, Post child) => model.posts.add(child),
         cascade: cascade);
+    return models;
   }
 
   PostBean get postBean;
@@ -167,16 +177,26 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, length: 50);
+    st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(authorId.name,
-        foreignTable: authorBean.tableName, foreignCol: 'id', length: 50);
-    st.addStr(message.name, length: 150);
+        foreignTable: authorBean.tableName,
+        foreignCol: 'id',
+        length: 50,
+        isNullable: false);
+    st.addStr(message.name, length: 150, isNullable: false);
     return adapter.createTable(st);
   }
 
   Future<dynamic> insert(Post model) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
+  }
+
+  Future<void> insertMany(List<Post> models) async {
+    final List<List<SetColumn>> data =
+        models.map((model) => toSetColumns(model)).toList();
+    final InsertMany insert = inserters.addAll(data);
+    return adapter.insertMany(insert);
   }
 
   Future<int> update(Post model, {Set<String> only}) async {
