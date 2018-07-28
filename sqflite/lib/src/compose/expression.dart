@@ -38,20 +38,20 @@ String composeExpression(final Expression exp) {
   } else if (exp is And) {
     return composeAnd(exp);
   } else if (exp is Cond) {
-    return '${composeCol(exp.lhs)} ${exp.op.string} ${composeValue(exp.rhs)}';
+    return '${composeField(exp.lhs)} ${exp.op.string} ${composeValue(exp.rhs)}';
   } else if (exp is CondCol) {
-    return '${composeCol(exp.lhs)} ${exp.op.string} ${composeCol(exp.rhs)}';
+    return '${composeField(exp.lhs)} ${exp.op.string} ${composeField(exp.rhs)}';
   } else if (exp is Between) {
-    return '(${composeCol(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
+    return '(${composeField(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
   } else if (exp is InBetweenCol) {
-    return '(${composeCol(exp.field)} BETWEEN ${composeCol(exp.low)} AND ${composeCol(exp.high)})';
+    return '(${composeField(exp.field)} BETWEEN ${composeField(exp.low)} AND ${composeField(exp.high)})';
   } else {
     throw new Exception('Unknown expression ${exp.runtimeType}!');
   }
 }
 
-String composeCol(final Col col) =>
-    (col.tableAlias != null ? col.tableAlias + '.' : '') + col.field;
+String composeField(final Field col) =>
+    (col.tableName != null ? col.tableName + '.' : '') + col.name;
 
 String composeValue(dynamic val) {
   if (val == null) return null;
@@ -65,8 +65,8 @@ String composeValue(dynamic val) {
     return '"$val"';
   } else if (val is bool) {
     return val ? "1" : "0";
-  } else if (val is Col) {
-    return composeCol(val);
+  } else if (val is Field) {
+    return composeField(val);
   } else {
     throw new Exception("Invalid type ${val.runtimeType}!");
   }

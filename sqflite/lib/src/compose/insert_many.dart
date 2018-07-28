@@ -1,18 +1,18 @@
 part of query.compose;
 
 String composeInsertMany(final InsertMany st) {
-  final QueryInsertManyInfo info = st.info;
+  final ImmutableInsertManyStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('INSERT INTO ');
-  sb.write(info.tableName);
+  sb.write(info.table);
 
   final keys = info.values[0].keys.toList();
   sb.write(' SELECT ');
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
     sb.write('${composeValue(info.values[0][key])} AS \'${key}\'');
-    if (i < keys.length-1) {
+    if (i < keys.length - 1) {
       sb.write(', ');
     }
   }
@@ -25,7 +25,7 @@ String composeInsertMany(final InsertMany st) {
     for (var j = 0; j < keys.length; ++j) {
       var key = keys[j];
       sb.write('${composeValue(values[key])}');
-      if (j < keys.length-1) {
+      if (j < keys.length - 1) {
         sb.write(', ');
       }
     }

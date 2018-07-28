@@ -181,3 +181,5 @@ main() async {
   exit(0);
 }
 ```
+
+For more usage don't hesitate to check this example https://github.com/jaguar-orm/sqflite 

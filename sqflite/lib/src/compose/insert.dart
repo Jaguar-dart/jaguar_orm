@@ -1,11 +1,11 @@
 part of query.compose;
 
 String composeInsert(final Insert st) {
-  final QueryInsertInfo info = st.info;
+  final ImmutableInsertStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('INSERT INTO ');
-  sb.write(info.tableName);
+  sb.write(info.table);
   sb.write('(');
 
   sb.write(info.values.keys.join(', '));

@@ -17,10 +17,10 @@ String composeRemove(final Remove st) {
   return sb.toString();
 }
 
-String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.dbName}";
+String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.name}";
 
 String composeDrop(final Drop st) {
   return "DROP TABLE " +
-      (st.onlyDropIfExists ? 'IF EXISTS ' : '') +
+      (st.onlyIfExists ? 'IF EXISTS ' : '') +
       st.tables.join(', ');
 }
