@@ -50,7 +50,7 @@ class PostBean {
 
   /// Inserts a new post into table
   Future insert(Post post) async {
-    Insert inserter = new Insert()..into(tableName);
+    Insert inserter = new Insert(tableName);
 
     inserter.set(id, post.id);
     inserter.set(msg, post.msg);
@@ -71,7 +71,7 @@ class PostBean {
 
   /// Finds one post by [id]
   Future<Post> findOne(int id) async {
-    Find updater = new Find()..from(tableName);
+    Find updater = new Find(tableName);
 
     updater.where(this.id.eq(id));
 
@@ -87,7 +87,7 @@ class PostBean {
 
   /// Finds all posts
   Future<List<Post>> findAll() async {
-    Find finder = new Find()..from(tableName);
+    Find finder = new Find(tableName);
 
     List<Map> maps = await (await _adapter.find(finder)).toList();
 
@@ -108,7 +108,7 @@ class PostBean {
 
   /// Deletes a post by [id]
   Future<int> remove(int id) async {
-    Remove deleter = new Remove()..from(tableName);
+    Remove deleter = new Remove(tableName);
 
     deleter.where(this.id.eq(id));
 
@@ -117,7 +117,7 @@ class PostBean {
 
   /// Deletes all posts
   Future<int> removeAll() async {
-    Remove deleter = new Remove()..from(tableName);
+    Remove deleter = new Remove(tableName);
 
     return await _adapter.remove(deleter);
   }

@@ -1,20 +1,12 @@
 part of query;
 
 class Remove implements Statement {
-  String _tableName;
+  final String name;
 
   Expression _where = new And();
 
-  Remove() {
+  Remove(this.name) {
     _info = new QueryRemoveInfo(this);
-  }
-
-  Remove from(String tableName) {
-    if (_tableName != null) {
-      throw new Exception("Name already assigend!");
-    }
-    _tableName = tableName;
-    return this;
   }
 
   Remove or(Expression exp) {
@@ -79,7 +71,7 @@ class QueryRemoveInfo {
 
   QueryRemoveInfo(this._inner);
 
-  String get tableName => _inner._tableName;
+  String get tableName => _inner.name;
 
   // TODO immutable copy
   Expression get where => _inner._where;
