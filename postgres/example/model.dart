@@ -63,14 +63,10 @@ class PostBean extends Bean<Post> {
   }
 
   Future<void> createTable() async {
-    final st = new Create()
-        .named(tableName)
-        .ifNotExists()
+    await Create(tableName, ifNotExists: true)
         .addInt('_id', primary: true)
         .addStr('msg')
-        .addStr('author');
-
-    await adapter.createTable(st);
+        .addStr('author').exec(adapter);
   }
 
   /// Inserts a new post into table
@@ -81,8 +77,7 @@ class PostBean extends Bean<Post> {
 
   /// Updates a post
   Future<int> updateAuthor(int id, String author) async {
-    Update updater = new Update()..into(tableName);
-    updater.where(this.id.eq(id));
+    Update updater = new Update(tableName, where: this.id.eq(id));
 
     updater.set(this.author, author);
 

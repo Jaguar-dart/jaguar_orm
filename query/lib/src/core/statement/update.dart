@@ -1,22 +1,15 @@
 part of query;
 
 class Update implements Statement {
-  String _tableName;
+  final String name;
 
   final Map<String, dynamic> _values = {};
 
   Expression _where = new And();
 
-  Update() {
+  Update(this.name, {Expression where}) {
+    if(where != null) this.where(where);
     _info = new QueryUpdateInfo(this);
-  }
-
-  Update into(String tableName) {
-    if (_tableName != null) {
-      throw new Exception("Name already assigend!");
-    }
-    _tableName = tableName;
-    return this;
   }
 
   Update set<ValType>(Field<ValType> field, ValType value) {
@@ -104,7 +97,7 @@ class QueryUpdateInfo {
   QueryUpdateInfo(this._inner)
       : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
 
-  String get tableName => _inner._tableName;
+  String get tableName => _inner.name;
 
   final UnmodifiableMapView<String, dynamic> values;
 
