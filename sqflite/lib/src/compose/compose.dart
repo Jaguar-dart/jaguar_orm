@@ -2,11 +2,11 @@ library query.compose;
 
 import 'package:jaguar_query/jaguar_query.dart';
 
-part 'insert.dart';
-part 'insert_many.dart';
 part 'create.dart';
 part 'delete.dart';
 part 'expression.dart';
+part 'insert.dart';
+part 'insert_many.dart';
 part 'update.dart';
 
 String composeSelColumn(final SelColumn column) {
@@ -65,7 +65,7 @@ String composeOrderBy(final OrderBy orderBy) =>
     '${orderBy.columnName} ' + (orderBy.ascending ? 'ASC' : 'DESC');
 
 String composeFind(final Find find) {
-  final QueryFindInfo info = find.info;
+  final ImmutableFindStatement info = find.asImmutable;
   final sb = new StringBuffer();
   sb.write('SELECT ');
 

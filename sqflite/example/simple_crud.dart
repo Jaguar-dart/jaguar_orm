@@ -1,10 +1,11 @@
 // Copyright (c) 2016, teja. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'dart:io';
 import 'dart:async';
-import 'package:sqflite/sqflite.dart';
+import 'dart:io';
+
 import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
+import 'package:sqflite/sqflite.dart';
 
 // The model
 class Post {
@@ -39,12 +40,10 @@ class PostBean {
   String get tableName => 'posts';
 
   Future<Null> createTable() async {
-    final st = new Create()
-        .named(tableName)
-        .ifNotExists()
-        .addNullInt('_id', primary: true)
-        .addNullStr('msg')
-        .addNullStr('author');
+    final st = new Create(tableName, ifNotExists: true)
+        .addInt('_id', primary: true)
+        .addStr('msg', isNullable: true)
+        .addStr('author', isNullable: true);
 
     await _adapter.createTable(st);
   }
@@ -62,7 +61,7 @@ class PostBean {
 
   /// Updates a post
   Future<int> update(int id, String author) async {
-    Update updater = new Update()..into(tableName);
+    Update updater = new Update(tableName);
     updater.where(this.id.eq(id));
 
     updater.set(this.author, author);

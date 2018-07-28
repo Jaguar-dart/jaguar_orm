@@ -39,12 +39,16 @@ class PostBean {
   String get tableName => 'posts';
 
   Future<Null> createTable() async {
-    final st = new Create().named(tableName).ifNotExists().addInt('_id', primary: true, autoIncrement: true).addNullStr('msg').addNullStr('author');
+    final st = new Create(tableName, ifNotExists: true)
+        .addInt('_id', primary: true, autoIncrement: true)
+        .addStr('msg', isNullable: true)
+        .addStr('author', isNullable: true);
 
     await _adapter.createTable(st);
   }
 
-  List<SetColumn> toSetColumns(Post model, {bool update = false, Set<String> only}) {
+  List<SetColumn> toSetColumns(Post model,
+      {bool update = false, Set<String> only}) {
     List<SetColumn> ret = [];
 
     if (only == null) {
@@ -60,14 +64,16 @@ class PostBean {
 
   /// Inserts many posts into table
   Future insertMany(List<Post> posts) async {
-    InsertMany inserter = Sql.insertMany(tableName).bulk(posts.map((post) => toSetColumns(post)));
+    InsertMany inserter = Sql
+        .insertMany(tableName)
+        .addAll(posts.map((post) => toSetColumns(post)));
 
     return await _adapter.insertMany(inserter);
   }
 
   /// Updates a post
   Future<int> update(int id, String author) async {
-    Update updater = new Update()..into(tableName);
+    Update updater = new Update(tableName);
     updater.where(this.id.eq(id));
 
     updater.set(this.author, author);
@@ -137,7 +143,7 @@ main() async {
 
   final bean = new PostBean();
 
-  await _adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
+  await _adapter.dropTable(Sql.drop(bean.tableName, onlyIfExists: true));
 
   await bean.createTable();
 
