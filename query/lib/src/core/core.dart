@@ -47,16 +47,19 @@ class Sql {
   static InsertMany insertMany(String table) => new InsertMany().into(table);
 
   /// Creates a new [Update] statement
-  static Update update(String table) => new Update().into(table);
+  static Update update(String table, {Expression where}) =>
+      new Update(table, where: where);
 
   /// Creates a new [Delete] statement
   static Remove remove(String table) => new Remove().from(table);
 
   /// Returns a new [Create] statement
-  static Create create(String table) => new Create().named(table);
+  static Create create(String table, {bool ifNotExists: false}) =>
+      new Create(table, ifNotExists: ifNotExists);
 
   /// Returns a new [Drop] statement
-  static Drop drop(String table) => new Drop().named(table);
+  static Drop drop(String table, {bool onlyIfExists: false}) =>
+      new Drop(table, onlyIfExists: onlyIfExists);
 
   /// Returns a new [CreateDb] statement
   static CreateDb createDb(String database) => new CreateDb(database);

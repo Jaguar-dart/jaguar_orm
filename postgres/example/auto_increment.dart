@@ -14,14 +14,11 @@ class PostBean1 extends PostBean {
   PostBean1(Adapter adapter) : super(adapter);
 
   Future<void> createTable() async {
-    final st = new Create()
-        .named(tableName)
-        .ifNotExists()
+    await Create(tableName, ifNotExists: true)
         .addInt('_id', primary: true, autoIncrement: true)
         .addStr('msg')
-        .addStr('author');
-
-    await adapter.createTable(st);
+        .addStr('author')
+        .exec(adapter);
   }
 
   @override
@@ -49,7 +46,7 @@ main() async {
 
   final bean = PostBean1(adapter);
 
-  await adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
+  await adapter.dropTable(Sql.drop(bean.tableName, onlyIfExists: true));
 
   await bean.createTable();
 

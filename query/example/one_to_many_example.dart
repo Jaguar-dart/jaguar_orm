@@ -46,22 +46,20 @@ final PgAdapter adapter =
     new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 Future<void> dropTables() async {
-  final st = new Drop()..onlyIfExists().many(['post', 'author']);
+  final st = new Drop(['post', 'author'], onlyIfExists: true);
   await adapter.dropTable(st);
 }
 
 Future<void> createTables() async {
   {
-    await Sql.create('author')
-        .ifNotExists()
+    await Sql.create('author', ifNotExists: true)
         .addInt('_id', primary: true, autoIncrement: true)
         .addStr('name', length: 100)
         .exec(adapter);
   }
 
   {
-    await Sql.create('post')
-        .ifNotExists()
+    await Sql.create('post', ifNotExists: true)
         .addInt('_id', primary: true, autoIncrement: true)
         .addInt('authorId', foreignTable: 'author', foreignCol: '_id')
         .addStr('message', length: 100)

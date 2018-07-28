@@ -35,7 +35,7 @@ String composeCreate(final Create create) {
 
   if (info.ifNotExists) sb.write(' IF NOT EXISTS');
 
-  sb.write(' ${info.tableName} (');
+  sb.write(' ${info.name} (');
 
   sb.write(info.columns.values.map(composeCreateColumn).join(', '));
 

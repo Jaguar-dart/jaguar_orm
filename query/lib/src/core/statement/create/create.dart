@@ -1,24 +1,14 @@
 part of query;
 
 class Create implements Statement {
-  String _tableName;
+  final String name;
+
+  final bool ifNotExists;
 
   final Map<String, CreateColumn> _columns = {};
 
-  bool _ifNotExists = false;
-
-  Create() {
+  Create(this.name, {this.ifNotExists: false}) {
     _immutable = new ImmutableCreateStatement(this);
-  }
-
-  Create named(String tableName) {
-    _tableName = tableName;
-    return this;
-  }
-
-  Create ifNotExists([bool create = true]) {
-    _ifNotExists = create;
-    return this;
   }
 
   Create addInt(String name,
@@ -153,11 +143,11 @@ class ImmutableCreateStatement {
       : columns =
             new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
 
-  String get tableName => _inner._tableName;
+  String get name => _inner.name;
 
   final UnmodifiableMapView<String, CreateColumn> columns;
 
-  bool get ifNotExists => _inner._ifNotExists;
+  bool get ifNotExists => _inner.ifNotExists;
 }
 
 /// Clause to create a column in a SQL table.

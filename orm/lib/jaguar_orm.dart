@@ -4,6 +4,7 @@
 /// ORM for Dart backed by jaguar_query
 library jaguar_orm;
 
-export 'src/annotations/annotations.dart';
 export 'package:jaguar_query/jaguar_query.dart';
-export 'package:jaguar_orm/src/relations/relations.dart';
+
+export 'src/annotations/annotations.dart';
+export 'src/helpers/relations.dart';

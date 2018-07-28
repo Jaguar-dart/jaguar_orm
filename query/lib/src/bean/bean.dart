@@ -44,7 +44,7 @@ abstract class Bean<ModelType> {
 
   /// Drops the table if it already exists
   Future<void> drop() {
-    final st = Sql.drop(tableName).onlyIfExists();
+    final st = Sql.drop(tableName, onlyIfExists: true);
     return adapter.dropTable(st);
   }
 

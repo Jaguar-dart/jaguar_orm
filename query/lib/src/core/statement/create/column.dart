@@ -1,7 +1,7 @@
 part of query;
 
 /// Clause to create int column in SQL table.
-class CreateInt extends CreateColumn<int> {
+class CreateInt implements CreateColumn<int> {
   final bool isNullable;
 
   final String name;
@@ -14,19 +14,19 @@ class CreateInt extends CreateColumn<int> {
 
   final String uniqueGroup;
 
-  CreateInt(this.name,
+  const CreateInt(this.name,
       {this.isNullable: false,
       this.autoIncrement: false,
       this.isPrimary: false,
       this.foreignKey,
       this.uniqueGroup});
 
-  CreateInt.primary(this.name, {this.foreignKey, this.uniqueGroup})
+  const CreateInt.primary(this.name, {this.foreignKey, this.uniqueGroup})
       : isPrimary = true,
         isNullable = false,
         autoIncrement = false;
 
-  CreateInt.autoPrimary(this.name, {this.uniqueGroup})
+  const CreateInt.autoPrimary(this.name, {this.uniqueGroup})
       : isPrimary = true,
         autoIncrement = true,
         foreignKey = null,

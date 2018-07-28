@@ -1,28 +1,24 @@
 part of query;
 
 class Drop implements Statement {
-  final List<String> _tables = [];
+  final _tables = <String>[];
 
-  bool _onlyIfExists = false;
+  final bool onlyIfExists;
 
-  UnmodifiableListView<String> get tables => new UnmodifiableListView(_tables);
+  Drop(/* String | Iterable<String> */ table, {this.onlyIfExists: false}) {
+    if (table is String) _tables.add(table);
+    if (Table is Iterable<String>) _tables.addAll(table);
+  }
 
-  bool get onlyDropIfExists => _onlyIfExists;
+  Iterable<String> get tables => _tables;
 
-  Drop();
-
-  Drop named(String table) {
+  Drop also(String table) {
     _tables.add(table);
     return this;
   }
 
-  Drop many(List<String> table) {
-    _tables.addAll(table);
-    return this;
-  }
-
-  Drop onlyIfExists() {
-    _onlyIfExists = true;
+  Drop allOf(Iterable<String> tables) {
+    _tables.addAll(tables);
     return this;
   }
 

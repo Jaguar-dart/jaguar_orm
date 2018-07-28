@@ -21,6 +21,6 @@ String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.name}";
 
 String composeDrop(final Drop st) {
   return "DROP TABLE " +
-      (st.onlyDropIfExists ? 'IF EXISTS ' : '') +
+      (st.onlyIfExists ? 'IF EXISTS ' : '') +
       st.tables.join(', ');
 }
