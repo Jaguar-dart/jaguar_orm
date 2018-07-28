@@ -8,26 +8,12 @@ part of query;
 /// Use `exec` statement or `Adapter` to execute the statement against a
 /// database.
 class InsertMany implements Statement {
-  String _tableName;
+  final String name;
 
   final List<Map<String, dynamic>> _bulkValues = [];
 
-  InsertMany([/* Iterable<SetColumn> | Iterable<Iterable<SetColumn>> */ rows]) {
+  InsertMany(this.name) {
     _immutable = new ImmutableInsertManyStatement(this);
-
-    if (rows is Iterable<Iterable<SetColumn>>) {
-      addAll(rows);
-    } else if (rows is Iterable<SetColumn>) add(rows);
-  }
-
-  String get table => _tableName;
-
-  InsertMany into(String tableName) {
-    if (_tableName != null) {
-      throw new Exception("Name already assigend!");
-    }
-    _tableName = tableName;
-    return this;
   }
 
   /// Adds a single [row] to be inserted.
@@ -77,7 +63,7 @@ class ImmutableInsertManyStatement {
       : values = new UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
             _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 
-  String get table => _inner.table;
+  String get table => _inner.name;
 
   final UnmodifiableListView<UnmodifiableMapView<String, dynamic>> values;
 }
