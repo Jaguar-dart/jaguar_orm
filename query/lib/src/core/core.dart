@@ -41,7 +41,7 @@ class Sql {
       new Find(table, alias: alias);
 
   /// Creates a new [Insert] statement
-  static Insert insert(String table) => new Insert().into(table);
+  static Insert insert(String table) => new Insert(table);
 
   /// Creates a new [InsertMany] statement
   static InsertMany insertMany(String table) => new InsertMany().into(table);

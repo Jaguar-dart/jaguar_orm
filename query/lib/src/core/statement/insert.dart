@@ -9,29 +9,14 @@ part of query;
 /// Use `exec` statement or `Adapter` to execute the statement against a
 /// database.
 class Insert implements Statement {
-  String _table;
+  final String name;
 
   String _id;
 
   final Map<String, dynamic> _values = {};
 
-  Insert([/* Iterable<SetColumn> | Map<String, dynamic> */ row]) {
+  Insert(this.name) {
     _immutable = new ImmutableInsertStatement(this);
-
-    if (row is Iterable<SetColumn>) {
-      setMany(row);
-    } else if (row is Map<String, dynamic>) setValues(row);
-  }
-
-  String get table => _table;
-
-  /// Sets the [table] to insert into.
-  Insert into(String tableName) {
-    if (_table != null) {
-      throw new Exception("Name already assigend!");
-    }
-    _table = tableName;
-    return this;
   }
 
   /// Id is the auto-generated primary key that is set by the database. [Adapter]
@@ -116,7 +101,7 @@ class ImmutableInsertStatement {
   ImmutableInsertStatement(this._inner)
       : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
 
-  String get table => _inner.table;
+  String get table => _inner.name;
 
   String get id => _inner._id;
 

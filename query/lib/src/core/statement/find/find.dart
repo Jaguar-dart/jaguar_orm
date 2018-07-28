@@ -22,7 +22,7 @@ class Find implements Statement {
 
   Find(String tableName, {String alias, Expression where})
       : from = new TableName(tableName, alias) {
-    if(where != null) this.where(where);
+    if (where != null) this.where(where);
     _immutable = new ImmutableFindStatement(this);
   }
 

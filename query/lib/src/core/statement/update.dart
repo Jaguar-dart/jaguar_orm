@@ -8,7 +8,7 @@ class Update implements Statement {
   Expression _where = new And();
 
   Update(this.name, {Expression where}) {
-    if(where != null) this.where(where);
+    if (where != null) this.where(where);
     _info = new QueryUpdateInfo(this);
   }
 
