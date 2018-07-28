@@ -2,8 +2,9 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'package:sqflite/sqflite.dart';
+
 import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
+import 'package:sqflite/sqflite.dart';
 
 /// The adapter
 SqfliteAdapter _adapter;
@@ -38,12 +39,10 @@ class PostBean {
   String get tableName => 'posts';
 
   Future<Null> createTable() async {
-    final st = new Create()
-        .named(tableName)
-        .ifNotExists()
+    final st = new Create(tableName, ifNotExists: true)
         .addInt('_id', primary: true, autoIncrement: true)
-        .addNullStr('msg')
-        .addNullStr('author');
+        .addStr('msg', isNullable: true)
+        .addStr('author', isNullable: true);
 
     await _adapter.createTable(st);
   }
@@ -62,7 +61,7 @@ class PostBean {
 
   /// Updates a post
   Future<int> update(int id, String author) async {
-    Update updater = new Update()..into(tableName);
+    Update updater = new Update(tableName);
     updater.where(this.id.eq(id));
 
     updater.set(this.author, author);
@@ -132,7 +131,7 @@ main() async {
 
   final bean = new PostBean();
 
-  await _adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
+  await _adapter.dropTable(Sql.drop(bean.tableName, onlyIfExists: true));
 
   await bean.createTable();
 
