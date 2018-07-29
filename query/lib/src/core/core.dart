@@ -29,6 +29,7 @@ part 'statement/insert_many.dart';
 part 'statement/remove.dart';
 part 'statement/statements.dart';
 part 'statement/update.dart';
+part 'statement/update_many.dart';
 part 'table/table.dart';
 
 /// Main DSL class to create SQL statements
@@ -46,6 +47,9 @@ class Sql {
   /// Creates a new [Update] statement
   static Update update(String table, {Expression where}) =>
       new Update(table, where: where);
+
+  /// Creates a new [UpdateMany] statement
+  static UpdateMany updateMany(String table) => new UpdateMany(table);
 
   /// Creates a new [Delete] statement
   static Remove remove(String table) => new Remove(table);

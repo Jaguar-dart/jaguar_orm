@@ -4,9 +4,10 @@
 library jaguar_query_sqflite.src;
 
 import 'dart:async';
+
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:sqflite/sqflite.dart' as sqf;
 import 'package:jaguar_query_sqflite/composer.dart';
+import 'package:sqflite/sqflite.dart' as sqf;
 
 class SqfliteAdapter implements Adapter<sqf.Database> {
   sqf.Database _connection;
@@ -58,13 +59,23 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
   /// Inserts many records into the table
   Future<void> insertMany<T>(InsertMany st) {
     String strSt = composeInsertMany(st);
-    return _connection.rawQuery(strSt);
+    return _connection.execute(strSt);
   }
 
   /// Updates a record in the table
   Future<int> update(Update st) {
     String strSt = composeUpdate(st);
     return _connection.rawUpdate(strSt);
+  }
+
+  /// Updates a record in the table
+  Future<void> updateMany(UpdateMany st) {
+    List<String> strSt = composeUpdateMany(st);
+    final batch = _connection.batch();
+    for (var query in strSt) {
+      _connection.execute(query);
+    }
+    return batch.commit(noResult: true);
   }
 
   /// Deletes a record from the table
@@ -117,5 +128,4 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
       throw new Exception("Invalid type $T!");
     }
   }
-
 }

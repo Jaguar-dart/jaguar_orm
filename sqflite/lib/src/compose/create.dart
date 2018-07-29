@@ -15,6 +15,8 @@ String composeCreateColumn(final CreateColumn col) {
     }
   } else if (col is CreateBool) {
     sb.write(' INT');
+  } else if (col is CreateDouble) {
+    sb.write(' REAL');
   } else if (col is CreateDateTime) {
     sb.write(' TEXT');
   } else if (col is CreateStr) {

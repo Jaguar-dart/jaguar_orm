@@ -9,7 +9,7 @@ class Update implements Statement {
 
   Update(this.name, {Expression where}) {
     if (where != null) this.where(where);
-    _info = new QueryUpdateInfo(this);
+    _immutable = new ImmutableUpdateStatement(this);
   }
 
   Update set<ValType>(Field<ValType> field, ValType value) {
@@ -86,15 +86,15 @@ class Update implements Statement {
 
   Future<int> exec(Adapter adapter) => adapter.update(this);
 
-  QueryUpdateInfo _info;
+  ImmutableUpdateStatement _immutable;
 
-  QueryUpdateInfo get info => _info;
+  ImmutableUpdateStatement get asImmutable => _immutable;
 }
 
-class QueryUpdateInfo {
+class ImmutableUpdateStatement {
   final Update _inner;
 
-  QueryUpdateInfo(this._inner)
+  ImmutableUpdateStatement(this._inner)
       : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get tableName => _inner.name;

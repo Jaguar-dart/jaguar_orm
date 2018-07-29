@@ -4,9 +4,10 @@
 library jaguar_query_postgresql.src;
 
 import 'dart:async';
+
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:postgres/postgres.dart' as pg;
 import 'package:jaguar_query_postgres/composer.dart';
+import 'package:postgres/postgres.dart' as pg;
 
 class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   pg.PostgreSQLConnection _connection;
@@ -53,12 +54,12 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
 
     Map<String, Map<String, dynamic>> row = rows.first;
 
-    if(row.length == 0) return {};
+    if (row.length == 0) return {};
 
-    if(row.length == 1) return rows.first.values.first;
+    if (row.length == 1) return rows.first.values.first;
 
     final ret = <String, dynamic>{};
-    for(Map<String,dynamic> table in row.values) ret.addAll(table);
+    for (Map<String, dynamic> table in row.values) ret.addAll(table);
     return ret;
   }
 
@@ -113,5 +114,10 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   @override
   T parseValue<T>(dynamic v) {
     return v as T;
+  }
+
+  @override
+  Future<void> updateMany(UpdateMany statement) {
+    throw UnimplementedError('TODO need to be implemented');
   }
 }
