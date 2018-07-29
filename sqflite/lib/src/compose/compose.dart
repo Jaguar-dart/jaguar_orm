@@ -8,6 +8,7 @@ part 'expression.dart';
 part 'insert.dart';
 part 'insert_many.dart';
 part 'update.dart';
+part 'update_many.dart';
 
 String composeSelColumn(final SelColumn column) {
   if (column is CountSelColumn) {

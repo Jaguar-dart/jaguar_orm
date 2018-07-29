@@ -1,6 +1,7 @@
 library jaguar_orm.adapter;
 
 import 'dart:async';
+
 import 'package:jaguar_query/jaguar_query.dart';
 
 /// Adapter interface that must be implemented to support new databases
@@ -28,6 +29,9 @@ abstract class Adapter<ConnType> {
 
   /// Updates the row and returns the number of rows updated
   Future<int> update(Update statement);
+
+  /// Updates many rows
+  Future<void> updateMany(UpdateMany statement);
 
   /// Deletes the requested row
   Future<int> remove(Remove statement);

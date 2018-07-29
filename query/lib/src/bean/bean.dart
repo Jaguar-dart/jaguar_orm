@@ -1,6 +1,7 @@
 library jaguar_query.bean;
 
 import 'dart:async';
+
 import 'package:jaguar_query/jaguar_query.dart';
 
 typedef Expression ExpressionMaker<MT>(Bean<MT> bean);
@@ -23,6 +24,9 @@ abstract class Bean<ModelType> {
 
   /// Creates a 'update' query
   Update get updater => Sql.update(tableName);
+
+  /// Creates a 'updateMany' query
+  UpdateMany get updaters => Sql.updateMany(tableName);
 
   /// Creates a 'insert' query
   Insert get inserter => Sql.insert(tableName);
