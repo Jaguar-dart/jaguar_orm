@@ -66,7 +66,8 @@ class PostBean extends Bean<Post> {
     await Create(tableName, ifNotExists: true)
         .addInt('_id', primary: true)
         .addStr('msg')
-        .addStr('author').exec(adapter);
+        .addStr('author')
+        .exec(adapter);
   }
 
   /// Inserts a new post into table

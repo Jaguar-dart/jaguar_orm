@@ -5,8 +5,7 @@ import 'src/hook/hook.dart';
 import 'package:source_gen/source_gen.dart';
 
 Builder jaguarSerializerPartBuilder({String header}) =>
-    new PartBuilder([new BeanGenerator()],
-        header: header, generatedExtension: '.jorm.dart');
+    PartBuilder([BeanGenerator()], '.jorm.dart', header: header);
 
 Builder jaguarOrm(BuilderOptions options) =>
     jaguarSerializerPartBuilder(header: options.config['header'] as String);

@@ -61,11 +61,19 @@ abstract class _AuthorBean implements Bean<Author> {
     return retId;
   }
 
-  Future<void> insertMany(List<Author> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
-    final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+  Future<void> insertMany(List<Author> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
   }
 
   Future<int> update(Author model,
@@ -87,6 +95,26 @@ abstract class _AuthorBean implements Bean<Author> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<Author> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<Author> find(String id,
@@ -204,6 +232,18 @@ abstract class _PostBean implements Bean<Post> {
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
     return adapter.update(update);
+  }
+
+  Future<void> updateMany(List<Post> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(this.id.eq(model.id));
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<Post> find(String id,

@@ -70,6 +70,18 @@ abstract class _UserBean implements Bean<User> {
     return adapter.update(update);
   }
 
+  Future<void> updateMany(List<User> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(this.id.eq(model.id));
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
+  }
+
   Future<User> find(String id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));

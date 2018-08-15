@@ -59,11 +59,19 @@ abstract class _UserBean implements Bean<User> {
     return retId;
   }
 
-  Future<void> insertMany(List<User> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
-    final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+  Future<void> insertMany(List<User> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
   }
 
   Future<int> update(User model,
@@ -83,6 +91,26 @@ abstract class _UserBean implements Bean<User> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<User> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<User> find(String id,
@@ -196,6 +224,18 @@ abstract class _AddressBean implements Bean<Address> {
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
     return adapter.update(update);
+  }
+
+  Future<void> updateMany(List<Address> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(this.id.eq(model.id));
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<Address> find(String id,

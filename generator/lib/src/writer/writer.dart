@@ -15,8 +15,8 @@ class Writer {
     _w.writeln('abstract class _${_b.name} implements Bean<${_b.modelType}> {');
 
     for (Field field in _b.fields.values) {
-      _writeln("final ${field.field} = new ${field.vType}('${_camToSnak(
-          field.colName)}');");
+      _writeln(
+          "final ${field.field} = new ${field.vType}('${_camToSnak(field.colName)}');");
     }
 
     _writeFieldsMap();
@@ -79,8 +79,8 @@ class Writer {
     _w.writeln();
 
     _b.fields.values.forEach((Field field) {
-      _w.writeln("model.${field.field} = adapter.parseValue(map['${_camToSnak(
-          field.colName)}']);");
+      _w.writeln(
+          "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
     });
 
     _w.writeln();
@@ -149,8 +149,8 @@ class Writer {
   }
 
   void _writeToSetColumns() {
-    _w.writeln('List<SetColumn> toSetColumns(${_b
-        .modelType} model, {bool update = false, Set<String> only}) {');
+    _w.writeln(
+        'List<SetColumn> toSetColumns(${_b.modelType} model, {bool update = false, Set<String> only}) {');
     _w.writeln('List<SetColumn> ret = [];');
     _w.writeln();
 
@@ -165,8 +165,8 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      _w.writeln("if(only.contains(${field.field}.name)) ret.add(${field
-          .field}.set(model.${field.field}));");
+      _w.writeln(
+          "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
     });
 
     _w.writeln('}');
@@ -197,11 +197,11 @@ class Writer {
     }
 
     if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
-      _w.writeln('Future<dynamic> insert(${_b
-          .modelType} model, {bool cascade: false}) async {');
+      _w.writeln(
+          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
       _w.write('final Insert insert = inserter');
-      _w.writeln('.setMany(toSetColumns(model))..id(${_b.primary.first
-          .colName}.name);');
+      _w.writeln(
+          '.setMany(toSetColumns(model))..id(${_b.primary.first.colName}.name);');
       _w.writeln('final ret = await adapter.insert(insert);');
 
       _w.writeln('if(cascade) {');
@@ -247,8 +247,8 @@ class Writer {
       return;
     }
 
-    _w.writeln('Future<dynamic> insert(${_b
-        .modelType} model, {bool cascade: false}) async {');
+    _w.writeln(
+        'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
     _w.write('final Insert insert = inserter');
     _w.writeln('.setMany(toSetColumns(model));');
     _w.writeln('var retId = await adapter.insert(insert);');
@@ -304,8 +304,8 @@ class Writer {
     if (_b.preloads.length > 0) {
       cascade = ', {bool cascade: false}';
     }
-    _w.writeln('Future<void> insertMany(List<${_b
-        .modelType}> models${cascade}) async {');
+    _w.writeln(
+        'Future<void> insertMany(List<${_b.modelType}> models${cascade}) async {');
     if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
@@ -333,8 +333,8 @@ class Writer {
     if (_b.primary.length == 0) return;
 
     if (_b.preloads.length == 0) {
-      _w.writeln('Future<int> update(${_b
-          .modelType} model, {Set<String> only}) async {');
+      _w.writeln(
+          'Future<int> update(${_b.modelType} model, {Set<String> only}) async {');
       _w.write('final Update update = updater.');
       final String wheres = _b.primary
           .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
@@ -346,8 +346,8 @@ class Writer {
       return;
     }
 
-    _w.writeln('Future<int> update(${_b
-        .modelType} model, {bool cascade: false, bool associate: false, Set<String> only}) async {');
+    _w.writeln(
+        'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only}) async {');
     _w.write('final Update update = updater.');
     final String wheres = _b.primary
         .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
@@ -409,8 +409,8 @@ class Writer {
     if (_b.preloads.length > 0) {
       cascade = ', {bool cascade: false}';
     }
-    _w.writeln('Future<void> updateMany(List<${_b
-        .modelType}> models${cascade}) async {');
+    _w.writeln(
+        'Future<void> updateMany(List<${_b.modelType}> models${cascade}) async {');
     if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
@@ -654,8 +654,8 @@ class Writer {
   void _writePreload() {
     if (_b.preloads.length == 0) return;
 
-    _writeln('Future<${_b.modelType}> preload(${_b
-        .modelType} model, {bool cascade: false}) async {');
+    _writeln(
+        'Future<${_b.modelType}> preload(${_b.modelType} model, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       _write('model.');
       _write(p.property);
@@ -685,13 +685,13 @@ class Writer {
   void _writePreloadAll() {
     if (_b.preloads.length == 0) return;
 
-    _writeln('Future<List<${_b.modelType}>> preloadAll(List<${_b
-        .modelType}> models, {bool cascade: false}) async {');
+    _writeln(
+        'Future<List<${_b.modelType}>> preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
-          _writeln('models.forEach((${_b.modelType} model) => model.${p
-              .property} ??= []);');
+          _writeln(
+              'models.forEach((${_b.modelType} model) => model.${p.property} ??= []);');
         }
 
         _write('await OneToXHelper.');
@@ -723,17 +723,17 @@ class Writer {
         _write('], ');
         //Arg5: Setter
         if (!p.hasMany) {
-          _write('(${_b.modelType} model, ${p.modelName} child) => model.${p
-              .property} = child, ');
+          _write(
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = child, ');
         } else {
-          _write('(${_b.modelType} model, ${p.modelName} child) => model.${p
-              .property}.add(child), ');
+          _write(
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property}.add(child), ');
         }
         _writeln('cascade: cascade);');
       } else if (p is PreloadManyToMany) {
         _writeln('for(${_b.modelType} model in models) {');
-        _writeln('var temp = await ${p.beanInstanceName}.fetchBy${_b
-            .modelType}(model);');
+        _writeln(
+            'var temp = await ${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
         _writeln('if(model.${p.property} == null) model.${p.property} = temp;');
         _writeln('else {');
         _writeln('model.${p.property}.clear();');
@@ -807,8 +807,8 @@ class Writer {
   }
 
   void _writeDetach(BelongsToAssociation m) {
-    _writeln('Future<int> detach${_cap(m.modelName)}(${_cap(
-        m.modelName)} model) async {');
+    _writeln(
+        'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
@@ -839,8 +839,8 @@ class Writer {
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
     final String targetModel = (m.other as PreloadManyToMany).targetModelName;
-    _writeln('Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(
-        m.modelName)} model) async {');
+    _writeln(
+        'Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');

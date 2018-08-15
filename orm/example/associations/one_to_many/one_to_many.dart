@@ -49,8 +49,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
         super(adapter);
 
   Future createTable() {
-    final st = Sql
-        .create(tableName)
+    final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('name', length: 50);
     return adapter.createTable(st);
@@ -73,8 +72,7 @@ class PostBean extends Bean<Post> with _PostBean {
   PostBean(Adapter adapter) : super(adapter);
 
   Future createTable() {
-    final st = Sql
-        .create(tableName)
+    final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('message', length: 150)
         .addStr('author_id',

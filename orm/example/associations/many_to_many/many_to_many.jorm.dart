@@ -62,11 +62,19 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return retId;
   }
 
-  Future<void> insertMany(List<TodoList> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
-    final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+  Future<void> insertMany(List<TodoList> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
   }
 
   Future<int> update(TodoList model,
@@ -84,6 +92,26 @@ abstract class _TodoListBean implements Bean<TodoList> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<TodoList> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<TodoList> find(String id,
@@ -192,11 +220,19 @@ abstract class _CategoryBean implements Bean<Category> {
     return retId;
   }
 
-  Future<void> insertMany(List<Category> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
-    final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+  Future<void> insertMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      return adapter.insertMany(insert);
+    }
   }
 
   Future<int> update(Category model,
@@ -214,6 +250,26 @@ abstract class _CategoryBean implements Bean<Category> {
       }
     }
     return ret;
+  }
+
+  Future<void> updateMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      return Future.wait(futures);
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      return adapter.updateMany(update);
+    }
   }
 
   Future<Category> find(String id,
@@ -326,6 +382,18 @@ abstract class _PivotBean implements Bean<Pivot> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     return adapter.insertMany(insert);
+  }
+
+  Future<void> updateMany(List<Pivot> models) async {
+    final List<List<SetColumn>> data = [];
+    final List<Expression> where = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+      where.add(null);
+    }
+    final UpdateMany update = updaters.addAll(data, where);
+    return adapter.updateMany(update);
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,
