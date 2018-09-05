@@ -1,6 +1,6 @@
 name: jaguar_query_sqflite
 description: SQFLite adapter for jaguar_query
-version: 2.1.10
+version: 2.2.0
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -8,20 +8,20 @@ homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
 environment:
-  sdk: '>=2.0.0-dev.55.0 <2.0.0'
+  sdk: '>=2.0.0-dev.65.0 <3.0.0'
 
 flutter:
 
 dependencies:
   flutter:
     sdk: flutter
-  sqflite: ^0.11.0
-  jaguar_query: ^2.1.10
+  sqflite: ^0.11.2
+  jaguar_query: ^2.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-dependency_overrides:
-  jaguar_query:
-    path: ../query
+#dependency_overrides:
+#  jaguar_query:
+#    path: ../query
