@@ -6,10 +6,10 @@ library jaguar_query_postgresql.src;
 import 'dart:async';
 
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:jaguar_query_mysql/composer.dart';
+import 'package:jaguar_query_sqljocky/composer.dart';
 import 'package:sqljocky5/sqljocky.dart' as sj;
 
-class SjAdapter implements Adapter<sj.MySqlConnection> {
+class MysqlAdapter implements Adapter<sj.MySqlConnection> {
   sj.MySqlConnection _connection;
 
   final String host;
@@ -20,10 +20,10 @@ class SjAdapter implements Adapter<sj.MySqlConnection> {
   final String username;
   final String password;
 
-  SjAdapter (this.databaseName,
+  MysqlAdapter (this.databaseName,
       {this.username, this.password, this.host: 'localhost', this.port: 3306});
 
-  SjAdapter .FromConnection(sj.MySqlConnection connection)
+  MysqlAdapter .FromConnection(sj.MySqlConnection connection)
       : _connection = connection,
         host = null,
         port = null,
