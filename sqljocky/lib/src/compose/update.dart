@@ -1,7 +1,7 @@
 part of query.compose;
 
 String composeUpdate(final Update st) {
-  final QueryUpdateInfo info = st.info;
+  final ImmutableUpdateStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('UPDATE ');
@@ -14,7 +14,7 @@ String composeUpdate(final Update st) {
 
   if (info.where.length != 0) {
     sb.write(' WHERE ');
-    sb.write(composeAnd(info.where));
+    sb.write(composeExpression(info.where));
   }
 
   sb.write(';');

@@ -2,14 +2,18 @@ part of query.compose;
 
 String composeCreateColumn(final CreateColumn col) {
   final sb = new StringBuffer();
-  sb.write(col.colName);
+  sb.write(col.name);
 
   if (col is CreateInt) {
-    sb.write(' INT');
+    if (col.autoIncrement) {
+      sb.write(' SERIAL');
+    } else {
+      sb.write(' INT');
+    }
   } else if (col is CreateBool) {
     sb.write(' BOOLEAN');
   } else if (col is CreateDateTime) {
-    sb.write(' TIMESTAMP'); //TODO
+    sb.write(' TIMESTAMP');
   } else if (col is CreateStr) {
     sb.write(' VARCHAR(');
     sb.write(col.length);
@@ -20,60 +24,69 @@ String composeCreateColumn(final CreateColumn col) {
 
   if (!col.isNullable) sb.write(' NOT NULL');
 
-  if (col is CreateInt && col.autoIncrement) {
-    sb.write(' AUTO_INCREMENT');
-  }
-
   return sb.toString();
 }
 
 String composeCreate(final Create create) {
-  final QueryCreateInfo info = create.info;
+  final ImmutableCreateStatement info = create.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('CREATE TABLE');
 
   if (info.ifNotExists) sb.write(' IF NOT EXISTS');
 
-  sb.write(' ${info.tableName} (');
+  sb.write(' ${info.name} (');
 
   sb.write(info.columns.values.map(composeCreateColumn).join(', '));
 
-  final List<CreateColumn> primaries = info.columns.values
-      .where((CreateColumn col) => col.isPrimaryKey)
-      .toList();
+  final List<CreateColumn> primaries =
+      info.columns.values.where((CreateColumn col) => col.isPrimary).toList();
   if (primaries.length != 0) {
     sb.write(', PRIMARY KEY (');
-    sb.write(primaries.map((CreateColumn col) => col.colName).join(','));
+    sb.write(primaries.map((CreateColumn col) => col.name).join(','));
     sb.write(')');
   }
 
   {
-    final y = <CreateColumn>[];
-    final x = <String, List<CreateColumn>>{};
+    final uniques = <CreateColumn>[];
+    final compositeUniques = <String, List<CreateColumn>>{};
+    final foreigns = <String, Map<String, String>>{};
     for (CreateColumn col in info.columns.values) {
       if (col.foreignKey != null) {
-        sb.write(', FOREIGN KEY (${col.colName}) REFERENCES ${col.foreignKey
-            .table}(${col.foreignKey.col})');
+        if (!foreigns.containsKey(col.foreignKey.table)) {
+          foreigns[col.foreignKey.table] = <String, String>{};
+        }
+        foreigns[col.foreignKey.table][col.name] = col.foreignKey.col;
       }
 
-      if (col.unique.unique) {
-        if (col.unique.group == null) {
-          y.add(col);
+      if (col.uniqueGroup != null) {
+        if (col.uniqueGroup.isEmpty) {
+          uniques.add(col);
         } else {
-          x[col.unique.group] = (x[col.unique.group] ?? <CreateColumn>[])
-            ..add(col);
+          compositeUniques[col.uniqueGroup] =
+              (compositeUniques[col.uniqueGroup] ?? <CreateColumn>[])..add(col);
         }
       }
     }
 
-    for (CreateColumn col in y) {
-      sb.write(', UNIQUE(${col.colName})');
+    for (final String foreignTab in foreigns.keys) {
+      final Map<String, String> cols = foreigns[foreignTab];
+      sb.write(', FOREIGN KEY (');
+      sb.write(cols.keys.join(', '));
+      sb.write(') REFERENCES ');
+      sb.write(foreignTab + '(');
+      sb.write(cols.values.join(', '));
+      sb.write(')');
     }
 
-    for (String group in x.keys) {
-      final String str =
-          x[group].map((CreateColumn col) => col.colName).join(', ');
+    for (CreateColumn col in uniques) {
+      sb.write(', UNIQUE(${col.name})');
+    }
+
+    for (String group in compositeUniques.keys) {
+      final String str = compositeUniques[group]
+          .map((CreateColumn col) => col.name)
+          .join(', ');
       sb.write(', UNIQUE($str)');
     }
   }
@@ -83,4 +96,4 @@ String composeCreate(final Create create) {
   return sb.toString();
 }
 
-String composeCreateDb(final CreateDb st) => "CREATE DATABASE ${st.dbName}";
+String composeCreateDb(final CreateDb st) => "CREATE DATABASE ${st.name}";
