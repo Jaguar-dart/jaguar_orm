@@ -21,22 +21,3 @@ String composeInsert(final Insert st) {
 
   return sb.toString();
 }
-
-String composeValue(dynamic val) {
-  if (val == null) return null;
-  if (val is int) {
-    return "$val";
-  } else if (val is String) {
-    return "'$val'";
-  } else if (val is double || val is num) {
-    return "$val";
-  } else if (val is DateTime) {
-    return "$val"; //TODO
-  } else if (val is bool) {
-    return val ? 'TRUE' : 'FALSE';
-  } else if (val is Field) {
-    return composeField(val);
-  } else {
-    throw new Exception("Invalid type ${val.runtimeType}!");
-  }
-}

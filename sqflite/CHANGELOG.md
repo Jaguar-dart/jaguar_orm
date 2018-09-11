@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1
+
++ Fixed SQL string escape
+
 ## 2.1.10
 
 + Removed `NoRecordFound` exception

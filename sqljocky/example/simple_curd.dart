@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:jaguar_query_sqljocky/jaguar_query_sqljocky.dart';
 
 /// The adapter
-SqlJockyAdapter _adapter =
-    new SqlJockyAdapter('testing', username: 'root', password: 'dart_jaguar');
+MysqlAdapter _adapter =
+    MysqlAdapter('testing', username: 'root', password: 'dart_jaguar');
 
 // The model
 class Post {
@@ -38,19 +38,16 @@ class PostBean {
   String get tableName => 'posts';
 
   Future<Null> createTable() async {
-    final st = new Create()
-        .named(tableName)
-        .ifNotExists()
-        .addNullInt('_id', primary: true)
-        .addNullStr('msg')
-        .addNullStr('author');
-
+    final st = Create(tableName, ifNotExists: true)
+        .addInt('_id', primary: true)
+        .addStr('msg', isNullable: true)
+        .addStr('author', isNullable: true);
     await _adapter.createTable(st);
   }
 
   /// Inserts a new post into table
   Future insert(Post post) async {
-    Insert inserter = new Insert()..into(tableName);
+    Insert inserter = Insert(tableName);
 
     inserter.set(id, post.id);
     inserter.set(msg, post.msg);
@@ -61,7 +58,7 @@ class PostBean {
 
   /// Updates a post
   Future<int> update(int id, String author) async {
-    Update updater = new Update()..into(tableName);
+    Update updater = Update(tableName);
     updater.where(this.id.eq(id));
 
     updater.set(this.author, author);
@@ -71,13 +68,13 @@ class PostBean {
 
   /// Finds one post by [id]
   Future<Post> findOne(int id) async {
-    Find updater = new Find()..from(tableName);
+    Find updater = Find(tableName);
 
     updater.where(this.id.eq(id));
 
     Map map = await _adapter.findOne(updater);
 
-    Post post = new Post();
+    Post post = Post();
     post.id = map['_id'];
     post.msg = map['msg'];
     post.author = map['author'];
@@ -87,11 +84,11 @@ class PostBean {
 
   /// Finds all posts
   Future<List<Post>> findAll() async {
-    Find finder = new Find()..from(tableName);
+    Find finder = Find(tableName);
 
     List<Map> maps = await (await _adapter.find(finder)).toList();
 
-    List<Post> posts = new List<Post>();
+    List<Post> posts = List<Post>();
 
     for (Map map in maps) {
       Post post = new Post();
@@ -108,7 +105,7 @@ class PostBean {
 
   /// Removes a post by [id]
   Future<int> delete(int id) async {
-    Remove deleter = new Remove()..from(tableName);
+    Remove deleter = Remove(tableName);
 
     deleter.where(this.id.eq(id));
 
@@ -117,7 +114,7 @@ class PostBean {
 
   /// Removes all posts
   Future<int> deleteAll() async {
-    Remove deleter = new Remove()..from(tableName);
+    Remove deleter = Remove(tableName);
 
     return await _adapter.remove(deleter);
   }
@@ -129,7 +126,7 @@ main() async {
 
   final bean = new PostBean();
 
-  await _adapter.dropTable(Sql.drop(bean.tableName).onlyIfExists());
+  await _adapter.dropTable(Sql.drop(bean.tableName, onlyIfExists: true));
 
   await bean.createTable();
 
@@ -163,12 +160,8 @@ main() async {
   print(await bean.delete(2));
 
   // Find a post when none exists
-  try {
-    post = await bean.findOne(1);
-    print(post);
-  } on JaguarOrmException catch (e) {
-    print(e);
-  }
+  post = await bean.findOne(1);
+  print(post);
 
   // Close connection
   await _adapter.close();

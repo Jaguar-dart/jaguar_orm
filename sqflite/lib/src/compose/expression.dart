@@ -58,7 +58,7 @@ String composeValue(dynamic val) {
   if (val is int) {
     return "$val";
   } else if (val is String) {
-    return "'$val'";
+    return "'${sqlStringEscape(val)}'";
   } else if (val is double || val is num) {
     return "$val";
   } else if (val is DateTime) {
@@ -71,3 +71,5 @@ String composeValue(dynamic val) {
     throw new Exception("Invalid type ${val.runtimeType}!");
   }
 }
+
+String sqlStringEscape(String input) => input.replaceAll("'", "''");

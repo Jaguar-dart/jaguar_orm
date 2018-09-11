@@ -18,7 +18,8 @@ class CartItem {
   CartItem.make(this.amount, this.product, this.quantity);
 
   @override
-  String toString() => 'id=$id, amount=$amount, quantity=$quantity, product=$product, cartId=$cartId';
+  String toString() =>
+      'id=$id, amount=$amount, quantity=$quantity, product=$product, cartId=$cartId';
 
   CartItem copy({int id, int quantity, String product, double amount}) {
     return CartItem(
@@ -32,11 +33,14 @@ class CartItem {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is CartItem && runtimeType == other.runtimeType && amount == other.amount && product == other.product && quantity == other.quantity;
+      other is CartItem &&
+          runtimeType == other.runtimeType &&
+          amount == other.amount &&
+          product == other.product &&
+          quantity == other.quantity;
 
   @override
   int get hashCode => amount.hashCode ^ product.hashCode ^ quantity.hashCode;
-
 }
 
 @GenBean()
@@ -51,6 +55,7 @@ class CartItemBean extends Bean<CartItem> with _CartItemBean {
   @override
   CartBean get cartBean => _cartBean ??= CartBean(adapter);
 }
+
 class Cart {
   @PrimaryKey(auto: true)
   int id;
@@ -77,7 +82,11 @@ class Cart {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Cart && runtimeType == other.runtimeType && items == other.items && amount == other.amount;
+      identical(this, other) ||
+      other is Cart &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          amount == other.amount;
 
   @override
   int get hashCode => items.hashCode ^ amount.hashCode;

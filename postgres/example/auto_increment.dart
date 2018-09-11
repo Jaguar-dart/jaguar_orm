@@ -51,7 +51,7 @@ main() async {
   await bean.createTable();
 
   // Insert some posts
-  final id1 = await bean.insert(Post.make(msg: 'Whatever 1', author: 'mark'));
+  final id1 = await bean.insert(Post.make(msg: "Whatever' 1", author: 'mark'));
   final id2 = await bean.insert(Post.make(msg: 'Whatever 2', author: 'bob'));
 
   // Find one post

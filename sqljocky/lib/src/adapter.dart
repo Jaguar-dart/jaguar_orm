@@ -20,10 +20,10 @@ class MysqlAdapter implements Adapter<sj.MySqlConnection> {
   final String username;
   final String password;
 
-  MysqlAdapter (this.databaseName,
+  MysqlAdapter(this.databaseName,
       {this.username, this.password, this.host: 'localhost', this.port: 3306});
 
-  MysqlAdapter .FromConnection(sj.MySqlConnection connection)
+  MysqlAdapter.FromConnection(sj.MySqlConnection connection)
       : _connection = connection,
         host = null,
         port = null,
@@ -34,7 +34,8 @@ class MysqlAdapter implements Adapter<sj.MySqlConnection> {
   /// Connects to the database
   Future<void> connect() async {
     if (_connection == null) {
-      sj.ConnectionSettings connSettings = sj.ConnectionSettings(host: host,
+      sj.ConnectionSettings connSettings = sj.ConnectionSettings(
+          host: host,
           port: port,
           db: databaseName,
           user: username,
@@ -52,16 +53,15 @@ class MysqlAdapter implements Adapter<sj.MySqlConnection> {
   /// Finds one record in the table
   Future<Map> findOne(Find st) async {
     String stStr = composeFind(st);
-    sj.Results results =
-    await _connection.execute(stStr);
+    sj.Results results = await _connection.execute(stStr);
 
     if (results.isEmpty) return null;
 
     List resList = results.toList();
     Map map = {};
-    for(int i = 0; i < resList[0].length; i++){
-        Object value = resList[0][i];
-        map[results.fields[i].name] = value;
+    for (int i = 0; i < resList[0].length; i++) {
+      Object value = resList[0][i];
+      map[results.fields[i].name] = value;
     }
     return map;
   }
@@ -70,8 +70,6 @@ class MysqlAdapter implements Adapter<sj.MySqlConnection> {
   Future<List<Map>> find(Find st) async {
     String stStr = composeFind(st);
     sj.Results results = await _connection.execute(stStr);
-
-
 
     return results.map((v) => v.first.first).toList();
   }
