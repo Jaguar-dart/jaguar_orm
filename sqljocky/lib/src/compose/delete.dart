@@ -1,6 +1,6 @@
 part of query.compose;
 
-String composeDelete(final Remove st) {
+String composeRemove(final Remove st) {
   final QueryRemoveInfo info = st.info;
   final sb = new StringBuffer();
 
@@ -9,7 +9,7 @@ String composeDelete(final Remove st) {
 
   if (info.where.length != 0) {
     sb.write(' WHERE ');
-    sb.write(composeAnd(info.where));
+    sb.write(composeExpression(info.where));
   }
 
   sb.write(';');
@@ -17,10 +17,10 @@ String composeDelete(final Remove st) {
   return sb.toString();
 }
 
-String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.dbName}";
+String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.name}";
 
 String composeDrop(final Drop st) {
   return "DROP TABLE " +
-      (st.onlyDropIfExists ? 'IF EXISTS ' : '') +
+      (st.onlyIfExists ? 'IF EXISTS ' : '') +
       st.tables.join(', ');
 }

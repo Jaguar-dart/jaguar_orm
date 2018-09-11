@@ -3,125 +3,149 @@
 
 library jaguar_orm_sqljocky.src;
 
-import 'package:jaguar_query/jaguar_query.dart';
-import 'package:sqljocky5/sqljocky.dart' as sj;
-import 'package:sqljocky5/src/query/standard_data_packet.dart' as sj;
 import 'dart:async';
 
-import 'package:jaguar_query_sqljocky/src/compose/compose.dart';
-import 'package:sqljocky5/src/results/results_impl.dart' as sj;
+import 'package:jaguar_query/jaguar_query.dart';
+import 'package:jaguar_query_sqljocky/composer.dart';
+import 'package:sqljocky5/sqljocky.dart' as sj;
 
-abstract class JaguarOrmException {}
+class MysqlAdapter implements Adapter<sj.MySqlConnection> {
+  sj.MySqlConnection _connection;
 
-class NoRecordFound implements JaguarOrmException {
-  const NoRecordFound();
+  final String host;
 
-  String toString() => 'No record found!';
-}
-
-class SqlJockyAdapter implements Adapter<sj.ConnectionPool> {
-  sj.ConnectionPool _connection;
-
-  final String host, username, password, databaseName;
   final int port;
 
-  SqlJockyAdapter(this.databaseName,
+  final String databaseName;
+  final String username;
+  final String password;
+
+  MysqlAdapter (this.databaseName,
       {this.username, this.password, this.host: 'localhost', this.port: 3306});
 
-  SqlJockyAdapter.FromConnection(this._connection)
-      : host = null,
-        username = null,
-        password = null,
+  MysqlAdapter .FromConnection(sj.MySqlConnection connection)
+      : _connection = connection,
+        host = null,
+        port = null,
         databaseName = null,
-        port = null;
+        username = null,
+        password = null;
 
   /// Connects to the database
-  Future<Null> connect() async {
-    if (_connection != null) return;
-    _connection = new sj.ConnectionPool(
-        host: host,
-        port: port,
-        user: username,
-        password: password,
-        db: databaseName,
-        max: 5);
+  Future<void> connect() async {
+    if (_connection == null) {
+      sj.ConnectionSettings connSettings = sj.ConnectionSettings(host: host,
+          port: port,
+          db: databaseName,
+          user: username,
+          password: password);
+      _connection = await sj.MySqlConnection.connect(connSettings);
+    }
+    //if (_connection.isClosed) await connection.open();
   }
 
   /// Closes all connections to the database.
-  Future<Null> close() async {
-    _connection.closeConnectionsWhenNotInUse();
-  }
+  Future<void> close() => _connection.close();
 
-  sj.ConnectionPool get connection => _connection;
+  sj.MySqlConnection get connection => _connection;
 
   /// Finds one record in the table
   Future<Map> findOne(Find st) async {
-    sj.Results stream = await _connection.query(composeFind(st));
+    String stStr = composeFind(st);
+    sj.Results results =
+    await _connection.execute(stStr);
 
-    sj.StandardDataPacket rowFound;
-    await for (sj.StandardDataPacket row in stream) {
-      rowFound = row;
-      break;
+    if (results.isEmpty) return null;
+
+    List resList = results.toList();
+    Map map = {};
+    for(int i = 0; i < resList[0].length; i++){
+        Object value = resList[0][i];
+        map[results.fields[i].name] = value;
     }
-
-    if (rowFound == null) {
-      throw const NoRecordFound();
-    }
-
-    return rowFound.fields;
+    return map;
   }
 
   // Finds many records in the table
-  Future<Stream<Map>> find(Find st) async {
-    final controller = new StreamController<Map>();
+  Future<List<Map>> find(Find st) async {
+    String stStr = composeFind(st);
+    sj.Results results = await _connection.execute(stStr);
 
-    final sj.ResultsImpl stream = (await _connection.query(composeFind(st)));
-    StreamSubscription<sj.Row> sub;
-    sub = stream.listen((sj.Row row) {
-      controller.add(row.fields);
-    }, onDone: () async {
-      await sub.cancel();
-      await controller.close();
-    }, cancelOnError: true);
 
-    return controller.stream;
+
+    return results.map((v) => v.first.first).toList();
   }
 
   /// Inserts a record into the table
   Future<T> insert<T>(Insert st) async {
-    sj.Results result = await _connection.query(composeInsert(st));
-    return result.insertId as T;
+    String strSt = composeInsert(st);
+    sj.Results ret = await _connection.execute(strSt);
+    if (ret.isEmpty || ret.first.isEmpty) return null;
+    return ret.first.first;
+  }
+
+  @override
+  Future<void> insertMany<T>(InsertMany statement) {
+    throw new UnimplementedError('InsertMany is not implemented yet!');
   }
 
   /// Updates a record in the table
   Future<int> update(Update st) async {
-    final sj.Results res = await _connection.query(composeUpdate(st));
-    return res.affectedRows;
+    sj.Results results = await _connection.execute(composeUpdate(st));
+    return results.affectedRows;
   }
 
   /// Deletes a record from the table
   Future<int> remove(Remove st) async {
-    final sj.Results res = await _connection.query(composeDelete(st));
-    return res.affectedRows;
+    sj.Results results = await _connection.execute(composeRemove(st));
+    return results.affectedRows;
   }
 
   /// Creates the table
-  Future<Null> createTable(Create st) async {
-    await _connection.query(composeCreate(st));
+  Future<void> createTable(Create statement) async {
+    await _connection.execute(composeCreate(statement));
   }
 
   /// Create the database
-  Future<Null> createDatabase(CreateDb st) async {
-    await _connection.query(composeCreateDb(st));
+  Future<void> createDatabase(CreateDb st) async {
+    await _connection.execute(composeCreateDb(st));
   }
 
   /// Drops tables from database
-  Future<Null> dropTable(Drop st) async {
-    await _connection.query(composeDrop(st));
+  Future<void> dropTable(Drop st) async {
+    String stStr = composeDrop(st);
+    await _connection.execute(stStr);
+  }
+
+  Future<void> dropDb(DropDb st) async {
+    await _connection.execute(composeDropDb(st));
   }
 
   @override
   T parseValue<T>(dynamic v) {
-    return v as T;
+    if (T == String) {
+      return v;
+    } else if (T == int) {
+      return v?.toInt();
+    } else if (T == double) {
+      return v?.toDouble();
+    } else if (T == num) {
+      return v;
+    } else if (T == DateTime) {
+      if (v == null) return null;
+      if (v is String) return DateTime.parse(v) as T;
+      if (v == int) return DateTime.fromMillisecondsSinceEpoch(v * 1000) as T;
+      return null;
+    } else if (T == bool) {
+      if (v == null) return null;
+      return (v == 0 ? false : true) as T;
+    } else {
+      throw new Exception("Invalid type $T!");
+    }
+  }
+
+  @override
+  Future<void> updateMany(UpdateMany statement) {
+    throw UnimplementedError('TODO need to be implemented');
   }
 }
