@@ -312,7 +312,8 @@ class Writer {
       _w.write('for (var model in models) {');
       _w.write('futures.add(insert(model, cascade: cascade));');
       _w.write('}');
-      _w.writeln('return Future.wait(futures);');
+      _w.writeln('await Future.wait(futures);');
+      _w.writeln('return;');
       _w.write('}');
       _w.write('else {');
     }
@@ -320,7 +321,8 @@ class Writer {
     _w.write(
         'final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
     _w.writeln('final InsertMany insert = inserters.addAll(data);');
-    _w.writeln('return adapter.insertMany(insert);');
+    _w.writeln('await adapter.insertMany(insert);');
+    _w.writeln('return;');
 
     if (cascade.isNotEmpty) {
       _w.writeln('}');
@@ -417,7 +419,8 @@ class Writer {
       _w.write('for (var model in models) {');
       _w.write('futures.add(update(model, cascade: cascade));');
       _w.write('}');
-      _w.writeln('return Future.wait(futures);');
+      _w.writeln('await Future.wait(futures);');
+      _w.writeln('return;');
       _w.write('}');
       _w.write('else {');
     }
@@ -439,7 +442,8 @@ class Writer {
     _w.write('where.add($wheres);');
     _w.write('}');
     _w.write('final UpdateMany update = updaters.addAll(data, where);');
-    _w.writeln('return adapter.updateMany(update);');
+    _w.writeln('await adapter.updateMany(update);');
+    _w.writeln('return;');
 
     if (cascade.isNotEmpty) {
       _w.writeln('}');

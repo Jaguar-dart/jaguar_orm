@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2
+
++ Reflexive relations
+
 ## 2.1.15
 
 + Relations without associations

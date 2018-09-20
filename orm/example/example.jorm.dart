@@ -73,7 +73,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
     final List<List<SetColumn>> data =
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+    await adapter.insertMany(insert);
+    return;
   }
 
   Future<int> update(CartItem model, {Set<String> only}) async {
@@ -92,7 +93,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);
-    return adapter.updateMany(update);
+    await adapter.updateMany(update);
+    return;
   }
 
   Future<CartItem> find(int id,
@@ -202,12 +204,14 @@ abstract class _CartBean implements Bean<Cart> {
       for (var model in models) {
         futures.add(insert(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data =
           models.map((model) => toSetColumns(model)).toList();
       final InsertMany insert = inserters.addAll(data);
-      return adapter.insertMany(insert);
+      await adapter.insertMany(insert);
+      return;
     }
   }
 
@@ -238,7 +242,8 @@ abstract class _CartBean implements Bean<Cart> {
       for (var model in models) {
         futures.add(update(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data = [];
       final List<Expression> where = [];
@@ -248,7 +253,8 @@ abstract class _CartBean implements Bean<Cart> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
-      return adapter.updateMany(update);
+      await adapter.updateMany(update);
+      return;
     }
   }
 

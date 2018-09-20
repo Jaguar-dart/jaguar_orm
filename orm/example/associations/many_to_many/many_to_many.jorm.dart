@@ -68,12 +68,14 @@ abstract class _TodoListBean implements Bean<TodoList> {
       for (var model in models) {
         futures.add(insert(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data =
           models.map((model) => toSetColumns(model)).toList();
       final InsertMany insert = inserters.addAll(data);
-      return adapter.insertMany(insert);
+      await adapter.insertMany(insert);
+      return;
     }
   }
 
@@ -100,7 +102,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
       for (var model in models) {
         futures.add(update(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data = [];
       final List<Expression> where = [];
@@ -110,7 +113,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
-      return adapter.updateMany(update);
+      await adapter.updateMany(update);
+      return;
     }
   }
 
@@ -226,12 +230,14 @@ abstract class _CategoryBean implements Bean<Category> {
       for (var model in models) {
         futures.add(insert(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data =
           models.map((model) => toSetColumns(model)).toList();
       final InsertMany insert = inserters.addAll(data);
-      return adapter.insertMany(insert);
+      await adapter.insertMany(insert);
+      return;
     }
   }
 
@@ -258,7 +264,8 @@ abstract class _CategoryBean implements Bean<Category> {
       for (var model in models) {
         futures.add(update(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data = [];
       final List<Expression> where = [];
@@ -268,7 +275,8 @@ abstract class _CategoryBean implements Bean<Category> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
-      return adapter.updateMany(update);
+      await adapter.updateMany(update);
+      return;
     }
   }
 
@@ -381,7 +389,8 @@ abstract class _PivotBean implements Bean<Pivot> {
     final List<List<SetColumn>> data =
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+    await adapter.insertMany(insert);
+    return;
   }
 
   Future<void> updateMany(List<Pivot> models) async {
@@ -393,7 +402,8 @@ abstract class _PivotBean implements Bean<Pivot> {
       where.add(null);
     }
     final UpdateMany update = updaters.addAll(data, where);
-    return adapter.updateMany(update);
+    await adapter.updateMany(update);
+    return;
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,

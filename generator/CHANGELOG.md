@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.5
+
++ Reflexive relations
+
 ## 2.1.20
 
 + `IgnoreColumn` on getters fix

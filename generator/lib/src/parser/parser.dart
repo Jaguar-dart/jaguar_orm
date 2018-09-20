@@ -40,6 +40,7 @@ class ParsedBean {
   /// is recursive, this avoids infinite recursion. This shall be set only for
   /// the `Bean` being generated.
   final bool doRelations;
+  final bool doAssociation;
 
   /// The [ClassElement] element of the `GenBean` spec.
   final ClassElement clazz;
@@ -66,7 +67,7 @@ class ParsedBean {
 
   final beanedForeignAssociations = <DartType, BeanedForeignAssociation>{};
 
-  ParsedBean(this.clazz, {this.doRelations: true});
+  ParsedBean(this.clazz, {this.doRelations: true, this.doAssociation: true});
 
   WriterModel detect() {
     _getModel();
@@ -75,6 +76,7 @@ class ParsedBean {
 
     // Collect [BelongsToAssociation] from [BelongsToForeign]
     for (Field f in fields.values) {
+      if (!doAssociation) continue;
       if (f.foreign is! BelongsToForeign) continue;
 
       final BelongsToForeign foreign = f.foreign;
@@ -82,7 +84,8 @@ class ParsedBean {
       BelongsToAssociation current = beanedAssociations[bean];
 
       final WriterModel info =
-          ParsedBean(bean.element, doRelations: false).detect();
+          ParsedBean(bean.element, doRelations: false, doAssociation: false)
+              .detect();
 
       final Preload other = info.findHasXByAssociation(clazz.type);
 
@@ -114,6 +117,7 @@ class ParsedBean {
 
     // Collect [BeanedForeignAssociation] from [BelongsToForeign]
     for (Field f in fields.values) {
+      if (!doAssociation) continue;
       if (f.foreign is! BelongsToForeign) continue;
 
       final BelongsToForeign foreign = f.foreign;
@@ -121,7 +125,8 @@ class ParsedBean {
 
       {
         final WriterModel info =
-            ParsedBean(bean.element, doRelations: false).detect();
+            ParsedBean(bean.element, doRelations: false, doAssociation: false)
+                .detect();
         final Preload other = info.findHasXByAssociation(clazz.type);
         if (other != null) continue;
       }
@@ -176,7 +181,8 @@ class ParsedBean {
 
     for (BelongsToAssociation m in beanedAssociations.values) {
       final WriterModel info =
-          ParsedBean(m.bean.element, doRelations: false).detect();
+          ParsedBean(m.bean.element, doRelations: false, doAssociation: false)
+              .detect();
 
       for (Field f in m.fields) {
         Field ff = info.fieldByColName(f.foreign.refCol);
@@ -207,12 +213,13 @@ class ParsedBean {
 
     if (doRelations) {
       for (Preload p in preloads) {
+        if (p.bean == clazz.type) {
+          p.foreignFields.addAll(beanedAssociations[p.bean].fields);
+        }
         for (Field f in p.foreignFields) {
           Field ff = ret.fieldByColName(f.foreign.refCol);
-
           if (ff == null)
             throw Exception('Foreign key in foreign model not found!');
-
           p.fields.add(ff);
         }
       }
@@ -306,19 +313,10 @@ class ParsedBean {
         // Must have both getter and setter
         if (field.getter == null || field.setter == null) continue;
 
-        bool ignore = false;
-
-        // If IgnoreField is present, skip!
-        for (ElementAnnotation annot in field.metadata) {
-          DartObject annotObj = annot.computeConstantValue();
-          if (isIgnore.isExactlyType(annotObj.type)) {
-            ignores.add(field.name);
-            ignore = true;
-            break;
-          }
+        if (isIgnore.firstAnnotationOf(field) != null) {
+          ignores.add(field.name);
+          continue;
         }
-
-        if (ignore) continue;
 
         if (field.isStatic) continue;
 
@@ -362,19 +360,9 @@ class ParsedBean {
   }
 
   bool _relation(DartType curBean, FieldElement f) {
-    DartObject rel;
-    for (ElementAnnotation annot in f.metadata) {
-      DartObject v = annot.computeConstantValue();
-      if (!isRelation.isAssignableFromType(v.type)) continue;
-      if (rel != null)
-        throw Exception('Only one Relation annotation is allowed on a Field!');
-      rel = v;
-    }
-
+    DartObject rel = isRelation.firstAnnotationOf(f);
     if (rel == null) return false;
-
     parseRelation(curBean, f, rel);
-
     return true;
   }
 
@@ -388,16 +376,18 @@ class ParsedBean {
 
       BelongsToAssociation g;
       if (doRelations) {
-        final WriterModel info =
-            ParsedBean(bean.element, doRelations: false).detect();
-        g = info.belongTos[curBean];
-        if (g == null || g is! BelongsToAssociation)
-          throw Exception('Association $bean not found! Field ${f.name}.');
+        if (bean != curBean) {
+          final WriterModel info =
+              ParsedBean(bean.element, doRelations: false).detect();
+          g = info.belongTos[curBean];
+          if (g == null || g is! BelongsToAssociation)
+            throw Exception('Association $bean not found! Field ${f.name}.');
+        }
       }
 
       final bool hasMany = isHasMany.isExactlyType(obj.type);
 
-      preloads.add(PreloadOneToX(bean, f.name, g?.fields, hasMany));
+      preloads.add(PreloadOneToX(bean, f.name, g?.fields ?? [], hasMany));
       return;
     } else if (isManyToMany.isExactlyType(obj.type)) {
       final DartType pivot = obj.getField('pivotBean').toTypeValue();

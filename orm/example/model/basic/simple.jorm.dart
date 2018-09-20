@@ -60,7 +60,8 @@ abstract class _UserBean implements Bean<User> {
     final List<List<SetColumn>> data =
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+    await adapter.insertMany(insert);
+    return;
   }
 
   Future<int> update(User model, {Set<String> only}) async {
@@ -79,7 +80,8 @@ abstract class _UserBean implements Bean<User> {
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);
-    return adapter.updateMany(update);
+    await adapter.updateMany(update);
+    return;
   }
 
   Future<User> find(String id,

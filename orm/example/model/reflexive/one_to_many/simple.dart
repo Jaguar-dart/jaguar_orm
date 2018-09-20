@@ -14,8 +14,8 @@ class Directory {
   @Column(length: 50)
   String name;
 
-  @HasOne(DirectoryBean)
-  Directory child;
+  @HasMany(DirectoryBean)
+  List<Directory> child;
 
   @BelongsTo(DirectoryBean)
   String parentId;

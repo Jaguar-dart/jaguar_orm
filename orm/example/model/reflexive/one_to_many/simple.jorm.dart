@@ -61,8 +61,11 @@ abstract class _DirectoryBean implements Bean<Directory> {
       Directory newModel;
       if (model.child != null) {
         newModel ??= await find(model.id);
-        directoryBean.associateDirectory(model.child, newModel);
-        await directoryBean.insert(model.child);
+        model.child
+            .forEach((x) => directoryBean.associateDirectory(x, newModel));
+        for (final child in model.child) {
+          await directoryBean.insert(child);
+        }
       }
     }
     return retId;
@@ -96,9 +99,12 @@ abstract class _DirectoryBean implements Bean<Directory> {
       if (model.child != null) {
         if (associate) {
           newModel ??= await find(model.id);
-          directoryBean.associateDirectory(model.child, newModel);
+          model.child
+              .forEach((x) => directoryBean.associateDirectory(x, newModel));
         }
-        await directoryBean.update(model.child);
+        for (final child in model.child) {
+          await directoryBean.update(child);
+        }
       }
     }
     return ret;
@@ -153,14 +159,14 @@ abstract class _DirectoryBean implements Bean<Directory> {
     return adapter.remove(remove);
   }
 
-  Future<Directory> findByDirectory(String parentId,
+  Future<List<Directory>> findByDirectory(String parentId,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.parentId.eq(parentId));
-    final Directory model = await findOne(find);
+    final List<Directory> models = await findMany(find);
     if (preload) {
-      await this.preload(model, cascade: cascade);
+      await this.preloadAll(models, cascade: cascade);
     }
-    return model;
+    return models;
   }
 
   Future<List<Directory>> findByDirectoryList(List<Directory> models,
@@ -193,12 +199,13 @@ abstract class _DirectoryBean implements Bean<Directory> {
 
   Future<List<Directory>> preloadAll(List<Directory> models,
       {bool cascade: false}) async {
+    models.forEach((Directory model) => model.child ??= []);
     await OneToXHelper.preloadAll<Directory, Directory>(
         models,
         (Directory model) => [model.id],
         directoryBean.findByDirectoryList,
         (Directory model) => [model.parentId],
-        (Directory model, Directory child) => model.child = child,
+        (Directory model, Directory child) => model.child.add(child),
         cascade: cascade);
     return models;
   }

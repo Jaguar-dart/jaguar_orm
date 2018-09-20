@@ -67,12 +67,14 @@ abstract class _AuthorBean implements Bean<Author> {
       for (var model in models) {
         futures.add(insert(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data =
           models.map((model) => toSetColumns(model)).toList();
       final InsertMany insert = inserters.addAll(data);
-      return adapter.insertMany(insert);
+      await adapter.insertMany(insert);
+      return;
     }
   }
 
@@ -103,7 +105,8 @@ abstract class _AuthorBean implements Bean<Author> {
       for (var model in models) {
         futures.add(update(model, cascade: cascade));
       }
-      return Future.wait(futures);
+      await Future.wait(futures);
+      return;
     } else {
       final List<List<SetColumn>> data = [];
       final List<Expression> where = [];
@@ -113,7 +116,8 @@ abstract class _AuthorBean implements Bean<Author> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
-      return adapter.updateMany(update);
+      await adapter.updateMany(update);
+      return;
     }
   }
 
@@ -224,7 +228,8 @@ abstract class _PostBean implements Bean<Post> {
     final List<List<SetColumn>> data =
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
-    return adapter.insertMany(insert);
+    await adapter.insertMany(insert);
+    return;
   }
 
   Future<int> update(Post model, {Set<String> only}) async {
@@ -243,7 +248,8 @@ abstract class _PostBean implements Bean<Post> {
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);
-    return adapter.updateMany(update);
+    await adapter.updateMany(update);
+    return;
   }
 
   Future<Post> find(String id,
