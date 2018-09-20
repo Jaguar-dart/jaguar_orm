@@ -25,12 +25,12 @@ main() async {
   await userBean.createTable();
 
   // Insert a new record
-  await userBean.insert(new User(id: '1', name: 'teja', age: 29));
-  await userBean.insert(new User(id: '2', name: 'kleak', age: 24));
-  await userBean.insert(new User(id: '3', name: 'lejard', age: 25));
+  int id = await userBean.insert(new User(name: 'teja', age: 29));
+  await userBean.insert(new User(name: 'kleak', age: 24));
+  await userBean.insert(new User(name: 'lejard', age: 25));
 
   // Fetching record by primary key
-  User user = await userBean.find('1');
+  User user = await userBean.find(id);
   print(user);
 
   // Updating a record
@@ -42,7 +42,7 @@ main() async {
   print(users);
 
   // Remove
-  await userBean.remove('1');
+  await userBean.remove(id);
 
   users = await userBean.getAll();
   print(users);

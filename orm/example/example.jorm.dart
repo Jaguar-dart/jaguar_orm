@@ -21,7 +21,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
         cartId.name: cartId,
       };
   CartItem fromMap(Map map) {
-    CartItem model = new CartItem();
+    CartItem model = CartItem();
 
     model.id = adapter.parseValue(map['id']);
     model.amount = adapter.parseValue(map['amount']);
@@ -37,13 +37,11 @@ abstract class _CartItemBean implements Bean<CartItem> {
     List<SetColumn> ret = [];
 
     if (only == null) {
-      ret.add(id.set(model.id));
       ret.add(amount.set(model.amount));
       ret.add(product.set(model.product));
       ret.add(quantity.set(model.quantity));
       ret.add(cartId.set(model.cartId));
     } else {
-      if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
       if (only.contains(product.name)) ret.add(product.set(model.product));
       if (only.contains(quantity.name)) ret.add(quantity.set(model.quantity));
@@ -64,9 +62,13 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(CartItem model) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
-    return adapter.insert(insert);
+  Future<dynamic> insert(CartItem model, {bool cascade: false}) async {
+    final Insert insert = inserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.insert(insert);
+    if (cascade) {
+      CartItem newModel;
+    }
+    return retId;
   }
 
   Future<void> insertMany(List<CartItem> models) async {
@@ -152,7 +154,7 @@ abstract class _CartBean implements Bean<Cart> {
         amount.name: amount,
       };
   Cart fromMap(Map map) {
-    Cart model = new Cart();
+    Cart model = Cart();
 
     model.id = adapter.parseValue(map['id']);
     model.amount = adapter.parseValue(map['amount']);
@@ -165,10 +167,8 @@ abstract class _CartBean implements Bean<Cart> {
     List<SetColumn> ret = [];
 
     if (only == null) {
-      ret.add(id.set(model.id));
       ret.add(amount.set(model.amount));
     } else {
-      if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
     }
 
@@ -183,19 +183,19 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<dynamic> insert(Cart model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model))..id(id.name);
-    final ret = await adapter.insert(insert);
+    final Insert insert = inserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.insert(insert);
     if (cascade) {
       Cart newModel;
       if (model.items != null) {
-        newModel ??= await find(ret);
+        newModel ??= await find(retId);
         model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         for (final child in model.items) {
           await cartItemBean.insert(child);
         }
       }
     }
-    return ret;
+    return retId;
   }
 
   Future<void> insertMany(List<Cart> models, {bool cascade: false}) async {

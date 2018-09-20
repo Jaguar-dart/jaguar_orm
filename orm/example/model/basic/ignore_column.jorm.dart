@@ -17,7 +17,7 @@ abstract class _UserBean implements Bean<User> {
         age.name: age,
       };
   User fromMap(Map map) {
-    User model = new User();
+    User model = User();
 
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);

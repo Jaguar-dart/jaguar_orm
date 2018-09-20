@@ -75,7 +75,7 @@ class Writer {
 
   void _writeFromMap() {
     _w.writeln('${_b.modelType} fromMap(Map map) {');
-    _w.writeln('${_b.modelType} model = new ${_b.modelType}();');
+    _w.writeln('${_b.modelType} model = ${_b.modelType}();');
     _w.writeln();
 
     _b.fields.values.forEach((Field field) {
@@ -158,15 +158,19 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
+      if (!field.autoIncrement) {
+        _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
+      }
     });
 
     _w.writeln('} else {');
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      _w.writeln(
-          "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
+      if (!field.autoIncrement) {
+        _w.writeln(
+            "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
+      }
     });
 
     _w.writeln('}');
@@ -187,7 +191,7 @@ class Writer {
   }
 
   void _writeInsert() {
-    if (_b.preloads.length == 0 || _b.primary.length == 0) {
+    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
       _w.writeln('Future<dynamic> insert(${_b.modelType} model) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln('.setMany(toSetColumns(model));');
@@ -196,61 +200,14 @@ class Writer {
       return;
     }
 
-    if (_b.primary.length == 1 && _b.primary.first.autoIncrement) {
-      _w.writeln(
-          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
-      _w.write('final Insert insert = inserter');
-      _w.writeln(
-          '.setMany(toSetColumns(model))..id(${_b.primary.first.colName}.name);');
-      _w.writeln('final ret = await adapter.insert(insert);');
-
-      _w.writeln('if(cascade) {');
-      _w.writeln('${_b.modelType} newModel;');
-      for (Preload p in _b.preloads) {
-        _w.writeln('if(model.${p.property} != null) {');
-        _w.writeln('newModel ??= await find(ret);');
-
-        if (!p.hasMany) {
-          _write(_uncap(p.beanInstanceName));
-          _writeln(
-              '.associate${_b.modelType}(model.' + p.property + ', newModel);');
-          _write('await ' +
-              _uncap(p.beanInstanceName) +
-              '.insert(model.' +
-              p.property +
-              ');');
-        } else {
-          if (p is PreloadOneToX) {
-            _write('model.' + p.property + '.forEach((x) => ');
-            _write(_uncap(p.beanInstanceName));
-            _writeln('.associate${_b.modelType}(x, newModel));');
-            _writeln('for(final child in model.${p.property}) {');
-            _writeln('await ' + _uncap(p.beanInstanceName) + '.insert(child);');
-            _writeln('}');
-          } else if (p is PreloadManyToMany) {
-            _writeln('for(final child in model.${p.property}) {');
-            _writeln('await ${p.targetBeanInstanceName}.insert(child);');
-            if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-              _writeln('await ${p.beanInstanceName}.attach(model, child);');
-            } else {
-              _writeln('await ${p.beanInstanceName}.attach(child, model);');
-            }
-            _writeln('}');
-          }
-        }
-        _w.writeln('}');
-      }
-      _w.writeln('}');
-
-      _w.writeln('return ret;');
-      _w.writeln('}');
-      return;
-    }
-
     _w.writeln(
         'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
     _w.write('final Insert insert = inserter');
-    _w.writeln('.setMany(toSetColumns(model));');
+    _w.write('.setMany(toSetColumns(model))');
+    for (Field f in _b.primary) {
+      if (f.autoIncrement) _w.write('.id(${f.field}.name)');
+    }
+    _w.writeln(';');
     _w.writeln('var retId = await adapter.insert(insert);');
 
     _w.writeln('if(cascade) {');

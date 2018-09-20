@@ -4,8 +4,8 @@ import 'package:jaguar_orm/jaguar_orm.dart';
 part 'simple.jorm.dart';
 
 class User {
-  @PrimaryKey()
-  String id;
+  @PrimaryKey(auto: true, isNullable: false)
+  int id;
 
   String name;
 

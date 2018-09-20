@@ -15,7 +15,7 @@ abstract class _AuthorBean implements Bean<Author> {
         name.name: name,
       };
   Author fromMap(Map map) {
-    Author model = new Author();
+    Author model = Author();
 
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
@@ -181,7 +181,7 @@ abstract class _PostBean implements Bean<Post> {
         message.name: message,
       };
   Post fromMap(Map map) {
-    Post model = new Post();
+    Post model = Post();
 
     model.id = adapter.parseValue(map['id']);
     model.authorId = adapter.parseValue(map['author_id']);

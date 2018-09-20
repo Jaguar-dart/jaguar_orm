@@ -7,7 +7,7 @@ part of 'simple.dart';
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  final id = new StrField('id');
+  final id = new IntField('id');
   final name = new StrField('name');
   final age = new IntField('age');
   Map<String, Field> _fields;
@@ -17,7 +17,7 @@ abstract class _UserBean implements Bean<User> {
         age.name: age,
       };
   User fromMap(Map map) {
-    User model = new User();
+    User model = User();
 
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
@@ -31,11 +31,9 @@ abstract class _UserBean implements Bean<User> {
     List<SetColumn> ret = [];
 
     if (only == null) {
-      ret.add(id.set(model.id));
       ret.add(name.set(model.name));
       ret.add(age.set(model.age));
     } else {
-      if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(name.name)) ret.add(name.set(model.name));
       if (only.contains(age.name)) ret.add(age.set(model.age));
     }
@@ -45,15 +43,19 @@ abstract class _UserBean implements Bean<User> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, isNullable: false);
+    st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addStr(name.name, isNullable: false);
     st.addInt(age.name, isNullable: true);
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(User model) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
-    return adapter.insert(insert);
+  Future<dynamic> insert(User model, {bool cascade: false}) async {
+    final Insert insert = inserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.insert(insert);
+    if (cascade) {
+      User newModel;
+    }
+    return retId;
   }
 
   Future<void> insertMany(List<User> models) async {
@@ -84,13 +86,12 @@ abstract class _UserBean implements Bean<User> {
     return;
   }
 
-  Future<User> find(String id,
-      {bool preload: false, bool cascade: false}) async {
+  Future<User> find(int id, {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await findOne(find);
   }
 
-  Future<int> remove(String id) async {
+  Future<int> remove(int id) async {
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
   }
