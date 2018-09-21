@@ -427,7 +427,7 @@ class Writer {
 
     if (_b.preloads.length > 0) {
       _writeln('final ${_b.modelType} model = await findOne(find);');
-      _writeln('if (preload) {');
+      _writeln('if (preload && model != null) {');
       _writeln('await this.preload(model, cascade: cascade);');
       _writeln('}');
       _writeln('return model;');
@@ -470,6 +470,7 @@ class Writer {
       return '${f.field}';
     }).join(','));
     _writeln(');');
+    _w.writeln('if(newModel != null) {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         _write(
@@ -480,6 +481,7 @@ class Writer {
         _write('await ${p.beanInstanceName}.detach${_b.modelType}(newModel);');
       }
     }
+    _w.writeln('}');
     _writeln('}');
 
     _w.writeln('final Remove remove = remover.');
