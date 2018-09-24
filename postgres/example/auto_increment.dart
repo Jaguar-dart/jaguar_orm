@@ -52,7 +52,7 @@ main() async {
 
   // Insert some posts
   final id1 = await bean.insert(Post.make(msg: "Whatever' 1", author: 'mark'));
-  final id2 = await bean.insert(Post.make(msg: 'hello@g.com', author: 'bob'));
+  final id2 = await bean.insert(Post.make(msg: 'hello@@g.com', author: 'bob'));
 
   // Find one post
   Post post = await bean.findById(id1);
