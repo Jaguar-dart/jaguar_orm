@@ -26,8 +26,8 @@ dev_dependencies:
   collection: ^1.14.10
   path: ^1.6.2
 
-#dependency_overrides:
-#  jaguar_query:
-#    path: ../query
+dependency_overrides:
+  jaguar_query:
+    path: ../query
 #  jaguar_orm:
 #    path: ../orm

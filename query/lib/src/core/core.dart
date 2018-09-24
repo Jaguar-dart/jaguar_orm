@@ -24,6 +24,8 @@ part 'statement/create/create.dart';
 part 'statement/create_db.dart';
 part 'statement/drop.dart';
 part 'statement/find/find.dart';
+part 'statement/upsert.dart';
+part 'statement/upsert_many.dart';
 part 'statement/insert.dart';
 part 'statement/insert_many.dart';
 part 'statement/remove.dart';
@@ -37,6 +39,12 @@ class Sql {
   /// Creates a new [Find] statement
   static Find find(String table, {String alias}) =>
       new Find(table, alias: alias);
+
+  /// Creates a new [Upsert] statement
+  static Upsert upsert(String table) => new Upsert(table);
+
+  /// Creates a new [UpsertMany] statement
+  static UpsertMany upsertMany(String table) => new UpsertMany(table);
 
   /// Creates a new [Insert] statement
   static Insert insert(String table) => new Insert(table);

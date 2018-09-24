@@ -158,19 +158,14 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if (!field.autoIncrement) {
-        _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
-      }
+      _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
     });
 
     _w.writeln('} else {');
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if (!field.autoIncrement) {
-        _w.writeln(
-            "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
-      }
+        _w.writeln("if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
     });
 
     _w.writeln('}');
@@ -183,11 +178,115 @@ class Writer {
   void _writeCrud() {
     _writeInsert();
     _writeInsertMany();
+    _writeUpsert();
+    _writeUpsertMany();
     _writeUpdate();
     _writeUpdateMany();
     _writeFind();
     _writeRemove();
     _writeRemoveMany();
+  }
+
+  void _writeUpsert() {
+    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
+      _w.writeln('Future<dynamic> upsert(${_b.modelType} model) async {');
+      _w.write('final Upsert upsert = upserter');
+      _w.writeln('.setMany(toSetColumns(model));');
+      _w.writeln('return adapter.upsert(upsert);');
+      _w.writeln('}');
+      return;
+    }
+
+    _w.writeln(
+        'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false}) async {');
+    _w.write('final Upsert upsert = upserter');
+    _w.write('.setMany(toSetColumns(model))');
+    for (Field f in _b.primary) {
+      if (f.autoIncrement) _w.write('.id(${f.field}.name)');
+    }
+    _w.writeln(';');
+    _w.writeln('var retId = await adapter.upsert(upsert);');
+
+    _w.writeln('if(cascade) {');
+    _w.writeln('${_b.modelType} newModel;');
+    for (Preload p in _b.preloads) {
+      _w.writeln('if(model.${p.property} != null) {');
+      _w.writeln('newModel ??= await find(');
+      _write(_b.primary.map((f) {
+        if (f.autoIncrement) return 'retId';
+        return 'model.${f.field}';
+      }).join(','));
+      _writeln(');');
+
+      if (!p.hasMany) {
+        _write(_uncap(p.beanInstanceName));
+        _writeln(
+            '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+        _write('await ' +
+            _uncap(p.beanInstanceName) +
+            '.upsert(model.' +
+            p.property +
+            ');');
+      } else {
+        if (p is PreloadOneToX) {
+          _write('model.' + p.property + '.forEach((x) => ');
+          _write(_uncap(p.beanInstanceName));
+          _writeln('.associate${_b.modelType}(x, newModel));');
+          _writeln('for(final child in model.${p.property}) {');
+          _writeln('await ' + _uncap(p.beanInstanceName) + '.upsert(child);');
+          _writeln('}');
+        } else if (p is PreloadManyToMany) {
+          _writeln('for(final child in model.${p.property}) {');
+          _writeln('await ${p.targetBeanInstanceName}.upsert(child);');
+          if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
+            _writeln('await ${p.beanInstanceName}.attach(model, child);');
+          } else {
+            _writeln('await ${p.beanInstanceName}.attach(child, model);');
+          }
+          _writeln('}');
+        }
+      }
+      _w.writeln('}');
+    }
+    _w.writeln('}');
+    _w.writeln('return retId;');
+    _w.writeln('}');
+  }
+
+  void _writeUpsertMany() {
+    var cascade = '';
+    if (_b.preloads.length > 0) {
+      cascade = ', {bool cascade: false}';
+    }
+    _w.writeln(
+        'Future<void> upsertMany(List<${_b.modelType}> models${cascade}) async {');
+    if (cascade.isNotEmpty) {
+      _w.write('if(cascade)  {');
+      _w.write('final List<Future> futures = [];');
+      _w.write('for (var model in models) {');
+      _w.write('futures.add(upsert(model, cascade: cascade));');
+      _w.write('}');
+      _w.writeln('await Future.wait(futures);');
+      _w.writeln('return;');
+      _w.write('}');
+      _w.write('else {');
+    }
+
+    _w.write('final List<List<SetColumn>> data = [];');
+    _w.write('for (var i = 0; i < models.length; ++i) {');
+    _w.write('var model = models[i];');
+    _w.write('data.add(toSetColumns(model).toList());');
+
+    _w.write('}');
+    _w.write('final UpsertMany upsert = upserters.addAll(data);');
+    _w.writeln('await adapter.upsertMany(upsert);');
+    _w.writeln('return;');
+
+    if (cascade.isNotEmpty) {
+      _w.writeln('}');
+    }
+
+    _w.writeln('}');
   }
 
   void _writeInsert() {
