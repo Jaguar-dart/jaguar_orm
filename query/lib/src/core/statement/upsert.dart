@@ -11,19 +11,10 @@ part of query;
 class Upsert implements Statement {
   final String name;
 
-  String _id;
-
   final Map<String, dynamic> _values = {};
 
   Upsert(this.name) {
     _immutable = new ImmutableUpsertStatement(this);
-  }
-
-  /// Id is the auto-generated primary key that is set by the database. [Adapter]
-  /// will request the database to return this column on inserts.
-  Upsert id(String id) {
-    _id = id;
-    return this;
   }
 
   /// Set the the [value] of given column ([field]).
@@ -83,7 +74,6 @@ class Upsert implements Statement {
 
   /// Read-only representation of this statement.
   ImmutableUpsertStatement get asImmutable => _immutable;
-
 }
 
 class ImmutableUpsertStatement {
@@ -93,8 +83,6 @@ class ImmutableUpsertStatement {
       : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get table => _inner.name;
-
-  String get id => _inner._id;
 
   final UnmodifiableMapView<String, dynamic> values;
 }

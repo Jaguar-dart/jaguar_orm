@@ -84,7 +84,18 @@ class MysqlAdapter implements Adapter<sj.MySqlConnection> {
 
   @override
   Future<void> insertMany<T>(InsertMany statement) {
-    throw new UnimplementedError('InsertMany is not implemented yet!');
+    throw UnimplementedError('InsertMany is not implemented yet!');
+  }
+
+  /// Executes the insert or update statement and returns the primary key of
+  /// inserted row
+  Future<T> upsert<T>(Upsert statement) {
+    throw UnimplementedError();
+  }
+
+  /// Executes bulk insert or update statement
+  Future<void> upsertMany<T>(UpsertMany statement) {
+    throw UnimplementedError();
   }
 
   /// Updates a record in the table

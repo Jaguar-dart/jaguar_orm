@@ -57,7 +57,6 @@ abstract class Adapter<ConnType> {
 
   /// Parses values coming from database into Dart values
   T parseValue<T>(dynamic v);
-
 }
 
 /// Convenience class to execute `Find` statement using [adapter]

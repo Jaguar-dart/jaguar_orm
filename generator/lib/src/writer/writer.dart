@@ -158,11 +158,11 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if(field.autoIncrement) {
+      if (field.autoIncrement) {
         _w.writeln("if(model.${field.field} != null) {");
       }
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
-      if(field.autoIncrement) {
+      if (field.autoIncrement) {
         _w.writeln("}");
       }
     });
@@ -171,11 +171,12 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if(field.autoIncrement) {
+      if (field.autoIncrement) {
         _w.writeln("if(model.${field.field} != null) {");
       }
-      _w.writeln("if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
-      if(field.autoIncrement) {
+      _w.writeln(
+          "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
+      if (field.autoIncrement) {
         _w.writeln("}");
       }
     });

@@ -61,7 +61,7 @@ class ImmutableUpsertManyStatement {
 
   ImmutableUpsertManyStatement(this._inner)
       : values = new UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
-      _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
+            _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 
   String get table => _inner.name;
 
