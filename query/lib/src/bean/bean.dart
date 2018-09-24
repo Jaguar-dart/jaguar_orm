@@ -28,6 +28,12 @@ abstract class Bean<ModelType> {
   /// Creates a 'updateMany' query
   UpdateMany get updaters => Sql.updateMany(tableName);
 
+  /// Creates a 'upsert' query
+  Upsert get upserter => Sql.upsert(tableName);
+
+  /// Creates a 'upsertMany' query
+  UpsertMany get upserters => Sql.upsertMany(tableName);
+
   /// Creates a 'insert' query
   Insert get inserter => Sql.insert(tableName);
 

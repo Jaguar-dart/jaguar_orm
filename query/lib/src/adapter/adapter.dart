@@ -20,6 +20,13 @@ abstract class Adapter<ConnType> {
   /// Returns a list of rows found by executing [statement]
   Future<List<Map>> find(Find statement);
 
+  /// Executes the insert or update statement and returns the primary key of
+  /// inserted row
+  Future<T> upsert<T>(Upsert statement);
+
+  /// Executes bulk insert or update statement
+  Future<void> upsertMany<T>(UpsertMany statement);
+
   /// Executes the insert statement and returns the primary key of
   /// inserted row
   Future<T> insert<T>(Insert statement);
@@ -50,6 +57,7 @@ abstract class Adapter<ConnType> {
 
   /// Parses values coming from database into Dart values
   T parseValue<T>(dynamic v);
+
 }
 
 /// Convenience class to execute `Find` statement using [adapter]

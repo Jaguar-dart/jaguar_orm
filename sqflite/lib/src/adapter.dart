@@ -56,6 +56,22 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     return _connection.rawInsert(strSt) as Future<T>;
   }
 
+  /// Inserts or update a record into the table
+  Future<T> upsert<T>(Upsert st) async {
+    String strSt = composeUpsert(st);
+    return _connection.rawInsert(strSt) as Future<T>;
+  }
+
+  /// Inserts or update records into the table
+  Future<void> upsertMany<T>(UpsertMany st) async {
+    List<String> strSt = composeUpsertMany(st);
+    final batch = _connection.batch();
+    for (var query in strSt) {
+      _connection.execute(query);
+    }
+    return batch.commit(noResult: true);
+  }
+
   /// Inserts many records into the table
   Future<void> insertMany<T>(InsertMany st) {
     String strSt = composeInsertMany(st);

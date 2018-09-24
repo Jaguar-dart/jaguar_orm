@@ -5,6 +5,8 @@ import 'package:jaguar_query/jaguar_query.dart';
 part 'create.dart';
 part 'delete.dart';
 part 'expression.dart';
+part 'upsert.dart';
+part 'upsert_many.dart';
 part 'insert.dart';
 part 'insert_many.dart';
 part 'update.dart';
