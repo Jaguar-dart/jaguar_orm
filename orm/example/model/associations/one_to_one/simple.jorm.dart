@@ -76,6 +76,40 @@ abstract class _UserBean implements Bean<User> {
     }
   }
 
+  Future<dynamic> upsert(User model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      User newModel;
+      if (model.address != null) {
+        newModel ??= await find(model.id);
+        addressBean.associateUser(model.address, newModel);
+        await addressBean.upsert(model.address);
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<User> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
   Future<int> update(User model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -121,7 +155,7 @@ abstract class _UserBean implements Bean<User> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final User model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -130,7 +164,9 @@ abstract class _UserBean implements Bean<User> {
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final User newModel = await find(id);
-      await addressBean.removeByUser(newModel.id);
+      if (newModel != null) {
+        await addressBean.removeByUser(newModel.id);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
@@ -221,6 +257,22 @@ abstract class _AddressBean implements Bean<Address> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
+    return;
+  }
+
+  Future<dynamic> upsert(Address model) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    return adapter.upsert(upsert);
+  }
+
+  Future<void> upsertMany(List<Address> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
     return;
   }
 

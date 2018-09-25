@@ -31,9 +31,15 @@ abstract class _UserBean implements Bean<User> {
     List<SetColumn> ret = [];
 
     if (only == null) {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
       ret.add(name.set(model.name));
       ret.add(age.set(model.age));
     } else {
+      if (model.id != null) {
+        if (only.contains(id.name)) ret.add(id.set(model.id));
+      }
       if (only.contains(name.name)) ret.add(name.set(model.name));
       if (only.contains(age.name)) ret.add(age.set(model.age));
     }
@@ -63,6 +69,26 @@ abstract class _UserBean implements Bean<User> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
+    return;
+  }
+
+  Future<dynamic> upsert(User model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      User newModel;
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<User> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
     return;
   }
 

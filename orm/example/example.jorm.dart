@@ -37,11 +37,17 @@ abstract class _CartItemBean implements Bean<CartItem> {
     List<SetColumn> ret = [];
 
     if (only == null) {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
       ret.add(amount.set(model.amount));
       ret.add(product.set(model.product));
       ret.add(quantity.set(model.quantity));
       ret.add(cartId.set(model.cartId));
     } else {
+      if (model.id != null) {
+        if (only.contains(id.name)) ret.add(id.set(model.id));
+      }
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
       if (only.contains(product.name)) ret.add(product.set(model.product));
       if (only.contains(quantity.name)) ret.add(quantity.set(model.quantity));
@@ -76,6 +82,26 @@ abstract class _CartItemBean implements Bean<CartItem> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
+    return;
+  }
+
+  Future<dynamic> upsert(CartItem model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      CartItem newModel;
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<CartItem> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
     return;
   }
 
@@ -167,8 +193,14 @@ abstract class _CartBean implements Bean<Cart> {
     List<SetColumn> ret = [];
 
     if (only == null) {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
       ret.add(amount.set(model.amount));
     } else {
+      if (model.id != null) {
+        if (only.contains(id.name)) ret.add(id.set(model.id));
+      }
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
     }
 
@@ -211,6 +243,42 @@ abstract class _CartBean implements Bean<Cart> {
           models.map((model) => toSetColumns(model)).toList();
       final InsertMany insert = inserters.addAll(data);
       await adapter.insertMany(insert);
+      return;
+    }
+  }
+
+  Future<dynamic> upsert(Cart model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model)).id(id.name);
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      Cart newModel;
+      if (model.items != null) {
+        newModel ??= await find(retId);
+        model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
+        for (final child in model.items) {
+          await cartItemBean.upsert(child);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<Cart> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
       return;
     }
   }
@@ -261,7 +329,7 @@ abstract class _CartBean implements Bean<Cart> {
   Future<Cart> find(int id, {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Cart model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -270,7 +338,9 @@ abstract class _CartBean implements Bean<Cart> {
   Future<int> remove(int id, [bool cascade = false]) async {
     if (cascade) {
       final Cart newModel = await find(id);
-      await cartItemBean.removeByCart(newModel.id);
+      if (newModel != null) {
+        await cartItemBean.removeByCart(newModel.id);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);

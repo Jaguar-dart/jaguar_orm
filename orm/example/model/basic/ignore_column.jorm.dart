@@ -64,6 +64,22 @@ abstract class _UserBean implements Bean<User> {
     return;
   }
 
+  Future<dynamic> upsert(User model) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    return adapter.upsert(upsert);
+  }
+
+  Future<void> upsertMany(List<User> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
+    return;
+  }
+
   Future<int> update(User model, {Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))

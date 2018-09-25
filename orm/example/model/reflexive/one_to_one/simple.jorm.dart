@@ -85,6 +85,40 @@ abstract class _DirectoryBean implements Bean<Directory> {
     }
   }
 
+  Future<dynamic> upsert(Directory model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      Directory newModel;
+      if (model.child != null) {
+        newModel ??= await find(model.id);
+        directoryBean.associateDirectory(model.child, newModel);
+        await directoryBean.upsert(model.child);
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<Directory> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
   Future<int> update(Directory model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -130,7 +164,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Directory model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -139,7 +173,9 @@ abstract class _DirectoryBean implements Bean<Directory> {
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final Directory newModel = await find(id);
-      await directoryBean.removeByDirectory(newModel.id);
+      if (newModel != null) {
+        await directoryBean.removeByDirectory(newModel.id);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);

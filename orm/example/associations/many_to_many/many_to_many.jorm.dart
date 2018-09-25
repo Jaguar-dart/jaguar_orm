@@ -79,6 +79,42 @@ abstract class _TodoListBean implements Bean<TodoList> {
     }
   }
 
+  Future<dynamic> upsert(TodoList model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      TodoList newModel;
+      if (model.categories != null) {
+        newModel ??= await find(model.id);
+        for (final child in model.categories) {
+          await categoryBean.upsert(child);
+          await pivotBean.attach(model, child);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<TodoList> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
   Future<int> update(TodoList model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -122,7 +158,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final TodoList model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -131,7 +167,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final TodoList newModel = await find(id);
-      await pivotBean.detachTodoList(newModel);
+      if (newModel != null) {
+        await pivotBean.detachTodoList(newModel);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
@@ -241,6 +279,42 @@ abstract class _CategoryBean implements Bean<Category> {
     }
   }
 
+  Future<dynamic> upsert(Category model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      Category newModel;
+      if (model.todolists != null) {
+        newModel ??= await find(model.id);
+        for (final child in model.todolists) {
+          await todoListBean.upsert(child);
+          await pivotBean.attach(child, model);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
   Future<int> update(Category model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -284,7 +358,7 @@ abstract class _CategoryBean implements Bean<Category> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Category model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -293,7 +367,9 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final Category newModel = await find(id);
-      await pivotBean.detachCategory(newModel);
+      if (newModel != null) {
+        await pivotBean.detachCategory(newModel);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
@@ -390,6 +466,22 @@ abstract class _PivotBean implements Bean<Pivot> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
+    return;
+  }
+
+  Future<dynamic> upsert(Pivot model) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    return adapter.upsert(upsert);
+  }
+
+  Future<void> upsertMany(List<Pivot> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
     return;
   }
 

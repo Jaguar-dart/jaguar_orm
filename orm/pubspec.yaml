@@ -22,6 +22,6 @@ dev_dependencies:
   jaguar_orm_gen:
     path: ../generator
 
-#dependency_overrides:
-#  jaguar_query:
-#    path: ../query
+dependency_overrides:
+  jaguar_query:
+    path: ../query

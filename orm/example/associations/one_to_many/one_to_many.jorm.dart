@@ -78,6 +78,42 @@ abstract class _AuthorBean implements Bean<Author> {
     }
   }
 
+  Future<dynamic> upsert(Author model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      Author newModel;
+      if (model.posts != null) {
+        newModel ??= await find(model.id);
+        model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
+        for (final child in model.posts) {
+          await postBean.upsert(child);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<Author> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
   Future<int> update(Author model,
       {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
@@ -125,7 +161,7 @@ abstract class _AuthorBean implements Bean<Author> {
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Author model = await findOne(find);
-    if (preload) {
+    if (preload && model != null) {
       await this.preload(model, cascade: cascade);
     }
     return model;
@@ -134,7 +170,9 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<int> remove(String id, [bool cascade = false]) async {
     if (cascade) {
       final Author newModel = await find(id);
-      await postBean.removeByAuthor(newModel.id);
+      if (newModel != null) {
+        await postBean.removeByAuthor(newModel.id);
+      }
     }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
@@ -229,6 +267,22 @@ abstract class _PostBean implements Bean<Post> {
         models.map((model) => toSetColumns(model)).toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
+    return;
+  }
+
+  Future<dynamic> upsert(Post model) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    return adapter.upsert(upsert);
+  }
+
+  Future<void> upsertMany(List<Post> models) async {
+    final List<List<SetColumn>> data = [];
+    for (var i = 0; i < models.length; ++i) {
+      var model = models[i];
+      data.add(toSetColumns(model).toList());
+    }
+    final UpsertMany upsert = upserters.addAll(data);
+    await adapter.upsertMany(upsert);
     return;
   }
 
