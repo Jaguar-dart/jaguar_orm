@@ -234,6 +234,13 @@ class ParsedBean {
       throw Exception("Beans must implement Bean interface!");
     }
 
+    final ElementAnnotation meta = clazz.metadata.firstWhere(
+            (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
+        orElse: () => null);
+    if (meta == null)
+      throw Exception("Cannot find or parse `GenBean` annotation!");
+    reader = ConstantReader(meta.computeConstantValue());
+
     final InterfaceType interface = clazz.allSupertypes
         .firstWhere((InterfaceType i) => isBean.isExactlyType(i));
 
@@ -242,13 +249,6 @@ class ParsedBean {
     if (model.isDynamic) {
       throw Exception("Don't support Model of type dynamic!");
     }
-
-    final ElementAnnotation meta = clazz.metadata.firstWhere(
-        (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
-        orElse: () => null);
-    if (meta == null)
-      throw Exception("Cannot create reader for bean ${clazz.displayName}!");
-    reader = ConstantReader(meta.computeConstantValue());
   }
 
   /// Parses and populates [fields]

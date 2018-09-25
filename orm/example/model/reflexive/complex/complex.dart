@@ -140,6 +140,8 @@ class Category {
   List<Product> products;
 }
 
+/// bean
+@GenBean()
 class CategoryBean extends Bean<Category> with _CategoryBean {
   ProductBean get productBean => ProductBean(adapter);
 
