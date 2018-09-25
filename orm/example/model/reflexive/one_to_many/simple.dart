@@ -17,7 +17,7 @@ class Directory {
   @HasMany(DirectoryBean)
   List<Directory> child;
 
-  @BelongsTo(DirectoryBean)
+  @BelongsTo(DirectoryBean, isNullable: true)
   String parentId;
 }
 

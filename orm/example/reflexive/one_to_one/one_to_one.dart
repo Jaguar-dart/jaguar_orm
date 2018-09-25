@@ -3,10 +3,9 @@
 
 library example.has_one;
 
-/*
 import 'dart:io';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
-import '../../model/associations/one_to_one/simple.dart';
+import '../../model/reflexive/one_to_one/simple.dart';
 
 /// The adapter
 final adapter =
@@ -17,93 +16,83 @@ main() async {
   await adapter.connect();
 
   // Create beans
-  final userBean = UserBean(adapter);
-  final addressBean = AddressBean(adapter);
+  final dirBean = DirectoryBean(adapter);
 
   // Drop old tables
-  await addressBean.drop();
-  await userBean.drop();
+  await dirBean.drop();
 
   // Create new tables
-  await userBean.createTable();
-  await addressBean.createTable();
+  await dirBean.createTable();
 
   // Cascaded One-To-One insert
   {
-    final user = User()
-      ..id = '1'
-      ..name = 'Teja'
-      ..address = (Address()
-        ..id = '1'
-        ..street = 'Stockholm');
-    await userBean.insert(user, cascade: true);
+    final user = Directory(id: '1', name: 'etc')
+      ..child = (Directory(id: '2', name: 'nginx'));
+    await dirBean.insert(user, cascade: true);
   }
 
   // Fetch One-To-One preloaded
   {
-    final user = await userBean.find('1', preload: true);
+    final user = await dirBean.find('1', preload: true);
     print(user);
   }
 
   // Manual One-To-One insert
   {
-    User user = User()
-      ..id = '2'
-      ..name = 'Kleak';
-    await userBean.insert(user, cascade: true);
+    var parent = Directory(id: '3', name: 'opt');
+    await dirBean.insert(parent);
 
-    user = await userBean.find('2');
+    parent = await dirBean.find('3');
 
-    final address = Address()
-      ..id = '2'
-      ..street = 'Stockholm';
-    addressBean.associateUser(address, user);
-    await addressBean.insert(address);
+    final child = Directory(id: '4', name: 'var');
+    dirBean.associateDirectory(child, parent);
+    await dirBean.insert(child);
   }
 
   // Manual One-To-One preload
   {
-    final user = await userBean.find('2');
-    print(user);
-    user.address = await addressBean.findByUser(user.id);
-    print(user);
+    final dir = await dirBean.find('3');
+    print(dir);
+    dir.child = await dirBean.findByDirectory(dir.id);
+    print(dir);
   }
 
   // Preload many
   {
-    final users = await userBean.getAll();
+    final users = await dirBean.getAll();
     print(users);
-    await userBean.preloadAll(users);
+    await dirBean.preloadAll(users);
     print(users);
   }
 
   // Cascaded One-To-One update
   {
-    User user = await userBean.find('1', preload: true);
-    user.name = 'Teja Hackborn';
-    user.address.street = 'Stockholm, Sweden';
-    await userBean.update(user, cascade: true);
+    Directory dir = await dirBean.find('1', preload: true);
+    dir.name = 'Etc';
+    dir.child.name = 'Nginx';
+    await dirBean.update(dir, cascade: true);
   }
 
   // Fetch One-To-One relationship preloaded
   {
-    final user = await userBean.find('1', preload: true);
+    final user = await dirBean.find('1', preload: true);
     print(user);
   }
 
   // Cascaded removal of One-To-One relation
-  await userBean.remove('1', true);
+  await dirBean.remove('1', true);
 
   {
-    final users = await userBean.getAll();
+    final users = await dirBean.getAll();
     print(users);
-    final addresses = await addressBean.getAll();
-    print(addresses);
   }
 
-  // Remove addresses belonging to a User
-  await addressBean.removeByUser('2');
+  await dirBean.removeByDirectory('3');
+
+  {
+    final users = await dirBean.getAll();
+    print(users);
+  }
 
   exit(0);
 }
-*/

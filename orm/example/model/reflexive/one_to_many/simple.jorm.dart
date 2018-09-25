@@ -49,7 +49,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
     st.addStr(parentId.name,
         foreignTable: directoryBean.tableName,
         foreignCol: 'id',
-        isNullable: false);
+        isNullable: true);
     return adapter.createTable(st);
   }
 
