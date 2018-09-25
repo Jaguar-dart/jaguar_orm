@@ -19,6 +19,11 @@ class Directory {
 
   @BelongsTo(DirectoryBean, isNullable: true)
   String parentId;
+
+  Directory({this.id, this.name, this.parentId});
+
+  String toString() =>
+      {"id": id, "name": name, "parentId": parentId, "child": child}.toString();
 }
 
 @GenBean()
