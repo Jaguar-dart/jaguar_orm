@@ -12,6 +12,8 @@ class Field {
 
   final String field;
 
+  final bool isFinal;
+
   String get vType {
     try {
       return getValType(type);
@@ -40,7 +42,8 @@ class Field {
       @required this.length,
       @required this.isPrimary,
       @required this.foreign,
-      @required this.unique})
+      @required this.unique,
+      @required this.isFinal})
       : colName = colName ?? field;
 }
 
