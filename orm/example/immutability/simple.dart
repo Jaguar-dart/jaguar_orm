@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'package:jaguar_orm/jaguar_orm.dart';
+import 'package:meta/meta.dart';
 
 part 'simple.jorm.dart';
 
 class User {
   @PrimaryKey(auto: true, isNullable: false)
-  int id;
+  final int id;
 
-  String name;
+  final String name;
 
   @Column(isNullable: true)
-  int age;
+  final int age;
 
-  User({this.id, this.name, this.age});
+  const User({@required this.id, @required this.name, @required this.age});
 
   bool operator ==(final other) {
     if (other is User)
