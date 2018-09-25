@@ -75,12 +75,19 @@ class Writer {
 
   void _writeFromMap() {
     _w.writeln('${_b.modelType} fromMap(Map map) {');
-    _w.writeln('${_b.modelType} model = ${_b.modelType}();');
-    _w.writeln();
+    _w.write('${_b.modelType} model = ${_b.modelType}(');
+    _b.fields.values.forEach((Field field) {
+      if (field.isFinal) {
+        _w.write('${field.field}: adapter.parseValue(map[\'${_camToSnak(field.colName)}\']),');
+      }
+    });
+    _w.writeln(');');
 
     _b.fields.values.forEach((Field field) {
-      _w.writeln(
-          "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
+      if(!field.isFinal) {
+        _w.writeln(
+            "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
+      }
     });
 
     _w.writeln();
