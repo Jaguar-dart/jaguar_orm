@@ -437,7 +437,8 @@ Field parseColumn(FieldElement f, DartObject obj) {
         length: length,
         foreign: null,
         isPrimary: false,
-        unique: unique);
+        unique: unique,
+        isFinal: f.isFinal);
   } else if (isPrimaryKey.isExactlyType(obj.type)) {
     return Field(f.type.name, f.name, colName,
         isNullable: isNullable,
@@ -445,7 +446,8 @@ Field parseColumn(FieldElement f, DartObject obj) {
         autoIncrement: autoIncrement,
         length: length,
         foreign: null,
-        unique: unique);
+        unique: unique,
+        isFinal: f.isFinal);
   } else if (isForeignKey.isAssignableFromType(obj.type)) {
     final String table = obj.getField('toTable').toStringValue();
     final String refCol = obj.getField('refCol').toStringValue();
@@ -458,7 +460,8 @@ Field parseColumn(FieldElement f, DartObject obj) {
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,
-        unique: unique);
+        unique: unique,
+        isFinal: f.isFinal);
   } else if (isBelongsTo.isAssignableFromType(obj.type)) {
     final DartType bean = obj.getField('bean').toTypeValue();
     final String refCol = obj.getField('refCol').toStringValue();
@@ -476,7 +479,8 @@ Field parseColumn(FieldElement f, DartObject obj) {
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,
-        unique: unique);
+        unique: unique,
+        isFinal: f.isFinal);
   }
 
   throw FieldSpecException(f.name, 'Invalid ColumnBase type!');
