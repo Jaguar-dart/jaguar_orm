@@ -5,7 +5,7 @@ library example.has_one;
 
 import 'dart:io';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
-import '../../model/reflexive/one_to_many/simple.dart';
+import '../../model/reflexive/complex/complex.dart';
 
 /// The adapter
 final adapter =
@@ -16,90 +16,96 @@ main() async {
   await adapter.connect();
 
   // Create beans
-  final dirBean = DirectoryBean(adapter);
+  final piBean = ProductItemsBean(adapter);
+  final ppBean = ProductItemsPivotBean(adapter);
+  final pBean = ProductBean(adapter);
 
   // Drop old tables
-  await dirBean.drop();
+  await ppBean.drop();
+  await piBean.drop();
+  await pBean.drop();
 
   // Create new tables
-  await dirBean.createTable();
+  await pBean.createTable();
+  await piBean.createTable();
+  await ppBean.createTable();
 
-  // Cascaded One-To-One insert
+  // Cascaded Many-To-Many insert
   {
-    final user = Directory(id: '1', name: 'etc')
-      ..child = [
-        Directory(id: '2', name: 'nginx'),
-        Directory(id: '3', name: 'mongo')
+    final product = Product.make(id: '1', sku: "1", name: "P1")
+      ..lists = <ProductItems>[
+        ProductItems.make(id: '1', name: 'PI1'),
+        ProductItems.make(id: '2', name: 'PI2')
       ];
-    await dirBean.insert(user, cascade: true);
+    await pBean.insert(product, cascade: true);
   }
 
-  // Fetch One-To-One preloaded
+  // Fetch Many-To-Many preloaded
   {
-    final user = await dirBean.find('1', preload: true);
+    final products = await pBean.find('1', preload: true);
+    print(products);
+  }
+
+  // Manual Many-To-Many insert
+  {
+    var product = Product.make(id: '2', sku: "2", name: "P2");
+    await pBean.insert(product, cascade: true);
+
+    product = await pBean.find('2');
+
+    final item1 = ProductItems.make(id: '3', name: 'PI3');
+    await piBean.insert(item1);
+    await ppBean.attach(item1, product);
+
+    final item2 = ProductItems.make(id: '4', name: 'PI4');
+    await piBean.insert(item2);
+    await ppBean.attach(item2, product);
+  }
+
+  // Manual Many-To-Many preload
+  {
+    final product = await pBean.find('2');
+    print(product);
+    product.lists = await ppBean.fetchByProduct(product);
+    print(product);
+  }
+
+  // preload many
+  {
+    final products = await pBean.getAll();
+    await pBean.preloadAll(products);
+    print(products);
+  }
+
+  /*
+
+
+  // Cascaded Many-To-Many update
+  {
+    TodoList todolist = await todolistBean.find('1', preload: true);
+    todolist.description += '!';
+    todolist.categories[0].name += '!';
+    todolist.categories[1].name += '!';
+    await todolistBean.update(todolist, cascade: true);
+  }
+
+  // Debug print out
+  {
+    final user = await todolistBean.find('1', preload: true);
     print(user);
   }
 
-  // Manual One-To-One insert
+  // Cascaded removal of Many-To-Many relation
+  await todolistBean.remove('1', true);
+
+  // Debug print out
   {
-    var parent = Directory(id: '4', name: 'opt');
-    await dirBean.insert(parent);
-
-    parent = await dirBean.find('4');
-
-    var child = Directory(id: '5', name: 'var');
-    dirBean.associateDirectory(child, parent);
-    await dirBean.insert(child);
-
-    child = Directory(id: '6', name: 'bin');
-    dirBean.associateDirectory(child, parent);
-    await dirBean.insert(child);
-  }
-
-  // Manual One-To-One preload
-  {
-    final dir = await dirBean.find('4');
-    print(dir);
-    dir.child = await dirBean.findByDirectory(dir.id);
-    print(dir);
-  }
-
-  // Preload many
-  {
-    final users = await dirBean.getAll();
-    print(users);
-    await dirBean.preloadAll(users);
-    print(users);
-  }
-
-  // Cascaded One-To-One update
-  {
-    Directory dir = await dirBean.find('1', preload: true);
-    dir.name = 'Etc';
-    dir.child[0].name = 'Nginx';
-    await dirBean.update(dir, cascade: true);
-  }
-
-  // Fetch One-To-One relationship preloaded
-  {
-    final user = await dirBean.find('1', preload: true);
+    final user = await todolistBean.getAll();
     print(user);
+    final categories = await categoryBean.getAll();
+    print(categories);
   }
-
-  // Cascaded removal of One-To-One relation
-  await dirBean.remove('1', true);
-
-  {
-    final users = await dirBean.getAll();
-    print(users);
-  }
-
-  await dirBean.removeByDirectory('4');
-
-  {
-    final users = await dirBean.getAll();
-    print(users);
-  }
+  */
 
   exit(0);
 }

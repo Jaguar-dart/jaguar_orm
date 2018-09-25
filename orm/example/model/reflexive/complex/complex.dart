@@ -10,7 +10,7 @@ class ProductItems {
   /// constructor
   ProductItems();
 
-  ProductItems.make(this.id, this.name);
+  ProductItems.make({this.id, this.name});
 
   /// fields
   @PrimaryKey()
@@ -21,6 +21,8 @@ class ProductItems {
 
   @ManyToMany(ProductItemsPivotBean, ProductBean)
   List<Product> items;
+
+  String toString() => {"id": id, "name": name, "items": items}.toString();
 }
 
 /// bean
@@ -98,10 +100,11 @@ class Product {
   // int categoryId;
 
   @ManyToMany(ProductItemsPivotBean, ProductItemsBean)
-  List<ProductItems> lists;
+  List<ProductItems> lists = [];
 
   /// database
-  String toString() => "Product($id, $name, $sku)";
+  String toString() =>
+      {"id": id, "sku": sku, "name": name, "lists": lists}.toString();
 }
 
 /// bean
@@ -112,12 +115,12 @@ class ProductBean extends Bean<Product> with _ProductBean {
   ProductBean(Adapter adapter) : super(adapter);
 
   ProductItemsBean get productItemsBean {
-    _productItemsBean ??= new ProductItemsBean(adapter);
+    _productItemsBean ??= ProductItemsBean(adapter);
     return _productItemsBean;
   }
 
   ProductItemsPivotBean get productItemsPivotBean {
-    _productPivotBean ??= new ProductItemsPivotBean(adapter);
+    _productPivotBean ??= ProductItemsPivotBean(adapter);
     return _productPivotBean;
   }
 
