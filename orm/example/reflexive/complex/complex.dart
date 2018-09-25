@@ -16,6 +16,7 @@ main() async {
   await adapter.connect();
 
   // Create beans
+  final cBean = CategoryBean(adapter);
   final piBean = ProductItemsBean(adapter);
   final ppBean = ProductItemsPivotBean(adapter);
   final pBean = ProductBean(adapter);
@@ -24,15 +25,22 @@ main() async {
   await ppBean.drop();
   await piBean.drop();
   await pBean.drop();
+  await cBean.drop();
 
   // Create new tables
+  await cBean.createTable();
   await pBean.createTable();
   await piBean.createTable();
   await ppBean.createTable();
 
+  {
+    final cat = Category(id: 1);
+    await cBean.insert(cat);
+  }
+
   // Cascaded Many-To-Many insert
   {
-    final product = Product.make(id: '1', sku: "1", name: "P1")
+    final product = Product.make(id: '1', sku: "1", name: "P1", categoryId: 1)
       ..lists = <ProductItems>[
         ProductItems.make(id: '1', name: 'PI1'),
         ProductItems.make(id: '2', name: 'PI2')

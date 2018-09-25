@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.8
+
++ Immutability
++ Fixes for reflexive relations
+
 ## 2.2.6
 
 + Fixed autoincrement

@@ -400,17 +400,20 @@ abstract class _ProductBean implements Bean<Product> {
   final id = new StrField('id');
   final sku = new StrField('sku');
   final name = new StrField('name');
+  final categoryId = new IntField('category_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         sku.name: sku,
         name.name: name,
+        categoryId.name: categoryId,
       };
   Product fromMap(Map map) {
     Product model = Product();
     model.id = adapter.parseValue(map['id']);
     model.sku = adapter.parseValue(map['sku']);
     model.name = adapter.parseValue(map['name']);
+    model.categoryId = adapter.parseValue(map['category_id']);
 
     return model;
   }
@@ -423,10 +426,13 @@ abstract class _ProductBean implements Bean<Product> {
       ret.add(id.set(model.id));
       ret.add(sku.set(model.sku));
       ret.add(name.set(model.name));
+      ret.add(categoryId.set(model.categoryId));
     } else {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(sku.name)) ret.add(sku.set(model.sku));
       if (only.contains(name.name)) ret.add(name.set(model.name));
+      if (only.contains(categoryId.name))
+        ret.add(categoryId.set(model.categoryId));
     }
 
     return ret;
@@ -437,6 +443,10 @@ abstract class _ProductBean implements Bean<Product> {
     st.addStr(id.name, primary: true, isNullable: false);
     st.addStr(sku.name, isNullable: false);
     st.addStr(name.name, isNullable: true);
+    st.addInt(categoryId.name,
+        foreignTable: categoryBean.tableName,
+        foreignCol: 'id',
+        isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -577,6 +587,38 @@ abstract class _ProductBean implements Bean<Product> {
     return adapter.remove(remove);
   }
 
+  Future<List<Product>> findByCategory(int categoryId,
+      {bool preload: false, bool cascade: false}) async {
+    final Find find = finder.where(this.categoryId.eq(categoryId));
+    final List<Product> models = await findMany(find);
+    if (preload) {
+      await this.preloadAll(models, cascade: cascade);
+    }
+    return models;
+  }
+
+  Future<List<Product>> findByCategoryList(List<Category> models,
+      {bool preload: false, bool cascade: false}) async {
+    final Find find = finder;
+    for (Category model in models) {
+      find.or(this.categoryId.eq(model.id));
+    }
+    final List<Product> retModels = await findMany(find);
+    if (preload) {
+      await this.preloadAll(retModels, cascade: cascade);
+    }
+    return retModels;
+  }
+
+  Future<int> removeByCategory(int categoryId) async {
+    final Remove rm = remover.where(this.categoryId.eq(categoryId));
+    return await adapter.remove(rm);
+  }
+
+  void associateCategory(Product child, Category parent) {
+    child.categoryId = parent.id;
+  }
+
   Future<Product> preload(Product model, {bool cascade: false}) async {
     model.lists = await productItemsPivotBean.fetchByProduct(model);
     return model;
@@ -599,4 +641,203 @@ abstract class _ProductBean implements Bean<Product> {
   ProductItemsPivotBean get productItemsPivotBean;
 
   ProductItemsBean get productItemsBean;
+  CategoryBean get categoryBean;
+}
+
+abstract class _CategoryBean implements Bean<Category> {
+  final id = new IntField('id');
+  Map<String, Field> _fields;
+  Map<String, Field> get fields => _fields ??= {
+        id.name: id,
+      };
+  Category fromMap(Map map) {
+    Category model = Category();
+    model.id = adapter.parseValue(map['id']);
+
+    return model;
+  }
+
+  List<SetColumn> toSetColumns(Category model,
+      {bool update = false, Set<String> only}) {
+    List<SetColumn> ret = [];
+
+    if (only == null) {
+      ret.add(id.set(model.id));
+    } else {
+      if (only.contains(id.name)) ret.add(id.set(model.id));
+    }
+
+    return ret;
+  }
+
+  Future<void> createTable() async {
+    final st = Sql.create(tableName);
+    st.addInt(id.name, primary: true, isNullable: false);
+    return adapter.createTable(st);
+  }
+
+  Future<dynamic> insert(Category model, {bool cascade: false}) async {
+    final Insert insert = inserter.setMany(toSetColumns(model));
+    var retId = await adapter.insert(insert);
+    if (cascade) {
+      Category newModel;
+      if (model.products != null) {
+        newModel ??= await find(model.id);
+        model.products
+            .forEach((x) => productBean.associateCategory(x, newModel));
+        for (final child in model.products) {
+          await productBean.insert(child);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> insertMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data =
+          models.map((model) => toSetColumns(model)).toList();
+      final InsertMany insert = inserters.addAll(data);
+      await adapter.insertMany(insert);
+      return;
+    }
+  }
+
+  Future<dynamic> upsert(Category model, {bool cascade: false}) async {
+    final Upsert upsert = upserter.setMany(toSetColumns(model));
+    var retId = await adapter.upsert(upsert);
+    if (cascade) {
+      Category newModel;
+      if (model.products != null) {
+        newModel ??= await find(model.id);
+        model.products
+            .forEach((x) => productBean.associateCategory(x, newModel));
+        for (final child in model.products) {
+          await productBean.upsert(child);
+        }
+      }
+    }
+    return retId;
+  }
+
+  Future<void> upsertMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
+    }
+  }
+
+  Future<int> update(Category model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .setMany(toSetColumns(model, only: only));
+    final ret = adapter.update(update);
+    if (cascade) {
+      Category newModel;
+      if (model.products != null) {
+        if (associate) {
+          newModel ??= await find(model.id);
+          model.products
+              .forEach((x) => productBean.associateCategory(x, newModel));
+        }
+        for (final child in model.products) {
+          await productBean.update(child);
+        }
+      }
+    }
+    return ret;
+  }
+
+  Future<void> updateMany(List<Category> models, {bool cascade: false}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(toSetColumns(model).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      await adapter.updateMany(update);
+      return;
+    }
+  }
+
+  Future<Category> find(int id,
+      {bool preload: false, bool cascade: false}) async {
+    final Find find = finder.where(this.id.eq(id));
+    final Category model = await findOne(find);
+    if (preload && model != null) {
+      await this.preload(model, cascade: cascade);
+    }
+    return model;
+  }
+
+  Future<int> remove(int id, [bool cascade = false]) async {
+    if (cascade) {
+      final Category newModel = await find(id);
+      if (newModel != null) {
+        await productBean.removeByCategory(newModel.id);
+      }
+    }
+    final Remove remove = remover.where(this.id.eq(id));
+    return adapter.remove(remove);
+  }
+
+  Future<int> removeMany(List<Category> models) async {
+    final Remove remove = remover;
+    for (final model in models) {
+      remove.or(this.id.eq(model.id));
+    }
+    return adapter.remove(remove);
+  }
+
+  Future<Category> preload(Category model, {bool cascade: false}) async {
+    model.products = await productBean.findByCategory(model.id,
+        preload: cascade, cascade: cascade);
+    return model;
+  }
+
+  Future<List<Category>> preloadAll(List<Category> models,
+      {bool cascade: false}) async {
+    models.forEach((Category model) => model.products ??= []);
+    await OneToXHelper.preloadAll<Category, Product>(
+        models,
+        (Category model) => [model.id],
+        productBean.findByCategoryList,
+        (Product model) => [model.categoryId],
+        (Category model, Product child) => model.products.add(child),
+        cascade: cascade);
+    return models;
+  }
+
+  ProductBean get productBean;
 }

@@ -84,7 +84,7 @@ class ProductItemsPivotBean extends Bean<ProductItemsPivot>
 class Product {
   /// constructor
   Product();
-  Product.make({this.id, this.name, this.sku /*, this.categoryId */});
+  Product.make({this.id, this.name, this.sku, this.categoryId});
 
   /// fields
   @PrimaryKey()
@@ -96,8 +96,8 @@ class Product {
   @Column(isNullable: true)
   String name;
 
-  // @BelongsTo(CategoryBean)
-  // int categoryId;
+  @BelongsTo(CategoryBean, isNullable: true, byHasMany: true)
+  int categoryId;
 
   @ManyToMany(ProductItemsPivotBean, ProductItemsBean)
   List<ProductItems> lists = [];
@@ -127,19 +127,18 @@ class ProductBean extends Bean<Product> with _ProductBean {
   /// Table name for the model this bean manages
   String get tableName => "product";
 
-  /*
   @override
   CategoryBean get categoryBean => CategoryBean(adapter);
-  */
 }
 
-/*
 class Category {
   @PrimaryKey()
   int id;
 
-  @HasOne(ProductBean)
+  @HasMany(ProductBean)
   List<Product> products;
+
+  Category({this.id});
 }
 
 /// bean
@@ -152,4 +151,3 @@ class CategoryBean extends Bean<Category> with _CategoryBean {
   /// Table name for the model this bean manages
   String get tableName => "category";
 }
-*/
