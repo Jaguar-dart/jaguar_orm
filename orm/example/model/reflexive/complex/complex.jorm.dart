@@ -8,14 +8,14 @@ part of 'complex.dart';
 
 /*
 Exception while parsing field: items!
-Bad state: No element
-#0      _ListBase&Object&ListMixin.firstWhere (dart:collection/list.dart:148:5)
-#1      ParsedBean._getModel (package:jaguar_orm_gen/src/parser/parser.dart:247:10)
-#2      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:73:5)
+Unsupported operation: Null
+#0      _NullConstant.read (package:source_gen/src/constants/reader.dart:154:29)
+#1      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:265:31)
+#2      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:75:5)
 #3      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:88:16)
-#4      ParsedBean.parseRelation (package:jaguar_orm_gen/src/parser/parser.dart:413:60)
-#5      ParsedBean._relation (package:jaguar_orm_gen/src/parser/parser.dart:365:5)
-#6      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:329:16)
+#4      ParsedBean.parseRelation (package:jaguar_orm_gen/src/parser/parser.dart:416:60)
+#5      ParsedBean._relation (package:jaguar_orm_gen/src/parser/parser.dart:368:5)
+#6      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:332:16)
 #7      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:75:5)
 #8      BeanGenerator.generateForAnnotatedElement (package:jaguar_orm_gen/src/hook/hook.dart:38:56)
 <asynchronous suspension>
@@ -63,7 +63,7 @@ Bad state: No element
 #43     _RawReceivePortImpl._handleMessage (dart:isolate/runtime/libisolate_patch.dart:172:5)
 
 
-#0      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:341:9)
+#0      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:344:9)
 #1      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:75:5)
 #2      BeanGenerator.generateForAnnotatedElement (package:jaguar_orm_gen/src/hook/hook.dart:38:56)
 <asynchronous suspension>
@@ -301,10 +301,10 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 }
 
 /*
-Bad state: No element
-#0      _ListBase&Object&ListMixin.firstWhere (dart:collection/list.dart:148:5)
-#1      ParsedBean._getModel (package:jaguar_orm_gen/src/parser/parser.dart:247:10)
-#2      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:73:5)
+Unsupported operation: Null
+#0      _NullConstant.read (package:source_gen/src/constants/reader.dart:154:29)
+#1      ParsedBean._parseFields (package:jaguar_orm_gen/src/parser/parser.dart:265:31)
+#2      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:75:5)
 #3      ParsedBean.detect (package:jaguar_orm_gen/src/parser/parser.dart:88:16)
 #4      BeanGenerator.generateForAnnotatedElement (package:jaguar_orm_gen/src/hook/hook.dart:38:56)
 <asynchronous suspension>

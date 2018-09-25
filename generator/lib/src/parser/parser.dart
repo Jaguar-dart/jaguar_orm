@@ -243,10 +243,12 @@ class ParsedBean {
       throw Exception("Don't support Model of type dynamic!");
     }
 
-    reader = ConstantReader(clazz.metadata
-        .firstWhere(
-            (m) => isGenBean.isExactlyType(m.computeConstantValue().type))
-        .constantValue);
+    final ElementAnnotation meta = clazz.metadata.firstWhere(
+        (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
+        orElse: () => null);
+    if (meta == null)
+      throw Exception("Cannot create reader for bean ${clazz.displayName}!");
+    reader = ConstantReader(meta.computeConstantValue());
   }
 
   /// Parses and populates [fields]
