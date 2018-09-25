@@ -16,7 +16,6 @@ abstract class _TodoListBean implements Bean<TodoList> {
       };
   TodoList fromMap(Map map) {
     TodoList model = TodoList();
-
     model.id = adapter.parseValue(map['id']);
     model.description = adapter.parseValue(map['description']);
 
@@ -217,7 +216,6 @@ abstract class _CategoryBean implements Bean<Category> {
       };
   Category fromMap(Map map) {
     Category model = Category();
-
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
 
@@ -417,7 +415,6 @@ abstract class _PivotBean implements Bean<Pivot> {
       };
   Pivot fromMap(Map map) {
     Pivot model = Pivot();
-
     model.todolistId = adapter.parseValue(map['todolist_id']);
     model.categoryId = adapter.parseValue(map['category_id']);
 

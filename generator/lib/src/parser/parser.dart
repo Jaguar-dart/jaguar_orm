@@ -235,7 +235,7 @@ class ParsedBean {
     }
 
     final ElementAnnotation meta = clazz.metadata.firstWhere(
-            (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
+        (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
         orElse: () => null);
     if (meta == null)
       throw Exception("Cannot find or parse `GenBean` annotation!");
@@ -312,8 +312,11 @@ class ParsedBean {
         if (field.displayName == 'hashCode' ||
             field.displayName == 'runtimeType') continue;
 
-        // Must have both getter and setter if not final
-        if (!field.isFinal && (field.getter == null || field.setter == null)) continue;
+        // TODO allow setter only fields
+        if (field.getter == null) continue;
+        if (field.setter == null) {
+          if (!field.isFinal) continue;
+        }
 
         if (isIgnore.firstAnnotationOf(field) != null) {
           ignores.add(field.name);
@@ -336,7 +339,7 @@ class ParsedBean {
                 isNullable: false,
                 foreign: null,
                 isPrimary: false,
-                isFinal: field.isFinal);
+                isFinal: field.isFinal && field.getter.isSynthetic);
             fields[vf.field] = vf;
           }
         }

@@ -16,7 +16,6 @@ abstract class _UserBean implements Bean<User> {
       };
   User fromMap(Map map) {
     User model = User();
-
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
 
@@ -213,7 +212,6 @@ abstract class _AddressBean implements Bean<Address> {
       };
   Address fromMap(Map map) {
     Address model = Address();
-
     model.id = adapter.parseValue(map['id']);
     model.street = adapter.parseValue(map['street']);
     model.userId = adapter.parseValue(map['user_id']);

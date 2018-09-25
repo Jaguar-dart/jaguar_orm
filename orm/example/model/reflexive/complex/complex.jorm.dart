@@ -16,7 +16,6 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       };
   ProductItems fromMap(Map map) {
     ProductItems model = ProductItems();
-
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
 
@@ -220,7 +219,6 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
       };
   ProductItemsPivot fromMap(Map map) {
     ProductItemsPivot model = ProductItemsPivot();
-
     model.productId = adapter.parseValue(map['product_id']);
     model.productListId = adapter.parseValue(map['product_list_id']);
 
@@ -412,7 +410,6 @@ abstract class _ProductBean implements Bean<Product> {
       };
   Product fromMap(Map map) {
     Product model = Product();
-
     model.id = adapter.parseValue(map['id']);
     model.sku = adapter.parseValue(map['sku']);
     model.name = adapter.parseValue(map['name']);
@@ -648,14 +645,13 @@ abstract class _ProductBean implements Bean<Product> {
 }
 
 abstract class _CategoryBean implements Bean<Category> {
-  final id = new StrField('id');
+  final id = new IntField('id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
       };
   Category fromMap(Map map) {
     Category model = Category();
-
     model.id = adapter.parseValue(map['id']);
 
     return model;
@@ -676,7 +672,7 @@ abstract class _CategoryBean implements Bean<Category> {
 
   Future<void> createTable() async {
     final st = Sql.create(tableName);
-    st.addStr(id.name, primary: true, isNullable: false);
+    st.addInt(id.name, primary: true, isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -786,7 +782,7 @@ abstract class _CategoryBean implements Bean<Category> {
     }
   }
 
-  Future<Category> find(String id,
+  Future<Category> find(int id,
       {bool preload: false, bool cascade: false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Category model = await findOne(find);
@@ -796,7 +792,7 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(int id, [bool cascade = false]) async {
     if (cascade) {
       final Category newModel = await find(id);
       if (newModel != null) {

@@ -134,7 +134,7 @@ class ProductBean extends Bean<Product> with _ProductBean {
 
 class Category {
   @PrimaryKey()
-  String id;
+  int id;
 
   @HasOne(ProductBean)
   List<Product> products;
@@ -146,4 +146,7 @@ class CategoryBean extends Bean<Category> with _CategoryBean {
   ProductBean get productBean => ProductBean(adapter);
 
   CategoryBean(Adapter adapter): super(adapter);
+
+  /// Table name for the model this bean manages
+  String get tableName => "category";
 }

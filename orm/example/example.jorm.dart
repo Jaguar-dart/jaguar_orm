@@ -22,7 +22,6 @@ abstract class _CartItemBean implements Bean<CartItem> {
       };
   CartItem fromMap(Map map) {
     CartItem model = CartItem();
-
     model.id = adapter.parseValue(map['id']);
     model.amount = adapter.parseValue(map['amount']);
     model.product = adapter.parseValue(map['product']);
@@ -174,16 +173,18 @@ abstract class _CartItemBean implements Bean<CartItem> {
 abstract class _CartBean implements Bean<Cart> {
   final id = new IntField('id');
   final amount = new DoubleField('amount');
+  final amountLabel = new StrField('amount_label');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         amount.name: amount,
+        amountLabel.name: amountLabel,
       };
   Cart fromMap(Map map) {
     Cart model = Cart();
-
     model.id = adapter.parseValue(map['id']);
     model.amount = adapter.parseValue(map['amount']);
+    model.amountLabel = adapter.parseValue(map['amount_label']);
 
     return model;
   }
@@ -197,11 +198,14 @@ abstract class _CartBean implements Bean<Cart> {
         ret.add(id.set(model.id));
       }
       ret.add(amount.set(model.amount));
+      ret.add(amountLabel.set(model.amountLabel));
     } else {
       if (model.id != null) {
         if (only.contains(id.name)) ret.add(id.set(model.id));
       }
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
+      if (only.contains(amountLabel.name))
+        ret.add(amountLabel.set(model.amountLabel));
     }
 
     return ret;
@@ -211,6 +215,7 @@ abstract class _CartBean implements Bean<Cart> {
     final st = Sql.create(tableName);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addDouble(amount.name, isNullable: false);
+    st.addStr(amountLabel.name, isNullable: false);
     return adapter.createTable(st);
   }
 

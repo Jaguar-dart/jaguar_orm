@@ -18,7 +18,6 @@ abstract class _DirectoryBean implements Bean<Directory> {
       };
   Directory fromMap(Map map) {
     Directory model = Directory();
-
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
     model.parentId = adapter.parseValue(map['parent_id']);
