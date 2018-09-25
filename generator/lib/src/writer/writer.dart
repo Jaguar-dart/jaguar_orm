@@ -78,13 +78,14 @@ class Writer {
     _w.write('${_b.modelType} model = ${_b.modelType}(');
     _b.fields.values.forEach((Field field) {
       if (field.isFinal) {
-        _w.write('${field.field}: adapter.parseValue(map[\'${_camToSnak(field.colName)}\']),');
+        _w.write(
+            '${field.field}: adapter.parseValue(map[\'${_camToSnak(field.colName)}\']),');
       }
     });
     _w.writeln(');');
 
     _b.fields.values.forEach((Field field) {
-      if(!field.isFinal) {
+      if (!field.isFinal) {
         _w.writeln(
             "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
       }

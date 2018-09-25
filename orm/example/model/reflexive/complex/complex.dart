@@ -60,13 +60,11 @@ class ProductItemsPivot {
 @GenBean()
 class ProductItemsPivotBean extends Bean<ProductItemsPivot>
     with _ProductItemsPivotBean {
-
   ProductItemsBean _productItemsBean;
 
   ProductBean _productBean;
 
   ProductItemsPivotBean(Adapter adapter) : super(adapter);
-
 
   ProductBean get productBean {
     _productBean ??= ProductBean(adapter);
@@ -84,7 +82,7 @@ class ProductItemsPivotBean extends Bean<ProductItemsPivot>
 class Product {
   /// constructor
   Product();
-  Product.make(this.id, this.name, this.sku, this.categoryId);
+  Product.make({this.id, this.name, this.sku /*, this.categoryId */});
 
   /// fields
   @PrimaryKey()
@@ -96,21 +94,19 @@ class Product {
   @Column(isNullable: true)
   String name;
 
-  @BelongsTo(CategoryBean)
-  int categoryId;
+  // @BelongsTo(CategoryBean)
+  // int categoryId;
 
   @ManyToMany(ProductItemsPivotBean, ProductItemsBean)
   List<ProductItems> lists;
 
   /// database
   String toString() => "Product($id, $name, $sku)";
-
 }
 
 /// bean
 @GenBean()
 class ProductBean extends Bean<Product> with _ProductBean {
-
   ProductItemsBean _productItemsBean;
   ProductItemsPivotBean _productPivotBean;
   ProductBean(Adapter adapter) : super(adapter);
@@ -128,10 +124,13 @@ class ProductBean extends Bean<Product> with _ProductBean {
   /// Table name for the model this bean manages
   String get tableName => "product";
 
+  /*
   @override
   CategoryBean get categoryBean => CategoryBean(adapter);
+  */
 }
 
+/*
 class Category {
   @PrimaryKey()
   int id;
@@ -150,3 +149,4 @@ class CategoryBean extends Bean<Category> with _CategoryBean {
   /// Table name for the model this bean manages
   String get tableName => "category";
 }
+*/

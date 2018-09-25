@@ -10,20 +10,17 @@ abstract class _UserBean implements Bean<User> {
   final id = new StrField('id');
   final name = new StrField('name');
   final age = new IntField('age');
-  final whatever = new IntField('whatever');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         name.name: name,
         age.name: age,
-        whatever.name: whatever,
       };
   User fromMap(Map map) {
     User model = User();
     model.id = adapter.parseValue(map['id']);
     model.name = adapter.parseValue(map['name']);
     model.age = adapter.parseValue(map['age']);
-    model.whatever = adapter.parseValue(map['whatever']);
 
     return model;
   }
@@ -36,12 +33,10 @@ abstract class _UserBean implements Bean<User> {
       ret.add(id.set(model.id));
       ret.add(name.set(model.name));
       ret.add(age.set(model.age));
-      ret.add(whatever.set(model.whatever));
     } else {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(name.name)) ret.add(name.set(model.name));
       if (only.contains(age.name)) ret.add(age.set(model.age));
-      if (only.contains(whatever.name)) ret.add(whatever.set(model.whatever));
     }
 
     return ret;
@@ -52,7 +47,6 @@ abstract class _UserBean implements Bean<User> {
     st.addStr(id.name, primary: true, isNullable: false);
     st.addStr(name.name, isNullable: false);
     st.addInt(age.name, isNullable: false);
-    st.addInt(whatever.name, isNullable: false);
     return adapter.createTable(st);
   }
 

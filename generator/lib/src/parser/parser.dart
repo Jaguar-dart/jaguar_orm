@@ -315,7 +315,7 @@ class ParsedBean {
         // TODO allow setter only fields
         if (field.getter == null) continue;
         if (field.setter == null) {
-          if (!field.isFinal) continue;
+          if (!field.isFinal || field.isSynthetic) continue;
         }
 
         if (isIgnore.firstAnnotationOf(field) != null) {
