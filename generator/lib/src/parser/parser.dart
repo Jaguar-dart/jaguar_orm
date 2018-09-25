@@ -310,8 +310,8 @@ class ParsedBean {
         if (field.displayName == 'hashCode' ||
             field.displayName == 'runtimeType') continue;
 
-        // Must have both getter and setter
-        if (field.getter == null || field.setter == null) continue;
+        // Must have both getter and setter if not final
+        if (!field.isFinal && (field.getter == null || field.setter == null)) continue;
 
         if (isIgnore.firstAnnotationOf(field) != null) {
           ignores.add(field.name);
@@ -333,7 +333,8 @@ class ParsedBean {
                 autoIncrement: false,
                 isNullable: false,
                 foreign: null,
-                isPrimary: false);
+                isPrimary: false,
+                isFinal: field.isFinal);
             fields[vf.field] = vf;
           }
         }
