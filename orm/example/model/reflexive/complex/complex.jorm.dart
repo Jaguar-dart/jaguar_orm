@@ -324,7 +324,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   Future<int> detachProduct(Product model) async {
     final dels = await findByProduct(model.id);
     await removeByProduct(model.id);
-    final exp = new Or();
+    final exp = Or();
     for (final t in dels) {
       exp.or(productItemsBean.id.eq(t.productListId));
     }
@@ -333,7 +333,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<List<ProductItems>> fetchByProduct(Product model) async {
     final pivots = await findByProduct(model.id);
-    final exp = new Or();
+    if (pivots.isEmpty) return [];
+    final exp = Or();
     for (final t in pivots) {
       exp.or(productItemsBean.id.eq(t.productListId));
     }
@@ -369,7 +370,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   Future<int> detachProductItems(ProductItems model) async {
     final dels = await findByProductItems(model.id);
     await removeByProductItems(model.id);
-    final exp = new Or();
+    final exp = Or();
     for (final t in dels) {
       exp.or(productBean.id.eq(t.productId));
     }
@@ -378,7 +379,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<List<Product>> fetchByProductItems(ProductItems model) async {
     final pivots = await findByProductItems(model.id);
-    final exp = new Or();
+    if (pivots.isEmpty) return [];
+    final exp = Or();
     for (final t in pivots) {
       exp.or(productBean.id.eq(t.productId));
     }

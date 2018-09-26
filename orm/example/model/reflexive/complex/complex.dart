@@ -146,7 +146,7 @@ class Category {
 class CategoryBean extends Bean<Category> with _CategoryBean {
   ProductBean get productBean => ProductBean(adapter);
 
-  CategoryBean(Adapter adapter): super(adapter);
+  CategoryBean(Adapter adapter) : super(adapter);
 
   /// Table name for the model this bean manages
   String get tableName => "category";

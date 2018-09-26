@@ -522,7 +522,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   Future<int> detachTodoList(TodoList model) async {
     final dels = await findByTodoList(model.id);
     await removeByTodoList(model.id);
-    final exp = new Or();
+    final exp = Or();
     for (final t in dels) {
       exp.or(categoryBean.id.eq(t.categoryId));
     }
@@ -531,7 +531,8 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<List<Category>> fetchByTodoList(TodoList model) async {
     final pivots = await findByTodoList(model.id);
-    final exp = new Or();
+    if (pivots.isEmpty) return [];
+    final exp = Or();
     for (final t in pivots) {
       exp.or(categoryBean.id.eq(t.categoryId));
     }
@@ -565,7 +566,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   Future<int> detachCategory(Category model) async {
     final dels = await findByCategory(model.id);
     await removeByCategory(model.id);
-    final exp = new Or();
+    final exp = Or();
     for (final t in dels) {
       exp.or(todoListBean.id.eq(t.todolistId));
     }
@@ -574,7 +575,8 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<List<TodoList>> fetchByCategory(Category model) async {
     final pivots = await findByCategory(model.id);
-    final exp = new Or();
+    if (pivots.isEmpty) return [];
+    final exp = Or();
     for (final t in pivots) {
       exp.or(todoListBean.id.eq(t.todolistId));
     }

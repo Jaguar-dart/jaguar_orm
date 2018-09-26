@@ -3,7 +3,7 @@ library jaguar_orm.generator.writer;
 import 'package:jaguar_orm_gen/src/model/model.dart';
 
 class Writer {
-  final StringBuffer _w = new StringBuffer();
+  final StringBuffer _w = StringBuffer();
 
   final WriterModel _b;
 
@@ -16,7 +16,7 @@ class Writer {
 
     for (Field field in _b.fields.values) {
       _writeln(
-          "final ${field.field} = new ${field.vType}('${_camToSnak(field.colName)}');");
+          "final ${field.field} = ${field.vType}('${_camToSnak(field.colName)}');");
     }
 
     _writeFieldsMap();
@@ -113,7 +113,7 @@ class Writer {
       } else if (f.type == 'DateTime') {
         _write('DateTime');
       } else {
-        throw new Exception('Invalid column data type!');
+        throw Exception('Invalid column data type!');
       }
       _write('(');
       _write('${f.field}.name');
@@ -128,20 +128,20 @@ class Writer {
           _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
           _write(", foreignCol: '${foreign.refCol}'");
         } else {
-          throw new Exception('Unimplemented!');
+          throw Exception('Unimplemented!');
         }
       }
 
       if (f.autoIncrement) {
         if (f.type != 'int') {
-          throw new Exception('Auto increment is allowed only on int columns!');
+          throw Exception('Auto increment is allowed only on int columns!');
         }
         _write(", autoIncrement: ${f.autoIncrement}");
       }
 
       if (f.length != null) {
         if (f.type != 'String') {
-          throw new Exception('Length is allowed only on text columns!');
+          throw Exception('Length is allowed only on text columns!');
         }
         _write(", length: ${f.length}");
       }
@@ -830,7 +830,7 @@ class Writer {
   }
 
   void _writeBeans() {
-    final written = new Set<String>();
+    final written = Set<String>();
 
     for (Preload p in _b.preloads) {
       if (written.contains(p.beanInstanceName)) continue;
@@ -900,7 +900,7 @@ class Writer {
     _writeln(');');
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
-    _writeln('final exp = new Or();');
+    _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
     BelongsToAssociation o = _b.getMatchingManyToMany(m);
@@ -927,7 +927,8 @@ class Writer {
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
-    _writeln('final exp = new Or();');
+    _writeln('if (pivots.isEmpty) return [];');
+    _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
     BelongsToAssociation o = _b.getMatchingManyToMany(m);
@@ -961,7 +962,7 @@ class Writer {
       _write('${m1.modelName} one, ${_cap(m.modelName)} two');
     }
     _writeln(') async {');
-    _writeln('final ret = new ${_b.modelType}();');
+    _writeln('final ret = ${_b.modelType}();');
 
     if (m.modelName.compareTo(m1.modelName) > 0) {
       for (int i = 0; i < m.fields.length; i++) {
@@ -997,7 +998,7 @@ String _uncap(String str) =>
     str.substring(0, 1).toLowerCase() + str.substring(1);
 
 String _camToSnak(String str) {
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   for (int i = 0; i < str.length; i++) {
     final int code = str.codeUnitAt(i);
