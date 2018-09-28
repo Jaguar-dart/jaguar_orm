@@ -4,6 +4,7 @@ version: 2.2.2
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
+- Aumard Jimmy <jimmy.aumard@gmail.com>
 homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
@@ -15,7 +16,7 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  sqflite: ^0.11.2
+  sqflite: ^0.12.1
   jaguar_query: ^2.2.4
 
 dev_dependencies:

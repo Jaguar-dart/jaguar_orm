@@ -19,7 +19,7 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
 
   SqfliteAdapter.FromConnection(sqf.Database connection)
       : _connection = connection,
-        path = connection.path,
+        path = null,
         version = null;
 
   /// Connects to the database
@@ -31,6 +31,14 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
 
   /// Closes all connections to the database.
   Future<void> close() => _connection.close();
+
+  /// Change connection to the database.
+  Future<void> switchDatabase(sqf.Database connection) async {
+    if (_connection != null && _connection.isOpen) {
+      await _connection.close();
+    }
+    _connection = connection;
+  }
 
   sqf.Database get connection => _connection;
 
