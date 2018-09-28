@@ -840,6 +840,9 @@ class Writer {
       _write(p.beanInstanceName);
       _writeln(';');
       if (p is PreloadManyToMany) {
+        if (written.contains(p.targetBeanInstanceName)) continue;
+        written.add(p.targetBeanInstanceName);
+
         _writeln('');
         _write(p.targetBeanName);
         _write(' get ');
