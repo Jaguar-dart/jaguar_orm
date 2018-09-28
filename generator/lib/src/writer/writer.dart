@@ -470,7 +470,6 @@ class Writer {
         if (p is PreloadOneToX) {
           _writeln('await ' + _uncap(p.beanInstanceName) + '.update(child);');
         } else if (p is PreloadManyToMany) {
-          _writeln('await ');
           _writeln('await ${p.targetBeanInstanceName}.update(child);');
         }
         _writeln('}');
