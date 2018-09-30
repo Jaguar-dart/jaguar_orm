@@ -97,8 +97,8 @@ class Writer {
   }
 
   void _writeCreate() {
-    _w.writeln('Future<void> createTable() async {');
-    _writeln('final st = Sql.create(tableName);');
+    _w.writeln('Future<void> createTable({bool ifNotExists: false}) async {');
+    _writeln('final st = Sql.create(tableName, ifNotExists: ifNotExists);');
     for (final Field f in _b.fields.values) {
       _write('st.add');
 
