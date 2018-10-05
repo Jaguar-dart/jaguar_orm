@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.16
+
++ Fixed `builder.dart` library name
+
 ## 2.2.10
 
 + `fetchBy*` bug fix when pivots are empty

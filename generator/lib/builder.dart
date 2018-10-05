@@ -1,4 +1,4 @@
-library jaguar_serializer_cli;
+library jaguar_orm_gen;
 
 import 'package:build/build.dart';
 import 'src/hook/hook.dart';
