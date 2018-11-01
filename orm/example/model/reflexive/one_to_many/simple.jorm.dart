@@ -7,9 +7,9 @@ part of example.has_one;
 // **************************************************************************
 
 abstract class _DirectoryBean implements Bean<Directory> {
-  final id = new StrField('id');
-  final name = new StrField('name');
-  final parentId = new StrField('parent_id');
+  final id = StrField('id');
+  final name = StrField('name');
+  final parentId = StrField('parent_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -42,8 +42,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
     st.addStr(parentId.name,
@@ -63,7 +63,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
         model.child
             .forEach((x) => directoryBean.associateDirectory(x, newModel));
         for (final child in model.child) {
-          await directoryBean.insert(child);
+          await directoryBean.insert(child, cascade: cascade);
         }
       }
     }
@@ -97,7 +97,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
         model.child
             .forEach((x) => directoryBean.associateDirectory(x, newModel));
         for (final child in model.child) {
-          await directoryBean.upsert(child);
+          await directoryBean.upsert(child, cascade: cascade);
         }
       }
     }
@@ -139,7 +139,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
               .forEach((x) => directoryBean.associateDirectory(x, newModel));
         }
         for (final child in model.child) {
-          await directoryBean.update(child);
+          await directoryBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }

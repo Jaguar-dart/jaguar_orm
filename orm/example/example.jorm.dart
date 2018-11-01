@@ -7,11 +7,11 @@ part of 'example.dart';
 // **************************************************************************
 
 abstract class _CartItemBean implements Bean<CartItem> {
-  final id = new IntField('id');
-  final amount = new DoubleField('amount');
-  final product = new StrField('product');
-  final quantity = new IntField('quantity');
-  final cartId = new IntField('cart_id');
+  final id = IntField('id');
+  final amount = DoubleField('amount');
+  final product = StrField('product');
+  final quantity = IntField('quantity');
+  final cartId = IntField('cart_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -56,8 +56,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addDouble(amount.name, isNullable: false);
     st.addStr(product.name, isNullable: true);
@@ -104,7 +104,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return;
   }
 
-  Future<int> update(CartItem model, {Set<String> only}) async {
+  Future<int> update(CartItem model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));
@@ -171,8 +172,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
 }
 
 abstract class _CartBean implements Bean<Cart> {
-  final id = new IntField('id');
-  final amount = new DoubleField('amount');
+  final id = IntField('id');
+  final amount = DoubleField('amount');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -205,8 +206,8 @@ abstract class _CartBean implements Bean<Cart> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addDouble(amount.name, isNullable: false);
     return adapter.createTable(st);
@@ -221,7 +222,7 @@ abstract class _CartBean implements Bean<Cart> {
         newModel ??= await find(retId);
         model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         for (final child in model.items) {
-          await cartItemBean.insert(child);
+          await cartItemBean.insert(child, cascade: cascade);
         }
       }
     }
@@ -254,7 +255,7 @@ abstract class _CartBean implements Bean<Cart> {
         newModel ??= await find(retId);
         model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         for (final child in model.items) {
-          await cartItemBean.upsert(child);
+          await cartItemBean.upsert(child, cascade: cascade);
         }
       }
     }
@@ -295,7 +296,8 @@ abstract class _CartBean implements Bean<Cart> {
           model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         }
         for (final child in model.items) {
-          await cartItemBean.update(child);
+          await cartItemBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }

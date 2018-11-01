@@ -7,8 +7,8 @@ part of example.one_to_many;
 // **************************************************************************
 
 abstract class _AuthorBean implements Bean<Author> {
-  final id = new StrField('id');
-  final name = new StrField('name');
+  final id = StrField('id');
+  final name = StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -37,8 +37,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
@@ -53,7 +53,7 @@ abstract class _AuthorBean implements Bean<Author> {
         newModel ??= await find(model.id);
         model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         for (final child in model.posts) {
-          await postBean.insert(child);
+          await postBean.insert(child, cascade: cascade);
         }
       }
     }
@@ -86,7 +86,7 @@ abstract class _AuthorBean implements Bean<Author> {
         newModel ??= await find(model.id);
         model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         for (final child in model.posts) {
-          await postBean.upsert(child);
+          await postBean.upsert(child, cascade: cascade);
         }
       }
     }
@@ -127,7 +127,7 @@ abstract class _AuthorBean implements Bean<Author> {
           model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         }
         for (final child in model.posts) {
-          await postBean.update(child);
+          await postBean.update(child, cascade: cascade, associate: associate);
         }
       }
     }
@@ -208,9 +208,9 @@ abstract class _AuthorBean implements Bean<Author> {
 }
 
 abstract class _PostBean implements Bean<Post> {
-  final id = new StrField('id');
-  final authorId = new StrField('author_id');
-  final message = new StrField('message');
+  final id = StrField('id');
+  final authorId = StrField('author_id');
+  final message = StrField('message');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -243,8 +243,8 @@ abstract class _PostBean implements Bean<Post> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(authorId.name,
         foreignTable: authorBean.tableName,
@@ -255,7 +255,7 @@ abstract class _PostBean implements Bean<Post> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Post model) async {
+  Future<dynamic> insert(Post model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
   }
@@ -268,7 +268,7 @@ abstract class _PostBean implements Bean<Post> {
     return;
   }
 
-  Future<dynamic> upsert(Post model) async {
+  Future<dynamic> upsert(Post model, {bool cascade: false}) async {
     final Upsert upsert = upserter.setMany(toSetColumns(model));
     return adapter.upsert(upsert);
   }
@@ -284,7 +284,8 @@ abstract class _PostBean implements Bean<Post> {
     return;
   }
 
-  Future<int> update(Post model, {Set<String> only}) async {
+  Future<int> update(Post model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));

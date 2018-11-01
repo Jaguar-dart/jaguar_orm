@@ -7,8 +7,8 @@ part of 'complex.dart';
 // **************************************************************************
 
 abstract class _ProductItemsBean implements Bean<ProductItems> {
-  final id = new StrField('id');
-  final name = new StrField('name');
+  final id = StrField('id');
+  final name = StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -37,8 +37,8 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, isNullable: false);
     st.addStr(name.name, isNullable: true);
     return adapter.createTable(st);
@@ -52,7 +52,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       if (model.items != null) {
         newModel ??= await find(model.id);
         for (final child in model.items) {
-          await productBean.insert(child);
+          await productBean.insert(child, cascade: cascade);
           await productItemsPivotBean.attach(model, child);
         }
       }
@@ -86,7 +86,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       if (model.items != null) {
         newModel ??= await find(model.id);
         for (final child in model.items) {
-          await productBean.upsert(child);
+          await productBean.upsert(child, cascade: cascade);
           await productItemsPivotBean.attach(model, child);
         }
       }
@@ -125,7 +125,8 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       ProductItems newModel;
       if (model.items != null) {
         for (final child in model.items) {
-          await await productBean.update(child);
+          await productBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }
@@ -210,8 +211,8 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
 }
 
 abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
-  final productId = new StrField('product_id');
-  final productListId = new StrField('product_list_id');
+  final productId = StrField('product_id');
+  final productListId = StrField('product_list_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         productId.name: productId,
@@ -242,8 +243,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(productId.name,
         foreignTable: productBean.tableName,
         foreignCol: 'id',
@@ -255,7 +256,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(ProductItemsPivot model) async {
+  Future<dynamic> insert(ProductItemsPivot model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
   }
@@ -268,7 +269,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return;
   }
 
-  Future<dynamic> upsert(ProductItemsPivot model) async {
+  Future<dynamic> upsert(ProductItemsPivot model, {bool cascade: false}) async {
     final Upsert upsert = upserter.setMany(toSetColumns(model));
     return adapter.upsert(upsert);
   }
@@ -388,7 +389,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   }
 
   Future<dynamic> attach(ProductItems one, Product two) async {
-    final ret = new ProductItemsPivot();
+    final ret = ProductItemsPivot();
     ret.productListId = one.id;
     ret.productId = two.id;
     return insert(ret);
@@ -399,10 +400,10 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 }
 
 abstract class _ProductBean implements Bean<Product> {
-  final id = new StrField('id');
-  final sku = new StrField('sku');
-  final name = new StrField('name');
-  final categoryId = new IntField('category_id');
+  final id = StrField('id');
+  final sku = StrField('sku');
+  final name = StrField('name');
+  final categoryId = IntField('category_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -440,8 +441,8 @@ abstract class _ProductBean implements Bean<Product> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, isNullable: false);
     st.addStr(sku.name, isNullable: false);
     st.addStr(name.name, isNullable: true);
@@ -460,7 +461,7 @@ abstract class _ProductBean implements Bean<Product> {
       if (model.lists != null) {
         newModel ??= await find(model.id);
         for (final child in model.lists) {
-          await productItemsBean.insert(child);
+          await productItemsBean.insert(child, cascade: cascade);
           await productItemsPivotBean.attach(child, model);
         }
       }
@@ -493,7 +494,7 @@ abstract class _ProductBean implements Bean<Product> {
       if (model.lists != null) {
         newModel ??= await find(model.id);
         for (final child in model.lists) {
-          await productItemsBean.upsert(child);
+          await productItemsBean.upsert(child, cascade: cascade);
           await productItemsPivotBean.attach(child, model);
         }
       }
@@ -531,7 +532,8 @@ abstract class _ProductBean implements Bean<Product> {
       Product newModel;
       if (model.lists != null) {
         for (final child in model.lists) {
-          await await productItemsBean.update(child);
+          await productItemsBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }
@@ -647,7 +649,7 @@ abstract class _ProductBean implements Bean<Product> {
 }
 
 abstract class _CategoryBean implements Bean<Category> {
-  final id = new IntField('id');
+  final id = IntField('id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -672,8 +674,8 @@ abstract class _CategoryBean implements Bean<Category> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, isNullable: false);
     return adapter.createTable(st);
   }
@@ -688,7 +690,7 @@ abstract class _CategoryBean implements Bean<Category> {
         model.products
             .forEach((x) => productBean.associateCategory(x, newModel));
         for (final child in model.products) {
-          await productBean.insert(child);
+          await productBean.insert(child, cascade: cascade);
         }
       }
     }
@@ -722,7 +724,7 @@ abstract class _CategoryBean implements Bean<Category> {
         model.products
             .forEach((x) => productBean.associateCategory(x, newModel));
         for (final child in model.products) {
-          await productBean.upsert(child);
+          await productBean.upsert(child, cascade: cascade);
         }
       }
     }
@@ -764,7 +766,8 @@ abstract class _CategoryBean implements Bean<Category> {
               .forEach((x) => productBean.associateCategory(x, newModel));
         }
         for (final child in model.products) {
-          await productBean.update(child);
+          await productBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }
