@@ -7,8 +7,8 @@ part of example.has_one;
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  final id = new StrField('id');
-  final name = new StrField('name');
+  final id = StrField('id');
+  final name = StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -37,8 +37,8 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
@@ -52,7 +52,7 @@ abstract class _UserBean implements Bean<User> {
       if (model.address != null) {
         newModel ??= await find(model.id);
         addressBean.associateUser(model.address, newModel);
-        await addressBean.insert(model.address);
+        await addressBean.insert(model.address, cascade: cascade);
       }
     }
     return retId;
@@ -83,7 +83,7 @@ abstract class _UserBean implements Bean<User> {
       if (model.address != null) {
         newModel ??= await find(model.id);
         addressBean.associateUser(model.address, newModel);
-        await addressBean.upsert(model.address);
+        await addressBean.upsert(model.address, cascade: cascade);
       }
     }
     return retId;
@@ -122,7 +122,8 @@ abstract class _UserBean implements Bean<User> {
           newModel ??= await find(model.id);
           addressBean.associateUser(model.address, newModel);
         }
-        await addressBean.update(model.address);
+        await addressBean.update(model.address,
+            cascade: cascade, associate: associate);
       }
     }
     return ret;
@@ -201,9 +202,9 @@ abstract class _UserBean implements Bean<User> {
 }
 
 abstract class _AddressBean implements Bean<Address> {
-  final id = new StrField('id');
-  final street = new StrField('street');
-  final userId = new StrField('user_id');
+  final id = StrField('id');
+  final street = StrField('street');
+  final userId = StrField('user_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -236,8 +237,8 @@ abstract class _AddressBean implements Bean<Address> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(street.name, length: 150, isNullable: false);
     st.addStr(userId.name,
@@ -245,7 +246,7 @@ abstract class _AddressBean implements Bean<Address> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Address model) async {
+  Future<dynamic> insert(Address model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
   }
@@ -258,7 +259,7 @@ abstract class _AddressBean implements Bean<Address> {
     return;
   }
 
-  Future<dynamic> upsert(Address model) async {
+  Future<dynamic> upsert(Address model, {bool cascade: false}) async {
     final Upsert upsert = upserter.setMany(toSetColumns(model));
     return adapter.upsert(upsert);
   }
@@ -274,7 +275,8 @@ abstract class _AddressBean implements Bean<Address> {
     return;
   }
 
-  Future<int> update(Address model, {Set<String> only}) async {
+  Future<int> update(Address model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));

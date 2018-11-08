@@ -7,9 +7,9 @@ part of example.has_one;
 // **************************************************************************
 
 abstract class _DirectoryBean implements Bean<Directory> {
-  final id = new StrField('id');
-  final name = new StrField('name');
-  final parentId = new StrField('parent_id');
+  final id = StrField('id');
+  final name = StrField('name');
+  final parentId = StrField('parent_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -42,8 +42,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
     st.addStr(parentId.name,
@@ -61,7 +61,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
       if (model.child != null) {
         newModel ??= await find(model.id);
         directoryBean.associateDirectory(model.child, newModel);
-        await directoryBean.insert(model.child);
+        await directoryBean.insert(model.child, cascade: cascade);
       }
     }
     return retId;
@@ -92,7 +92,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
       if (model.child != null) {
         newModel ??= await find(model.id);
         directoryBean.associateDirectory(model.child, newModel);
-        await directoryBean.upsert(model.child);
+        await directoryBean.upsert(model.child, cascade: cascade);
       }
     }
     return retId;
@@ -131,7 +131,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
           newModel ??= await find(model.id);
           directoryBean.associateDirectory(model.child, newModel);
         }
-        await directoryBean.update(model.child);
+        await directoryBean.update(model.child,
+            cascade: cascade, associate: associate);
       }
     }
     return ret;

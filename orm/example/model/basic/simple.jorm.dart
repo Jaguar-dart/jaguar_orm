@@ -7,9 +7,9 @@ part of 'simple.dart';
 // **************************************************************************
 
 abstract class _UserBean implements Bean<User> {
-  final id = new IntField('id');
-  final name = new StrField('name');
-  final age = new IntField('age');
+  final id = IntField('id');
+  final name = StrField('name');
+  final age = IntField('age');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -46,8 +46,8 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addStr(name.name, isNullable: false);
     st.addInt(age.name, isNullable: true);
@@ -91,7 +91,8 @@ abstract class _UserBean implements Bean<User> {
     return;
   }
 
-  Future<int> update(User model, {Set<String> only}) async {
+  Future<int> update(User model,
+      {bool cascade: false, bool associate: false, Set<String> only}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only));

@@ -7,8 +7,8 @@ part of example.many_to_many;
 // **************************************************************************
 
 abstract class _TodoListBean implements Bean<TodoList> {
-  final id = new StrField('id');
-  final description = new StrField('description');
+  final id = StrField('id');
+  final description = StrField('description');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -38,8 +38,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(description.name, length: 50, isNullable: false);
     return adapter.createTable(st);
@@ -53,7 +53,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
       if (model.categories != null) {
         newModel ??= await find(model.id);
         for (final child in model.categories) {
-          await categoryBean.insert(child);
+          await categoryBean.insert(child, cascade: cascade);
           await pivotBean.attach(model, child);
         }
       }
@@ -86,7 +86,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
       if (model.categories != null) {
         newModel ??= await find(model.id);
         for (final child in model.categories) {
-          await categoryBean.upsert(child);
+          await categoryBean.upsert(child, cascade: cascade);
           await pivotBean.attach(model, child);
         }
       }
@@ -124,7 +124,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
       TodoList newModel;
       if (model.categories != null) {
         for (final child in model.categories) {
-          await await categoryBean.update(child);
+          await categoryBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }
@@ -207,8 +208,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
 }
 
 abstract class _CategoryBean implements Bean<Category> {
-  final id = new StrField('id');
-  final name = new StrField('name');
+  final id = StrField('id');
+  final name = StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
@@ -237,8 +238,8 @@ abstract class _CategoryBean implements Bean<Category> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
     return adapter.createTable(st);
@@ -252,7 +253,7 @@ abstract class _CategoryBean implements Bean<Category> {
       if (model.todolists != null) {
         newModel ??= await find(model.id);
         for (final child in model.todolists) {
-          await todoListBean.insert(child);
+          await todoListBean.insert(child, cascade: cascade);
           await pivotBean.attach(child, model);
         }
       }
@@ -285,7 +286,7 @@ abstract class _CategoryBean implements Bean<Category> {
       if (model.todolists != null) {
         newModel ??= await find(model.id);
         for (final child in model.todolists) {
-          await todoListBean.upsert(child);
+          await todoListBean.upsert(child, cascade: cascade);
           await pivotBean.attach(child, model);
         }
       }
@@ -323,7 +324,8 @@ abstract class _CategoryBean implements Bean<Category> {
       Category newModel;
       if (model.todolists != null) {
         for (final child in model.todolists) {
-          await await todoListBean.update(child);
+          await todoListBean.update(child,
+              cascade: cascade, associate: associate);
         }
       }
     }
@@ -406,8 +408,8 @@ abstract class _CategoryBean implements Bean<Category> {
 }
 
 abstract class _PivotBean implements Bean<Pivot> {
-  final todolistId = new StrField('todolist_id');
-  final categoryId = new StrField('category_id');
+  final todolistId = StrField('todolist_id');
+  final categoryId = StrField('category_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         todolistId.name: todolistId,
@@ -438,8 +440,8 @@ abstract class _PivotBean implements Bean<Pivot> {
     return ret;
   }
 
-  Future<void> createTable() async {
-    final st = Sql.create(tableName);
+  Future<void> createTable({bool ifNotExists: false}) async {
+    final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(todolistId.name,
         foreignTable: todoListBean.tableName,
         foreignCol: 'id',
@@ -453,7 +455,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Pivot model) async {
+  Future<dynamic> insert(Pivot model, {bool cascade: false}) async {
     final Insert insert = inserter.setMany(toSetColumns(model));
     return adapter.insert(insert);
   }
@@ -466,7 +468,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     return;
   }
 
-  Future<dynamic> upsert(Pivot model) async {
+  Future<dynamic> upsert(Pivot model, {bool cascade: false}) async {
     final Upsert upsert = upserter.setMany(toSetColumns(model));
     return adapter.upsert(upsert);
   }
@@ -584,7 +586,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<dynamic> attach(TodoList one, Category two) async {
-    final ret = new Pivot();
+    final ret = Pivot();
     ret.todolistId = one.id;
     ret.categoryId = two.id;
     return insert(ret);
