@@ -638,7 +638,7 @@ class Writer {
         _write('final ${_b.modelType} model = await ');
         _writeln('findOne(find);');
 
-        _writeln('if (preload) {');
+        _writeln('if (preload && model != null) {');
         _writeln('await this.preload(model, cascade: cascade);');
         _writeln('}');
 
