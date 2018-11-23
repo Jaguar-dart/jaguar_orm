@@ -210,7 +210,8 @@ class Writer {
 
   void _writeUpsert() {
     if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
-      _w.writeln('Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false}) async {');
+      _w.writeln(
+          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false}) async {');
       _w.write('final Upsert upsert = upserter');
       _w.writeln('.setMany(toSetColumns(model));');
       _w.writeln('return adapter.upsert(upsert);');
@@ -254,11 +255,14 @@ class Writer {
           _write(_uncap(p.beanInstanceName));
           _writeln('.associate${_b.modelType}(x, newModel));');
           _writeln('for(final child in model.${p.property}) {');
-          _writeln('await ' + _uncap(p.beanInstanceName) + '.upsert(child, cascade: cascade);');
+          _writeln('await ' +
+              _uncap(p.beanInstanceName) +
+              '.upsert(child, cascade: cascade);');
           _writeln('}');
         } else if (p is PreloadManyToMany) {
           _writeln('for(final child in model.${p.property}) {');
-          _writeln('await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
+          _writeln(
+              'await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
             _writeln('await ${p.beanInstanceName}.attach(model, child);');
           } else {
@@ -312,7 +316,8 @@ class Writer {
 
   void _writeInsert() {
     if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
-      _w.writeln('Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
+      _w.writeln(
+          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln('.setMany(toSetColumns(model));');
       _w.writeln('return adapter.insert(insert);');
@@ -356,11 +361,14 @@ class Writer {
           _write(_uncap(p.beanInstanceName));
           _writeln('.associate${_b.modelType}(x, newModel));');
           _writeln('for(final child in model.${p.property}) {');
-          _writeln('await ' + _uncap(p.beanInstanceName) + '.insert(child, cascade: cascade);');
+          _writeln('await ' +
+              _uncap(p.beanInstanceName) +
+              '.insert(child, cascade: cascade);');
           _writeln('}');
         } else if (p is PreloadManyToMany) {
           _writeln('for(final child in model.${p.property}) {');
-          _writeln('await ${p.targetBeanInstanceName}.insert(child, cascade: cascade);');
+          _writeln(
+              'await ${p.targetBeanInstanceName}.insert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
             _writeln('await ${p.beanInstanceName}.attach(model, child);');
           } else {
@@ -468,9 +476,12 @@ class Writer {
       } else {
         _writeln('for(final child in model.${p.property}) {');
         if (p is PreloadOneToX) {
-          _writeln('await ' + _uncap(p.beanInstanceName) + '.update(child, cascade: cascade, associate: associate);');
+          _writeln('await ' +
+              _uncap(p.beanInstanceName) +
+              '.update(child, cascade: cascade, associate: associate);');
         } else if (p is PreloadManyToMany) {
-          _writeln('await ${p.targetBeanInstanceName}.update(child, cascade: cascade, associate: associate);');
+          _writeln(
+              'await ${p.targetBeanInstanceName}.update(child, cascade: cascade, associate: associate);');
         }
         _writeln('}');
       }

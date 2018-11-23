@@ -5,7 +5,7 @@
 ///
 /// Contains composer to compose jaguar_query statements into PostgreSQL
 /// queries
-library jaguar_query_postgres;
+library jaguar_query_sqflite;
 
 export 'src/adapter.dart';
 export 'package:jaguar_query/jaguar_query.dart';
