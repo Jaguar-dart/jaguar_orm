@@ -67,7 +67,7 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     List<String> strSt = composeUpsertMany(st);
     final batch = connection.batch();
     for (var query in strSt) {
-      connection.execute(query);
+      batch.execute(query);
     }
     return batch.commit(noResult: true);
   }
@@ -89,7 +89,7 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     List<String> strSt = composeUpdateMany(st);
     final batch = connection.batch();
     for (var query in strSt) {
-      connection.execute(query);
+      batch.execute(query);
     }
     return batch.commit(noResult: true);
   }
