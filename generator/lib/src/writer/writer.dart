@@ -264,9 +264,9 @@ class Writer {
           _writeln(
               'await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-            _writeln('await ${p.beanInstanceName}.attach(model, child);');
+            _writeln('await ${p.beanInstanceName}.attach(newModel, child);');
           } else {
-            _writeln('await ${p.beanInstanceName}.attach(child, model);');
+            _writeln('await ${p.beanInstanceName}.attach(child, newModel);');
           }
           _writeln('}');
         }
@@ -370,9 +370,9 @@ class Writer {
           _writeln(
               'await ${p.targetBeanInstanceName}.insert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-            _writeln('await ${p.beanInstanceName}.attach(model, child);');
+            _writeln('await ${p.beanInstanceName}.attach(newModel, child);');
           } else {
-            _writeln('await ${p.beanInstanceName}.attach(child, model);');
+            _writeln('await ${p.beanInstanceName}.attach(child, newModel);');
           }
           _writeln('}');
         }
