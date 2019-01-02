@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.22
+
++ Deduplication in attach during upsert
++ `attach` gets amn optional `upsert` parameter to control upsert or insert
+
+## 2.2.21
+
++ `newModel` instead of `model` is used in generated `upsert` code
+
 ## 2.2.16
 
 + Fixed `builder.dart` library name

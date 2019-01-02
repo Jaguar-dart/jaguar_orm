@@ -264,9 +264,11 @@ class Writer {
           _writeln(
               'await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-            _writeln('await ${p.beanInstanceName}.attach(newModel, child);');
+            _writeln(
+                'await ${p.beanInstanceName}.attach(newModel, child, upsert: true);');
           } else {
-            _writeln('await ${p.beanInstanceName}.attach(child, newModel);');
+            _writeln(
+                'await ${p.beanInstanceName}.attach(child, newModel, upsert: true);');
           }
           _writeln('}');
         }
@@ -974,7 +976,7 @@ class Writer {
     } else {
       _write('${m1.modelName} one, ${_cap(m.modelName)} two');
     }
-    _writeln(') async {');
+    _writeln(', {bool upsert: false}) async {');
     _writeln('final ret = ${_b.modelType}();');
 
     if (m.modelName.compareTo(m1.modelName) > 0) {
@@ -994,7 +996,13 @@ class Writer {
         _writeln('ret.${m.fields[i].field} = two.${m.foreignFields[i].field};');
       }
     }
-    _writeln('return insert(ret);');
+    _writeln('''
+    if(!upsert) {
+      return insert(ret);
+    } else {
+      return this.upsert(ret);
+    }
+    ''');
     _writeln('}');
   }
 
