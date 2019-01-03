@@ -9,7 +9,7 @@ import '../../model/reflexive/complex/complex.dart';
 
 /// The adapter
 final adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database

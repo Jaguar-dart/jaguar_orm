@@ -9,7 +9,7 @@ import '../model/basic/simple.dart';
 
 /// The adapter
 final _adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database

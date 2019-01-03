@@ -23,15 +23,22 @@ abstract class _AuthorBean implements Bean<Author> {
   }
 
   List<SetColumn> toSetColumns(Author model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
       ret.add(name.set(model.name));
-    } else {
+    } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(name.name)) ret.add(name.set(model.name));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.name != null) {
+        ret.add(name.set(model.name));
+      }
     }
 
     return ret;
@@ -44,8 +51,10 @@ abstract class _AuthorBean implements Bean<Author> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Author model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
+  Future<dynamic> insert(Author model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.insert(insert);
     if (cascade) {
       Author newModel;
@@ -60,7 +69,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return retId;
   }
 
-  Future<void> insertMany(List<Author> models, {bool cascade: false}) async {
+  Future<void> insertMany(List<Author> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -69,16 +79,20 @@ abstract class _AuthorBean implements Bean<Author> {
       await Future.wait(futures);
       return;
     } else {
-      final List<List<SetColumn>> data =
-          models.map((model) => toSetColumns(model)).toList();
+      final List<List<SetColumn>> data = models
+          .map((model) =>
+              toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+          .toList();
       final InsertMany insert = inserters.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
   }
 
-  Future<dynamic> upsert(Author model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model));
+  Future<dynamic> upsert(Author model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       Author newModel;
@@ -93,7 +107,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return retId;
   }
 
-  Future<void> upsertMany(List<Author> models, {bool cascade: false}) async {
+  Future<void> upsertMany(List<Author> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -105,7 +120,8 @@ abstract class _AuthorBean implements Bean<Author> {
       final List<List<SetColumn>> data = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upserters.addAll(data);
       await adapter.upsertMany(upsert);
@@ -114,10 +130,13 @@ abstract class _AuthorBean implements Bean<Author> {
   }
 
   Future<int> update(Author model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     final ret = adapter.update(update);
     if (cascade) {
       Author newModel;
@@ -134,7 +153,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return ret;
   }
 
-  Future<void> updateMany(List<Author> models, {bool cascade: false}) async {
+  Future<void> updateMany(List<Author> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -147,7 +167,8 @@ abstract class _AuthorBean implements Bean<Author> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -227,17 +248,27 @@ abstract class _PostBean implements Bean<Post> {
   }
 
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
       ret.add(authorId.set(model.authorId));
       ret.add(message.set(model.message));
-    } else {
+    } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(authorId.name)) ret.add(authorId.set(model.authorId));
       if (only.contains(message.name)) ret.add(message.set(model.message));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.authorId != null) {
+        ret.add(authorId.set(model.authorId));
+      }
+      if (model.message != null) {
+        ret.add(message.set(model.message));
+      }
     }
 
     return ret;
@@ -255,29 +286,38 @@ abstract class _PostBean implements Bean<Post> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Post model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
+  Future<dynamic> insert(Post model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.insert(insert);
   }
 
-  Future<void> insertMany(List<Post> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
+  Future<void> insertMany(List<Post> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
+    final List<List<SetColumn>> data = models
+        .map((model) =>
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
 
-  Future<dynamic> upsert(Post model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model));
+  Future<dynamic> upsert(Post model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.upsert(upsert);
   }
 
-  Future<void> upsertMany(List<Post> models) async {
+  Future<void> upsertMany(List<Post> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upserters.addAll(data);
     await adapter.upsertMany(upsert);
@@ -285,19 +325,24 @@ abstract class _PostBean implements Bean<Post> {
   }
 
   Future<int> update(Post model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.update(update);
   }
 
-  Future<void> updateMany(List<Post> models) async {
+  Future<void> updateMany(List<Post> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);

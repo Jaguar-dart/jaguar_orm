@@ -5,7 +5,7 @@ import 'package:quiver/core.dart';
 class HashableValues {
   final UnmodifiableListView items;
 
-  HashableValues(Iterable items) : items = new UnmodifiableListView(items);
+  HashableValues(Iterable items) : items = UnmodifiableListView(items);
 
   @override
   bool operator ==(other) {

@@ -158,11 +158,11 @@ class Writer {
 
   void _writeToSetColumns() {
     _w.writeln(
-        'List<SetColumn> toSetColumns(${_b.modelType} model, {bool update = false, Set<String> only}) {');
+        'List<SetColumn> toSetColumns(${_b.modelType} model, {bool update = false, Set<String> only, bool onlyNonNull: false}) {');
     _w.writeln('List<SetColumn> ret = [];');
     _w.writeln();
 
-    _w.writeln('if(only == null) {');
+    _w.writeln('if(only == null && !onlyNonNull) {');
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
@@ -175,7 +175,7 @@ class Writer {
       }
     });
 
-    _w.writeln('} else {');
+    _w.writeln('} else if (only != null) {');
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
@@ -187,6 +187,15 @@ class Writer {
       if (field.autoIncrement) {
         _w.writeln("}");
       }
+    });
+
+    _w.writeln('} else /* if (onlyNonNull) */ {');
+
+    // TODO if update, don't set primary key
+    _b.fields.values.forEach((Field field) {
+      _w.writeln("if(model.${field.field} != null) {");
+      _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
+      _w.writeln("}");
     });
 
     _w.writeln('}');
@@ -211,18 +220,20 @@ class Writer {
   void _writeUpsert() {
     if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
       _w.writeln(
-          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false}) async {');
+          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {');
       _w.write('final Upsert upsert = upserter');
-      _w.writeln('.setMany(toSetColumns(model));');
+      _w.writeln(
+          '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
       _w.writeln('return adapter.upsert(upsert);');
       _w.writeln('}');
       return;
     }
 
     _w.writeln(
-        'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false}) async {');
+        'Future<dynamic> upsert(${_b.modelType} model, {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {');
     _w.write('final Upsert upsert = upserter');
-    _w.write('.setMany(toSetColumns(model))');
+    _w.write(
+        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
     for (Field f in _b.primary) {
       if (f.autoIncrement) _w.write('.id(${f.field}.name)');
     }
@@ -283,10 +294,10 @@ class Writer {
   void _writeUpsertMany() {
     var cascade = '';
     if (_b.preloads.length > 0) {
-      cascade = ', {bool cascade: false}';
+      cascade = 'bool cascade: false, ';
     }
     _w.writeln(
-        'Future<void> upsertMany(List<${_b.modelType}> models${cascade}) async {');
+        'Future<void> upsertMany(List<${_b.modelType}> models, {${cascade} bool onlyNonNull: false, Set<String> only}) async {');
     if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
@@ -302,7 +313,8 @@ class Writer {
     _w.write('final List<List<SetColumn>> data = [];');
     _w.write('for (var i = 0; i < models.length; ++i) {');
     _w.write('var model = models[i];');
-    _w.write('data.add(toSetColumns(model).toList());');
+    _w.write(
+        'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());');
 
     _w.write('}');
     _w.write('final UpsertMany upsert = upserters.addAll(data);');
@@ -319,18 +331,20 @@ class Writer {
   void _writeInsert() {
     if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
       _w.writeln(
-          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
+          'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {');
       _w.write('final Insert insert = inserter');
-      _w.writeln('.setMany(toSetColumns(model));');
+      _w.writeln(
+          '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
       _w.writeln('return adapter.insert(insert);');
       _w.writeln('}');
       return;
     }
 
     _w.writeln(
-        'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false}) async {');
+        'Future<dynamic> insert(${_b.modelType} model, {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {');
     _w.write('final Insert insert = inserter');
-    _w.write('.setMany(toSetColumns(model))');
+    _w.write(
+        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
     for (Field f in _b.primary) {
       if (f.autoIncrement) _w.write('.id(${f.field}.name)');
     }
@@ -389,10 +403,10 @@ class Writer {
   void _writeInsertMany() {
     var cascade = '';
     if (_b.preloads.length > 0) {
-      cascade = ', {bool cascade: false}';
+      cascade = 'bool cascade: false,';
     }
     _w.writeln(
-        'Future<void> insertMany(List<${_b.modelType}> models${cascade}) async {');
+        'Future<void> insertMany(List<${_b.modelType}> models, {${cascade}bool onlyNonNull: false, Set<String> only}) async {');
     if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
@@ -406,7 +420,7 @@ class Writer {
     }
 
     _w.write(
-        'final List<List<SetColumn>> data = models.map((model) => toSetColumns(model)).toList();');
+        'final List<List<SetColumn>> data = models.map((model) => toSetColumns(model, only: only, onlyNonNull: onlyNonNull)).toList();');
     _w.writeln('final InsertMany insert = inserters.addAll(data);');
     _w.writeln('await adapter.insertMany(insert);');
     _w.writeln('return;');
@@ -423,26 +437,28 @@ class Writer {
 
     if (_b.preloads.length == 0) {
       _w.writeln(
-          'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only}) async {');
+          'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only, bool onlyNonNull: false}) async {');
       _w.write('final Update update = updater.');
       final String wheres = _b.primary
           .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
           .join('.');
       _w.write(wheres);
-      _w.writeln('.setMany(toSetColumns(model, only: only));');
+      _w.writeln(
+          '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
       _w.writeln('return adapter.update(update);');
       _w.writeln('}');
       return;
     }
 
     _w.writeln(
-        'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only}) async {');
+        'Future<int> update(${_b.modelType} model, {bool cascade: false, bool associate: false, Set<String> only, bool onlyNonNull: false}) async {');
     _w.write('final Update update = updater.');
     final String wheres = _b.primary
         .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
         .join('.');
     _w.write(wheres);
-    _w.writeln('.setMany(toSetColumns(model, only: only));');
+    _w.writeln(
+        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
     _w.writeln('final ret = adapter.update(update);');
 
     _w.writeln('if(cascade) {');
@@ -498,10 +514,10 @@ class Writer {
   void _writeUpdateMany() {
     var cascade = '';
     if (_b.preloads.length > 0) {
-      cascade = ', {bool cascade: false}';
+      cascade = 'bool cascade: false, ';
     }
     _w.writeln(
-        'Future<void> updateMany(List<${_b.modelType}> models${cascade}) async {');
+        'Future<void> updateMany(List<${_b.modelType}> models, {${cascade} bool onlyNonNull: false, Set<String> only}) async {');
     if (cascade.isNotEmpty) {
       _w.write('if(cascade)  {');
       _w.write('final List<Future> futures = [];');
@@ -518,7 +534,8 @@ class Writer {
     _w.write('final List<Expression> where = [];');
     _w.write('for (var i = 0; i < models.length; ++i) {');
     _w.write('var model = models[i];');
-    _w.write('data.add(toSetColumns(model).toList());');
+    _w.write(
+        'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());');
 
     String wheres;
     for (var prim in _b.primary) {

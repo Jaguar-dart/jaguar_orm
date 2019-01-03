@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.23
+
++ `onlyNonNull` for set columns, insert, upsert and update
+
 ## 2.2.22
 
 + Deduplication in attach during upsert

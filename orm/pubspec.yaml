@@ -19,6 +19,6 @@ dev_dependencies:
   test: ^1.2.0
   jaguar_query_postgres: # ^0.2.5
     path: ../postgres
-  build_runner: ^0.10.0
+  build_runner:
   jaguar_orm_gen:
     path: ../generator

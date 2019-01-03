@@ -23,15 +23,22 @@ abstract class _UserBean implements Bean<User> {
   }
 
   List<SetColumn> toSetColumns(User model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
       ret.add(name.set(model.name));
-    } else {
+    } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(name.name)) ret.add(name.set(model.name));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.name != null) {
+        ret.add(name.set(model.name));
+      }
     }
 
     return ret;
@@ -44,8 +51,10 @@ abstract class _UserBean implements Bean<User> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(User model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
+  Future<dynamic> insert(User model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.insert(insert);
     if (cascade) {
       User newModel;
@@ -58,7 +67,8 @@ abstract class _UserBean implements Bean<User> {
     return retId;
   }
 
-  Future<void> insertMany(List<User> models, {bool cascade: false}) async {
+  Future<void> insertMany(List<User> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -67,16 +77,20 @@ abstract class _UserBean implements Bean<User> {
       await Future.wait(futures);
       return;
     } else {
-      final List<List<SetColumn>> data =
-          models.map((model) => toSetColumns(model)).toList();
+      final List<List<SetColumn>> data = models
+          .map((model) =>
+              toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+          .toList();
       final InsertMany insert = inserters.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
   }
 
-  Future<dynamic> upsert(User model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model));
+  Future<dynamic> upsert(User model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       User newModel;
@@ -89,7 +103,8 @@ abstract class _UserBean implements Bean<User> {
     return retId;
   }
 
-  Future<void> upsertMany(List<User> models, {bool cascade: false}) async {
+  Future<void> upsertMany(List<User> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -101,7 +116,8 @@ abstract class _UserBean implements Bean<User> {
       final List<List<SetColumn>> data = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upserters.addAll(data);
       await adapter.upsertMany(upsert);
@@ -110,10 +126,13 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<int> update(User model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     final ret = adapter.update(update);
     if (cascade) {
       User newModel;
@@ -129,7 +148,8 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future<void> updateMany(List<User> models, {bool cascade: false}) async {
+  Future<void> updateMany(List<User> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -142,7 +162,8 @@ abstract class _UserBean implements Bean<User> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -221,17 +242,27 @@ abstract class _AddressBean implements Bean<Address> {
   }
 
   List<SetColumn> toSetColumns(Address model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
       ret.add(street.set(model.street));
       ret.add(userId.set(model.userId));
-    } else {
+    } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(street.name)) ret.add(street.set(model.street));
       if (only.contains(userId.name)) ret.add(userId.set(model.userId));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.street != null) {
+        ret.add(street.set(model.street));
+      }
+      if (model.userId != null) {
+        ret.add(userId.set(model.userId));
+      }
     }
 
     return ret;
@@ -246,29 +277,38 @@ abstract class _AddressBean implements Bean<Address> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Address model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model));
+  Future<dynamic> insert(Address model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.insert(insert);
   }
 
-  Future<void> insertMany(List<Address> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
+  Future<void> insertMany(List<Address> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
+    final List<List<SetColumn>> data = models
+        .map((model) =>
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
 
-  Future<dynamic> upsert(Address model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model));
+  Future<dynamic> upsert(Address model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.upsert(upsert);
   }
 
-  Future<void> upsertMany(List<Address> models) async {
+  Future<void> upsertMany(List<Address> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upserters.addAll(data);
     await adapter.upsertMany(upsert);
@@ -276,19 +316,24 @@ abstract class _AddressBean implements Bean<Address> {
   }
 
   Future<int> update(Address model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.update(update);
   }
 
-  Future<void> updateMany(List<Address> models) async {
+  Future<void> updateMany(List<Address> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);

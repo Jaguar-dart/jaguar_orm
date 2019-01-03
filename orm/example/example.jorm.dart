@@ -32,10 +32,10 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   List<SetColumn> toSetColumns(CartItem model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       if (model.id != null) {
         ret.add(id.set(model.id));
       }
@@ -43,7 +43,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
       ret.add(product.set(model.product));
       ret.add(quantity.set(model.quantity));
       ret.add(cartId.set(model.cartId));
-    } else {
+    } else if (only != null) {
       if (model.id != null) {
         if (only.contains(id.name)) ret.add(id.set(model.id));
       }
@@ -51,6 +51,22 @@ abstract class _CartItemBean implements Bean<CartItem> {
       if (only.contains(product.name)) ret.add(product.set(model.product));
       if (only.contains(quantity.name)) ret.add(quantity.set(model.quantity));
       if (only.contains(cartId.name)) ret.add(cartId.set(model.cartId));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.amount != null) {
+        ret.add(amount.set(model.amount));
+      }
+      if (model.product != null) {
+        ret.add(product.set(model.product));
+      }
+      if (model.quantity != null) {
+        ret.add(quantity.set(model.quantity));
+      }
+      if (model.cartId != null) {
+        ret.add(cartId.set(model.cartId));
+      }
     }
 
     return ret;
@@ -67,8 +83,11 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(CartItem model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model)).id(id.name);
+  Future<dynamic> insert(CartItem model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(id.name);
     var retId = await adapter.insert(insert);
     if (cascade) {
       CartItem newModel;
@@ -76,16 +95,22 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return retId;
   }
 
-  Future<void> insertMany(List<CartItem> models) async {
-    final List<List<SetColumn>> data =
-        models.map((model) => toSetColumns(model)).toList();
+  Future<void> insertMany(List<CartItem> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
+    final List<List<SetColumn>> data = models
+        .map((model) =>
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .toList();
     final InsertMany insert = inserters.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
 
-  Future<dynamic> upsert(CartItem model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model)).id(id.name);
+  Future<dynamic> upsert(CartItem model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(id.name);
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       CartItem newModel;
@@ -93,11 +118,13 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return retId;
   }
 
-  Future<void> upsertMany(List<CartItem> models) async {
+  Future<void> upsertMany(List<CartItem> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upserters.addAll(data);
     await adapter.upsertMany(upsert);
@@ -105,19 +132,24 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<int> update(CartItem model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.update(update);
   }
 
-  Future<void> updateMany(List<CartItem> models) async {
+  Future<void> updateMany(List<CartItem> models,
+      {bool onlyNonNull: false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(toSetColumns(model).toList());
+      data.add(
+          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);
@@ -188,19 +220,26 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   List<SetColumn> toSetColumns(Cart model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
     List<SetColumn> ret = [];
 
-    if (only == null) {
+    if (only == null && !onlyNonNull) {
       if (model.id != null) {
         ret.add(id.set(model.id));
       }
       ret.add(amount.set(model.amount));
-    } else {
+    } else if (only != null) {
       if (model.id != null) {
         if (only.contains(id.name)) ret.add(id.set(model.id));
       }
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
+    } else /* if (onlyNonNull) */ {
+      if (model.id != null) {
+        ret.add(id.set(model.id));
+      }
+      if (model.amount != null) {
+        ret.add(amount.set(model.amount));
+      }
     }
 
     return ret;
@@ -213,8 +252,11 @@ abstract class _CartBean implements Bean<Cart> {
     return adapter.createTable(st);
   }
 
-  Future<dynamic> insert(Cart model, {bool cascade: false}) async {
-    final Insert insert = inserter.setMany(toSetColumns(model)).id(id.name);
+  Future<dynamic> insert(Cart model,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+    final Insert insert = inserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(id.name);
     var retId = await adapter.insert(insert);
     if (cascade) {
       Cart newModel;
@@ -229,7 +271,8 @@ abstract class _CartBean implements Bean<Cart> {
     return retId;
   }
 
-  Future<void> insertMany(List<Cart> models, {bool cascade: false}) async {
+  Future<void> insertMany(List<Cart> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -238,16 +281,21 @@ abstract class _CartBean implements Bean<Cart> {
       await Future.wait(futures);
       return;
     } else {
-      final List<List<SetColumn>> data =
-          models.map((model) => toSetColumns(model)).toList();
+      final List<List<SetColumn>> data = models
+          .map((model) =>
+              toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+          .toList();
       final InsertMany insert = inserters.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
   }
 
-  Future<dynamic> upsert(Cart model, {bool cascade: false}) async {
-    final Upsert upsert = upserter.setMany(toSetColumns(model)).id(id.name);
+  Future<dynamic> upsert(Cart model,
+      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+    final Upsert upsert = upserter
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(id.name);
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       Cart newModel;
@@ -262,7 +310,8 @@ abstract class _CartBean implements Bean<Cart> {
     return retId;
   }
 
-  Future<void> upsertMany(List<Cart> models, {bool cascade: false}) async {
+  Future<void> upsertMany(List<Cart> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -274,7 +323,8 @@ abstract class _CartBean implements Bean<Cart> {
       final List<List<SetColumn>> data = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upserters.addAll(data);
       await adapter.upsertMany(upsert);
@@ -283,10 +333,13 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<int> update(Cart model,
-      {bool cascade: false, bool associate: false, Set<String> only}) async {
+      {bool cascade: false,
+      bool associate: false,
+      Set<String> only,
+      bool onlyNonNull: false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     final ret = adapter.update(update);
     if (cascade) {
       Cart newModel;
@@ -304,7 +357,8 @@ abstract class _CartBean implements Bean<Cart> {
     return ret;
   }
 
-  Future<void> updateMany(List<Cart> models, {bool cascade: false}) async {
+  Future<void> updateMany(List<Cart> models,
+      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -317,7 +371,8 @@ abstract class _CartBean implements Bean<Cart> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(toSetColumns(model).toList());
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
