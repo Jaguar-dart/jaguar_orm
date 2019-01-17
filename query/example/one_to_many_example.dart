@@ -122,7 +122,7 @@ Future<Post> getPostById(int id) => Sql.find('post')
 Future<Post> getPostByIdRelated(int id) async {
   Find st = Sql.find('post')
       .sel('post.*')
-      .selManyIn('author', ['_id', 'name'])
+      .selMany(['_id', 'name'], table: 'author')
       .innerJoin('author', 'author')
       .joinOn(Field.inTable('post', 'authorId')
           .eqField(Field.inTable('author', '_id')))
@@ -135,8 +135,8 @@ Future<Post> getPostByIdRelated(int id) async {
     ..message = map['message']
     ..likes = map['likes']
     ..author = (new Author()
-      ..id = map['author._id']
-      ..name = map['author.name']);
+      ..id = map['authorid']
+      ..name = map['name']);
   return post;
 }
 

@@ -37,7 +37,7 @@ String composeSelColumn(final SelColumn column) {
 String composeTableName(final TableName name) {
   String ret = '${name.tableName}';
   if (name.alias is String) {
-    ret += ' ${name.alias}';
+    ret += ' AS ${name.alias}';
   }
   return ret;
 }

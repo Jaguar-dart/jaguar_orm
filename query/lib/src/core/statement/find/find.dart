@@ -10,7 +10,7 @@ class Find implements Statement {
 
   JoinedTable _curJoin;
 
-  Expression _where = new And();
+  Expression _where = And();
 
   final List<OrderBy> _orderBy = [];
 
@@ -21,14 +21,14 @@ class Find implements Statement {
   int _offset;
 
   Find(String tableName, {String alias, Expression where})
-      : from = new TableName(tableName, alias) {
+      : from = TableName(tableName, alias) {
     if (where != null) this.where(where);
-    _immutable = new ImmutableFindStatement(this);
+    _immutable = ImmutableFindStatement(this);
   }
 
   /// Adds a 'join' clause to the select statement
   Find addJoin(JoinedTable join) {
-    if (join == null) throw new Exception('Join cannot be null!');
+    if (join == null) throw Exception('Join cannot be null!');
 
     _curJoin = join;
     _joins.add(_curJoin);
@@ -37,95 +37,81 @@ class Find implements Statement {
 
   /// Adds a 'inner join' clause to the select statement.
   Find innerJoin(String tableName, [String alias]) {
-    _curJoin = new JoinedTable.innerJoin(tableName, alias);
+    _curJoin = JoinedTable.innerJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'left join' clause to the select statement.
   Find leftJoin(String tableName, [String alias]) {
-    _curJoin = new JoinedTable.leftJoin(tableName, alias);
+    _curJoin = JoinedTable.leftJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'right join' clause to the select statement.
   Find rightJoin(String tableName, [String alias]) {
-    _curJoin = new JoinedTable.rightJoin(tableName, alias);
+    _curJoin = JoinedTable.rightJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'full join' clause to the select statement.
   Find fullJoin(String tableName, [String alias]) {
-    _curJoin = new JoinedTable.fullJoin(tableName, alias);
+    _curJoin = JoinedTable.fullJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds 'cross join' clause to the select statement.
   Find crossJoin(String tableName, [String alias]) {
-    _curJoin = new JoinedTable.crossJoin(tableName, alias);
+    _curJoin = JoinedTable.crossJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds the condition with which to perform joins.
   Find joinOn(Expression exp) {
-    if (_curJoin == null) throw new Exception('No joins in the join stack!');
+    if (_curJoin == null) throw Exception('No joins in the join stack!');
 
     _curJoin.joinOn(exp);
     return this;
   }
 
-  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
-  Find sel(String column, [String alias]) {
-    _column.add(new SelColumn(column, alias));
-    return this;
-  }
-
-  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
-  Find selAll() {
-    _column.add(new SelColumn('*'));
-    return this;
-  }
-
-  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
-  Find selAllFromTable(String table) {
-    _column.add(new SelColumn('$table.*'));
-    return this;
-  }
-
-  /// Selects many [columns] to be fetched. Use [alias] to alias the column name.
-  Find selMany(Iterable<String> columns, [String alias]) {
-    for (String columnName in columns) {
-      final String name = columnName;
-      _column.add(new SelColumn(name));
-    }
-    return this;
-  }
-
   /// Selects a [column] to be fetched from the [table]. Use [alias] to alias
   /// the column name.
-  Find selIn(String table, String column, [String alias]) {
-    final String name = table + '.' + column;
-    _column.add(new SelColumn(name, alias));
+  Find sel(String column, {String alias, String table}) {
+    String col = (table == null ? '' : table + '.') + column;
+    _column.add(SelColumn(col, alias));
+    return this;
+  }
+
+  /// Selects a [column] to be fetched. Use [alias] to alias the column name.
+  Find selAll([String table]) {
+    String col = (table == null ? '' : table + '.') + '*';
+    _column.add(SelColumn(col));
     return this;
   }
 
   /// Selects many [columns] to be fetched in the given [table]. Use [alias] to
   /// alias the column name.
-  Find selManyIn(String table, List<String> columns) {
-    for (String columnName in columns) {
-      final String name = table + '.' + columnName;
-      _column.add(new SelColumn(name));
+  Find selMany(Iterable<String> columns, {String table}) {
+    if (table == null) {
+      for (String columnName in columns) {
+        final String name = columnName;
+        _column.add(SelColumn(name));
+      }
+    } else {
+      for (String columnName in columns) {
+        final String name = table + '.' + columnName;
+        _column.add(SelColumn(name));
+      }
     }
     return this;
   }
 
   Find count(String column, {String alias, bool isDistinct: false}) {
-    _column
-        .add(new CountSelColumn(column, alias: alias, isDistinct: isDistinct));
+    _column.add(CountSelColumn(column, alias: alias, isDistinct: isDistinct));
     return this;
   }
 
@@ -189,20 +175,20 @@ class Find implements Statement {
       and(q.between<T>(column, low, high));
 
   Find orderBy(String column, [bool ascending = false]) {
-    _orderBy.add(new OrderBy(column, ascending));
+    _orderBy.add(OrderBy(column, ascending));
     return this;
   }
 
   Find orderByMany(List<String> columns, [bool ascending = false]) {
     columns.forEach((String column) {
-      _orderBy.add(new OrderBy(column, ascending));
+      _orderBy.add(OrderBy(column, ascending));
     });
     return this;
   }
 
   Find limit(int val) {
     if (_limit != null) {
-      throw new Exception('Already limited!');
+      throw Exception('Already limited!');
     }
     _limit = val;
     return this;
@@ -210,7 +196,7 @@ class Find implements Statement {
 
   Find offset(int val) {
     if (_offset != null) {
-      throw new Exception('Cant use more than one offset!');
+      throw Exception('Cant use more than one offset!');
     }
     _offset = val;
     return this;
@@ -227,7 +213,7 @@ class Find implements Statement {
   }
 
   FindExecutor<ConnType> exec<ConnType>(Adapter<ConnType> adapter) =>
-      new FindExecutor<ConnType>(adapter, this);
+      FindExecutor<ConnType>(adapter, this);
 
   ImmutableFindStatement _immutable;
 
@@ -238,10 +224,10 @@ class ImmutableFindStatement {
   Find _find;
 
   ImmutableFindStatement(this._find)
-      : selects = new UnmodifiableListView<SelColumn>(_find._column),
-        joins = new UnmodifiableListView<JoinedTable>(_find._joins),
-        orderBy = new UnmodifiableListView<OrderBy>(_find._orderBy),
-        groupBy = new UnmodifiableListView<String>(_find._groupBy);
+      : selects = UnmodifiableListView<SelColumn>(_find._column),
+        joins = UnmodifiableListView<JoinedTable>(_find._joins),
+        orderBy = UnmodifiableListView<OrderBy>(_find._orderBy),
+        groupBy = UnmodifiableListView<String>(_find._groupBy);
 
   TableName get from => _find.from;
 
