@@ -13,7 +13,7 @@ class InsertMany implements Statement {
   final List<Map<String, dynamic>> _bulkValues = [];
 
   InsertMany(this.name) {
-    _immutable = new ImmutableInsertManyStatement(this);
+    _immutable = ImmutableInsertManyStatement(this);
   }
 
   /// Adds a single [row] to be inserted.
@@ -60,7 +60,7 @@ class ImmutableInsertManyStatement {
   final InsertMany _inner;
 
   ImmutableInsertManyStatement(this._inner)
-      : values = new UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
+      : values = UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
             _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 
   String get table => _inner.name;

@@ -1,15 +1,15 @@
 part of query;
 
-class Update implements Statement {
+class Update implements Statement, Settable, Whereable {
   final String name;
 
   final Map<String, dynamic> _values = {};
 
-  Expression _where = new And();
+  Expression _where = And();
 
   Update(this.name, {Expression where}) {
     if (where != null) this.where(where);
-    _immutable = new ImmutableUpdateStatement(this);
+    _immutable = ImmutableUpdateStatement(this);
   }
 
   Update set<ValType>(Field<ValType> field, ValType value) {
@@ -31,6 +31,30 @@ class Update implements Statement {
 
   Update setValues(Map<String, dynamic> values) {
     _values.addAll(values);
+    return this;
+  }
+
+  /// Convenience method to set the [value] of int [column].
+  Update setInt(String column, int value) {
+    _values[column] = value;
+    return this;
+  }
+
+  /// Convenience method to set the [value] of string [column].
+  Update setString(String column, String value) {
+    _values[column] = value;
+    return this;
+  }
+
+  /// Convenience method to set the [value] of bool [column].
+  Update setBool(String column, bool value) {
+    _values[column] = value;
+    return this;
+  }
+
+  /// Convenience method to set the [value] of date time [column].
+  Update setDateTime(String column, DateTime value) {
+    _values[column] = value;
     return this;
   }
 
@@ -79,8 +103,6 @@ class Update implements Statement {
 
   Update like(String column, String val) => and(q.like(column, val));
 
-  Update eqCol<T>(String column, T val) => and(q.eq<T>(column, val));
-
   Update between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
@@ -95,7 +117,7 @@ class ImmutableUpdateStatement {
   final Update _inner;
 
   ImmutableUpdateStatement(this._inner)
-      : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
+      : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get tableName => _inner.name;
 

@@ -8,7 +8,7 @@ part of query;
 ///
 /// Use `exec` statement or `Adapter` to execute the statement against a
 /// database.
-class Insert implements Statement {
+class Insert implements Statement, Settable {
   final String name;
 
   String _id;
@@ -47,6 +47,12 @@ class Insert implements Statement {
   }
 
   /// Convenience method to set the [value] of int [column].
+  Insert setValues(Map<String, dynamic> values) {
+    _values.addAll(values);
+    return this;
+  }
+
+  /// Convenience method to set the [value] of int [column].
   Insert setInt(String column, int value) {
     _values[column] = value;
     return this;
@@ -67,12 +73,6 @@ class Insert implements Statement {
   /// Convenience method to set the [value] of date time [column].
   Insert setDateTime(String column, DateTime value) {
     _values[column] = value;
-    return this;
-  }
-
-  /// Convenience method to set the [value] of int [column].
-  Insert setValues(Map<String, dynamic> values) {
-    _values.addAll(values);
     return this;
   }
 

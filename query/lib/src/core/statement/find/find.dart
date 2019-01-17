@@ -1,7 +1,7 @@
 part of query;
 
 /// Select SQL statement builder.
-class Find implements Statement {
+class Find implements Statement, Whereable {
   final _column = <SelColumn>[];
 
   final TableName from;

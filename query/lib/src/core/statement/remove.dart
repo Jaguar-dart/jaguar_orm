@@ -1,6 +1,6 @@
 part of query;
 
-class Remove implements Statement {
+class Remove implements Statement, Whereable {
   final String name;
 
   Expression _where = new And();

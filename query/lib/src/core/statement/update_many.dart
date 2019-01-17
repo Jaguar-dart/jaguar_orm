@@ -1,12 +1,12 @@
 part of query;
 
-class UpdateMany implements Statement {
+class UpdateMany implements Statement /*, Whereable */ {
   String name;
 
   final List<Update> _bulkValues = [];
 
   UpdateMany(this.name) {
-    _immutable = new ImmutableUpdateManyStatement(this);
+    _immutable = ImmutableUpdateManyStatement(this);
   }
 
   UpdateMany addAll(List<List<SetColumn>> items, List<Expression> where) {
@@ -35,7 +35,7 @@ class ImmutableUpdateManyStatement {
   final UpdateMany _inner;
 
   ImmutableUpdateManyStatement(this._inner)
-      : values = new UnmodifiableListView<ImmutableUpdateStatement>(
+      : values = UnmodifiableListView<ImmutableUpdateStatement>(
             _inner._bulkValues.map((values) => values.asImmutable));
 
   String get tableName => _inner.name;
