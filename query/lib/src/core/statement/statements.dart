@@ -26,7 +26,7 @@ class SetColumn<ValType> {
 
   SetColumn(this.name, this.value);
 
-  /// Returns a new [SetColumn] that sets the current column to new [value].
+  /// Returns a [SetColumn] that sets the current column to new [value].
   SetColumn<ValType> setTo(ValType value) => SetColumn<ValType>(name, value);
 }
 

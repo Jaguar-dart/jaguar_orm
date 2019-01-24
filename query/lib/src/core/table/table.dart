@@ -43,31 +43,31 @@ class JoinedTable implements Table {
 
   final TableName _to;
 
-  final _on = new And();
+  final _on = And();
 
   JoinedTable(this._type, String tableName, [String alias])
-      : _to = new TableName(tableName, alias) {
-    _info = new QueryJoinedTableInfo(this);
+      : _to = TableName(tableName, alias) {
+    _info = QueryJoinedTableInfo(this);
   }
 
   factory JoinedTable.innerJoin(String tableName, [String alias]) =>
-      new JoinedTable(JoinType.InnerJoin, tableName, alias);
+      JoinedTable(JoinType.InnerJoin, tableName, alias);
 
   factory JoinedTable.leftJoin(String tableName, [String alias]) =>
-      new JoinedTable(JoinType.LeftJoin, tableName, alias);
+      JoinedTable(JoinType.LeftJoin, tableName, alias);
 
   factory JoinedTable.rightJoin(String tableName, [String alias]) =>
-      new JoinedTable(JoinType.RightJoin, tableName, alias);
+      JoinedTable(JoinType.RightJoin, tableName, alias);
 
   factory JoinedTable.fullJoin(String tableName, [String alias]) =>
-      new JoinedTable(JoinType.FullJoin, tableName, alias);
+      JoinedTable(JoinType.FullJoin, tableName, alias);
 
   factory JoinedTable.crossJoin(String tableName, [String alias]) =>
-      new JoinedTable(JoinType.CrossJoin, tableName, alias);
+      JoinedTable(JoinType.CrossJoin, tableName, alias);
 
   JoinedTable joinOn(Expression onExp) {
     if (_type == null || _to == null) {
-      throw new Exception('Query has no join on it!');
+      throw Exception('Query has no join on it!');
     }
 
     _on.and(onExp);
@@ -78,11 +78,11 @@ class JoinedTable implements Table {
   void validate() {
     if (_to == null) {
       if (_type != null || _on.length != 0) {
-        throw new Exception('Join not initialized properly!');
+        throw Exception('Join not initialized properly!');
       }
     } else {
       if (_type == null || _on.length == 0) {
-        throw new Exception('Join not initialized properly!');
+        throw Exception('Join not initialized properly!');
       }
     }
   }

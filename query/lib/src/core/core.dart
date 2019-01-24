@@ -37,41 +37,40 @@ part 'table/table.dart';
 /// Main DSL class to create SQL statements
 class Sql {
   /// Creates a new [Find] statement
-  static Find find(String table, {String alias}) =>
-      new Find(table, alias: alias);
+  static Find find(String table, {String alias}) => Find(table, alias: alias);
 
   /// Creates a new [Upsert] statement
-  static Upsert upsert(String table) => new Upsert(table);
+  static Upsert upsert(String table) => Upsert(table);
 
   /// Creates a new [UpsertMany] statement
-  static UpsertMany upsertMany(String table) => new UpsertMany(table);
+  static UpsertMany upsertMany(String table) => UpsertMany(table);
 
   /// Creates a new [Insert] statement
-  static Insert insert(String table) => new Insert(table);
+  static Insert insert(String table) => Insert(table);
 
   /// Creates a new [InsertMany] statement
-  static InsertMany insertMany(String table) => new InsertMany(table);
+  static InsertMany insertMany(String table) => InsertMany(table);
 
   /// Creates a new [Update] statement
   static Update update(String table, {Expression where}) =>
-      new Update(table, where: where);
+      Update(table, where: where);
 
   /// Creates a new [UpdateMany] statement
-  static UpdateMany updateMany(String table) => new UpdateMany(table);
+  static UpdateMany updateMany(String table) => UpdateMany(table);
 
   /// Creates a new [Delete] statement
-  static Remove remove(String table) => new Remove(table);
+  static Remove remove(String table) => Remove(table);
 
   /// Returns a new [Create] statement
   static Create create(String table, {bool ifNotExists: false}) =>
-      new Create(table, ifNotExists: ifNotExists);
+      Create(table, ifNotExists: ifNotExists);
 
   /// Returns a new [Drop] statement
   static Drop drop(String table, {bool onlyIfExists: false}) =>
-      new Drop(table, onlyIfExists: onlyIfExists);
+      Drop(table, onlyIfExists: onlyIfExists);
 
   /// Returns a new [CreateDb] statement
-  static CreateDb createDb(String database) => new CreateDb(database);
+  static CreateDb createDb(String database) => CreateDb(database);
 
-  static DropDb dropDb(String database) => new DropDb(database);
+  static DropDb dropDb(String database) => DropDb(database);
 }

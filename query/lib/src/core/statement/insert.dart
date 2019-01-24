@@ -16,7 +16,7 @@ class Insert implements Statement, Settable {
   final Map<String, dynamic> _values = {};
 
   Insert(this.name) {
-    _immutable = new ImmutableInsertStatement(this);
+    _immutable = ImmutableInsertStatement(this);
   }
 
   /// Id is the auto-generated primary key that is set by the database. [Adapter]
@@ -99,7 +99,7 @@ class ImmutableInsertStatement {
   final Insert _inner;
 
   ImmutableInsertStatement(this._inner)
-      : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
+      : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get table => _inner.name;
 

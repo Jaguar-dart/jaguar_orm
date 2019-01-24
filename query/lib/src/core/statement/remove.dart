@@ -3,10 +3,10 @@ part of query;
 class Remove implements Statement, Whereable {
   final String name;
 
-  Expression _where = new And();
+  Expression _where = And();
 
   Remove(this.name) {
-    _info = new QueryRemoveInfo(this);
+    _info = QueryRemoveInfo(this);
   }
 
   Remove or(Expression exp) {

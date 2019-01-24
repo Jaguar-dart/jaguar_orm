@@ -16,7 +16,7 @@ class Upsert implements Statement {
   String _id;
 
   Upsert(this.name) {
-    _immutable = new ImmutableUpsertStatement(this);
+    _immutable = ImmutableUpsertStatement(this);
   }
 
   /// Id is the auto-generated primary key that is set by the database. [Adapter]
@@ -89,7 +89,7 @@ class ImmutableUpsertStatement {
   final Upsert _inner;
 
   ImmutableUpsertStatement(this._inner)
-      : values = new UnmodifiableMapView<String, dynamic>(_inner._values);
+      : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get table => _inner.name;
 

@@ -8,7 +8,7 @@ class Create implements Statement {
   final Map<String, CreateColumn> _columns = {};
 
   Create(this.name, {this.ifNotExists: false}) {
-    _immutable = new ImmutableCreateStatement(this);
+    _immutable = ImmutableCreateStatement(this);
   }
 
   Create addInt(String name,
@@ -20,10 +20,9 @@ class Create implements Statement {
       String uniqueGroup}) {
     Foreign foreign;
     if (foreignTable != null) {
-      foreign =
-          new Foreign(foreignTable, foreignCol != null ? foreignCol : name);
+      foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
-    _columns[name] = new CreateInt(name,
+    _columns[name] = CreateInt(name,
         isNullable: isNullable,
         autoIncrement: autoIncrement,
         isPrimary: primary,
@@ -36,16 +35,15 @@ class Create implements Statement {
       {String foreignTable, String foreignCol, String uniqueGroup}) {
     Foreign foreign;
     if (foreignTable != null) {
-      foreign =
-          new Foreign(foreignTable, foreignCol != null ? foreignCol : name);
+      foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
-    _columns[name] = new CreateInt.primary(name,
-        foreignKey: foreign, uniqueGroup: uniqueGroup);
+    _columns[name] =
+        CreateInt.primary(name, foreignKey: foreign, uniqueGroup: uniqueGroup);
     return this;
   }
 
   Create addAutoPrimaryInt(String name, {String uniqueGroup}) {
-    _columns[name] = new CreateInt.autoPrimary(name, uniqueGroup: uniqueGroup);
+    _columns[name] = CreateInt.autoPrimary(name, uniqueGroup: uniqueGroup);
     return this;
   }
 
@@ -57,10 +55,9 @@ class Create implements Statement {
       String uniqueGroup}) {
     Foreign foreign;
     if (foreignTable != null) {
-      foreign =
-          new Foreign(foreignTable, foreignCol != null ? foreignCol : name);
+      foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
-    _columns[name] = new CreateDouble(name,
+    _columns[name] = CreateDouble(name,
         isNullable: isNullable,
         isPrimary: primary,
         foreignKey: foreign,
@@ -70,14 +67,14 @@ class Create implements Statement {
 
   Create addBool(String name, {bool isNullable: false, String uniqueGroup}) {
     _columns[name] =
-        new CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
+        CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
   }
 
   Create addDateTime(String name,
       {bool isNullable: false, String uniqueGroup}) {
-    _columns[name] = new CreateDateTime(name,
-        isNullable: isNullable, uniqueGroup: uniqueGroup);
+    _columns[name] =
+        CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
   }
 
@@ -90,10 +87,9 @@ class Create implements Statement {
       String uniqueGroup}) {
     Foreign foreign;
     if (foreignTable != null) {
-      foreign =
-          new Foreign(foreignTable, foreignCol != null ? foreignCol : name);
+      foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
-    _columns[name] = new CreateStr(name,
+    _columns[name] = CreateStr(name,
         isNullable: isNullable,
         length: length,
         isPrimary: primary,
@@ -109,10 +105,9 @@ class Create implements Statement {
       String uniqueGroup}) {
     Foreign foreign;
     if (foreignTable != null) {
-      foreign =
-          new Foreign(foreignTable, foreignCol != null ? foreignCol : name);
+      foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
-    _columns[name] = new CreateStr.primary(name,
+    _columns[name] = CreateStr.primary(name,
         length: length, foreignKey: foreign, uniqueGroup: uniqueGroup);
     return this;
   }
@@ -140,8 +135,7 @@ class ImmutableCreateStatement {
   final Create _inner;
 
   ImmutableCreateStatement(this._inner)
-      : columns =
-            new UnmodifiableMapView<String, CreateColumn>(_inner._columns);
+      : columns = UnmodifiableMapView<String, CreateColumn>(_inner._columns);
 
   String get name => _inner.name;
 

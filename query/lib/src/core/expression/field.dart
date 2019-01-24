@@ -22,101 +22,101 @@ class Field<ValType> {
 
   /// Returns an "is equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> author = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> author = Field<int>('age');
   ///     find.where(age.eq(20));
   Cond<ValType> eq(ValType value) => Cond.eq<ValType>(this, value);
 
   /// Returns a "not equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ne(20));
   Cond<ValType> ne(ValType value) => Cond.ne<ValType>(this, value);
 
   /// Returns a "greater than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gt(20));
   Cond<ValType> gt(ValType value) => Cond.gt<ValType>(this, value);
 
   /// Returns a "greater than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtEq(20));
   Cond<ValType> gtEq(ValType value) => Cond.gtEq<ValType>(this, value);
 
   /// Returns a "less than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltEq(20));
   Cond<ValType> ltEq(ValType value) => Cond.ltEq<ValType>(this, value);
 
   /// Returns a "less than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.lt(20));
   Cond<ValType> lt(ValType value) => Cond.lt<ValType>(this, value);
 
   /// Returns an "in between" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.between(20, 30));
   Between<ValType> between(ValType low, ValType high) =>
       Cond.between<ValType>(this, low, high);
 
   Field<ValType> aliasAs(String tableAlias) =>
-      new Field<ValType>.inTable(tableAlias, name);
+      Field<ValType>.inTable(tableAlias, name);
 
   /// Returns an "is equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.eqCol(col('age', 'employee')));
   CondCol<ValType> eqField(Field<ValType> rhs) =>
       CondCol.eq<ValType>(this, rhs);
 
   /// Returns a "not equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.neCol(col('age', 'employee')));
   CondCol<ValType> neField(Field<ValType> rhs) =>
       CondCol.ne<ValType>(this, rhs);
 
   /// Returns a "greater than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtCol(col('age', 'employee')));
   CondCol<ValType> gtField(Field<ValType> rhs) =>
       CondCol.gt<ValType>(this, rhs);
 
   /// Returns a "greater than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtEqCol(col('age', 'employee')));
   CondCol<ValType> gtEqField(Field<ValType> rhs) =>
       CondCol.gtEq<ValType>(this, rhs);
 
   /// Returns a "less than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltEqCol(col('age', 'employee')));
   CondCol<ValType> ltEqField(Field<ValType> rhs) =>
       CondCol.ltEq<ValType>(this, rhs);
 
   /// Returns a "less than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltCol(col('age', 'employee')));
   CondCol<ValType> ltField(Field<ValType> rhs) =>
       CondCol.lt<ValType>(this, rhs);
@@ -128,40 +128,40 @@ class Field<ValType> {
 
   /// Returns an "is equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.eqCol(col('age', 'employee')));
   CondCol<ValType> eqF(String name, {String table}) =>
       CondCol.eq<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "not equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.neCol(col('age', 'employee')));
   CondCol<ValType> neF(String name, {String table}) =>
       CondCol.ne<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "greater than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtCol(col('age', 'employee')));
   CondCol<ValType> gtF(String name, {String table}) =>
       CondCol.gt<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "greater than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtEqCol(col('age', 'employee')));
   CondCol<ValType> gtEqF(String name, {String table}) =>
       CondCol.gtEq<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "less than equal to" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltEqCol(col('age', 'employee')));
   CondCol<ValType> ltEqF(String name, {String table}) =>
       CondCol.ltEq<ValType>(this, Field<ValType>.inTable(table, name));

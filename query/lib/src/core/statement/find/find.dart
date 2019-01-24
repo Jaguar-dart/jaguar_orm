@@ -187,17 +187,15 @@ class Find implements Statement, Whereable {
   }
 
   Find limit(int val) {
-    if (_limit != null) {
-      throw Exception('Already limited!');
-    }
+    if (_limit != null) throw Exception('Already limited!');
+
     _limit = val;
     return this;
   }
 
   Find offset(int val) {
-    if (_offset != null) {
-      throw Exception('Cant use more than one offset!');
-    }
+    if (_offset != null) throw Exception('Cant use more than one offset!');
+
     _offset = val;
     return this;
   }

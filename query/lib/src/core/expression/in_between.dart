@@ -18,13 +18,13 @@ class Between<ValType> extends Expression {
 
   /// Creates a 'logical and' expression of this expression and the [other]
   And and(Expression exp) {
-    And ret = new And();
+    And ret = And();
     return ret.and(this).and(exp);
   }
 
   /// Creates a 'logical or' expression of this expression and the [other]
   Or or(Expression exp) {
-    Or ret = new Or();
+    Or ret = Or();
     return ret.or(this).or(exp);
   }
 }
@@ -47,13 +47,13 @@ class InBetweenCol<ValType> extends Expression {
 
   /// Creates a 'logical and' expression of this expression and the [other]
   And and(Expression exp) {
-    And ret = new And();
+    And ret = And();
     return ret.and(this).and(exp);
   }
 
   /// Creates a 'logical or' expression of this expression and the [other]
   Or or(Expression exp) {
-    Or ret = new Or();
+    Or ret = Or();
     return ret.or(this).or(exp);
   }
 }

@@ -9,17 +9,13 @@ abstract class Expression {
   int get length;
 
   /// Creates a 'logical and' expression of this expression and the [other]
-  And operator &(Expression other) {
-    return and(other);
-  }
+  And operator &(Expression other) => and(other);
 
   /// Creates a 'logical and' expression of this expression and the [other]
   And and(Expression exp);
 
   /// Creates a 'logical or' expression of this expression and the [other]
-  Or operator |(Expression other) {
-    return or(other);
-  }
+  Or operator |(Expression other) => or(other);
 
   /// Creates a 'logical or' expression of this expression and the [other]
   Or or(Expression exp);
