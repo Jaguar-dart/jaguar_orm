@@ -927,6 +927,7 @@ class Writer {
     _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
+    _writeln('if(dels.isNotEmpty) {');
     _write('await removeBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
@@ -947,6 +948,8 @@ class Writer {
     _writeln('}');
 
     _write('return await $beanName.removeWhere(exp);');
+    _writeln('}');
+    _writeln('return 0;');
     _writeln('}');
   }
 
