@@ -767,7 +767,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future<${_b.modelType}> preload(${_b.modelType} model, {bool cascade: false}) async {');
+        'Future<${_b.modelType}> preload(${_b.modelType} model, {bool cascade: false, bool fetchDuplicates: false}) async {');
     for (Preload p in _b.preloads) {
       _write('model.');
       _write(p.property);
@@ -787,7 +787,7 @@ class Writer {
         _write(', preload: cascade, cascade: cascade');
         _writeln(');');
       } else if (p is PreloadManyToMany) {
-        _write('${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
+        _write('${p.beanInstanceName}.fetchBy${_b.modelType}(model, fetchDuplicates: fetchDuplicates);');
       }
     }
     _writeln('return model;');
@@ -798,7 +798,7 @@ class Writer {
     if (_b.preloads.length == 0) return;
 
     _writeln(
-        'Future<List<${_b.modelType}>> preloadAll(List<${_b.modelType}> models, {bool cascade: false}) async {');
+        'Future<List<${_b.modelType}>> preloadAll(List<${_b.modelType}> models, {bool cascade: false, bool fetchDuplicates: false}) async {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
@@ -845,7 +845,7 @@ class Writer {
       } else if (p is PreloadManyToMany) {
         _writeln('for(${_b.modelType} model in models) {');
         _writeln(
-            'var temp = await ${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
+            'var temp = await ${p.beanInstanceName}.fetchBy${_b.modelType}(model, fetchDuplicates: fetchDuplicates);');
         _writeln('if(model.${p.property} == null) model.${p.property} = temp;');
         _writeln('else {');
         _writeln('model.${p.property}.clear();');
@@ -955,11 +955,12 @@ class Writer {
         (m.other as PreloadManyToMany).targetBeanInstanceName;
     final String targetModel = (m.other as PreloadManyToMany).targetModelName;
     _writeln(
-        'Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
+        'Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(m.modelName)} model, {bool fetchDuplicates: false}) async {');
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
-    _writeln('if (pivots.isEmpty) return [];');
+    _writeln('if (!fetchDuplicates) {');
+
     _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
@@ -973,8 +974,30 @@ class Writer {
     }
     _writeln(');');
     _writeln('}');
-
     _write('return await $beanName.findWhere(exp);');
+    _writeln('} else {');
+    _writeln('final List<$targetModel> returnList = [];');
+    _writeln('final groupedData = groupBy(pivots, (pivot) => pivot.');
+
+    for (final fieldKey in _b.fields.keys) {
+      final field = _b.fields[fieldKey];
+      if (field.foreign != null) {
+        if ((field.foreign as BelongsToForeign).modelName == _cap(m.modelName)) {
+          _write("$fieldKey);");
+          break;
+        }
+      }
+    }
+
+    _writeln('for (int i = 0; i < groupedData.values.length; i++) {');
+    _writeln('final data = await $beanName.find(groupedData.keys.elementAt(i));');
+    _writeln('for (int j = 0; j < groupedData.values.elementAt(i).length; j++) {');
+    _writeln('returnList.add(data);');
+    _writeln('}');
+    _writeln('}');
+    _writeln('return returnList;');
+    _writeln('}');
+
     _writeln('}');
   }
 
