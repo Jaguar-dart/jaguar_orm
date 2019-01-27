@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.24
+
++ Fixed bugs related to or expression in generated methods
+
 ## 2.2.23
 
 + `onlyNonNull` for set columns, insert, upsert and update
