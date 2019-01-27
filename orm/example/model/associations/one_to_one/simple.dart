@@ -52,7 +52,7 @@ class Address {
 @GenBean()
 class UserBean extends Bean<User> with _UserBean {
   UserBean(Adapter adapter)
-      : addressBean = new AddressBean(adapter),
+      : addressBean = AddressBean(adapter),
         super(adapter);
 
   final AddressBean addressBean;
@@ -63,7 +63,7 @@ class UserBean extends Bean<User> with _UserBean {
 @GenBean()
 class AddressBean extends Bean<Address> with _AddressBean {
   UserBean _userBean;
-  UserBean get userBean => _userBean ??= new UserBean(adapter);
+  UserBean get userBean => _userBean ??= UserBean(adapter);
 
   AddressBean(Adapter adapter) : super(adapter);
 

@@ -699,6 +699,10 @@ class Writer {
     if (_b.primary.length == 0) return;
 
     _w.writeln('Future<int> removeMany(List<${_b.modelType}> models) async {');
+    // Return if models is empty. If this is not done, all records will be removed!
+    _w.writeln(
+        "// Return if models is empty. If this is not done, all records will be removed! ");
+    _w.writeln("if(models == null || models.isEmpty) return 0;");
     _w.writeln('final Remove remove = remover;');
     _writeln('for(final model in models) {');
     _write('remove.or(');
@@ -737,7 +741,10 @@ class Writer {
     _write('List<${m.modelName}> models');
     _write(', {bool preload: false, bool cascade: false}');
     _writeln(') async {');
-
+    // Return if models is empty. If this is not done, all the records will be returned!
+    _writeln(
+        "// Return if models is empty. If this is not done, all the records will be returned!");
+    _writeln("if(models == null || models.isEmpty) return [];");
     _writeln('final Find find = finder;');
     _writeln('for (${m.modelName} model in models) {');
     _write('find.or(');
@@ -962,6 +969,9 @@ class Writer {
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
+    // Return if model has no pivots. If this is not done, all records will be removed!
+    _writeln(
+        "// Return if model has no pivots. If this is not done, all records will be removed!");
     _writeln('if (pivots.isEmpty) return [];');
     _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');

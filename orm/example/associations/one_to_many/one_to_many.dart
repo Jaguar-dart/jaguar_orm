@@ -45,7 +45,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
   final PostBean postBean;
 
   AuthorBean(Adapter adapter)
-      : postBean = new PostBean(adapter),
+      : postBean = PostBean(adapter),
         super(adapter);
 
   Future createTable({bool ifNotExists: false}) {
@@ -67,7 +67,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 )
 class PostBean extends Bean<Post> with _PostBean {
   AuthorBean _authorBean;
-  AuthorBean get authorBean => _authorBean ??= new AuthorBean(adapter);
+  AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);
 
   PostBean(Adapter adapter) : super(adapter);
 
@@ -92,8 +92,8 @@ main() async {
   await _adapter.connect();
 
   // Create beans
-  final authorBean = new AuthorBean(_adapter);
-  final postBean = new PostBean(_adapter);
+  final authorBean = AuthorBean(_adapter);
+  final postBean = PostBean(_adapter);
 
   // Drop old tables
   await postBean.drop();
@@ -105,14 +105,14 @@ main() async {
 
   // Cascaded One-To-One insert
   {
-    final author = new Author()
+    final author = Author()
       ..id = '1'
       ..name = 'Teja'
       ..posts = <Post>[
-        new Post()
+        Post()
           ..id = '10'
           ..message = 'Message 10',
-        new Post()
+        Post()
           ..id = '11'
           ..message = 'Message11'
       ];
@@ -127,20 +127,20 @@ main() async {
 
   // Manual One-To-One insert
   {
-    Author author = new Author()
+    Author author = Author()
       ..id = '2'
       ..name = 'Kleak';
     await authorBean.insert(author, cascade: true);
 
     author = await authorBean.find('2');
 
-    final post1 = new Post()
+    final post1 = Post()
       ..id = '20'
       ..message = 'Message 20';
     postBean.associateAuthor(post1, author);
     await postBean.insert(post1);
 
-    final post2 = new Post()
+    final post2 = Post()
       ..id = '21'
       ..message = 'Message 21';
     postBean.associateAuthor(post2, author);
