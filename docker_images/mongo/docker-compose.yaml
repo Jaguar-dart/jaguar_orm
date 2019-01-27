@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  mongo:
+    build: mongo
+    ports:
+      - '27018:27018'
+    volumes:
+      - mg-data:/data/db
+
+volumes:
+  mg-data: 
+

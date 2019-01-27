@@ -9,14 +9,14 @@ import '../model/basic/simple.dart';
 
 /// The adapter
 final _adapter =
-    new PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database
   await _adapter.connect();
 
   // Create beans
-  final userBean = new UserBean(_adapter);
+  final userBean = UserBean(_adapter);
 
   // Drop old tables
   await userBean.drop();
@@ -25,9 +25,9 @@ main() async {
   await userBean.createTable();
 
   // Insert a new record
-  int id = await userBean.insert(new User(name: 'teja', age: 29));
-  await userBean.insert(new User(name: 'kleak', age: 24));
-  await userBean.insert(new User(name: 'lejard', age: 25));
+  int id = await userBean.insert(User(name: 'teja', age: 29));
+  await userBean.insert(User(name: 'kleak', age: 24));
+  await userBean.insert(User(name: 'lejard', age: 25));
 
   // Fetching record by primary key
   User user = await userBean.find(id);

@@ -197,6 +197,8 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<int> removeMany(List<TodoList> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -418,6 +420,8 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<int> removeMany(List<Category> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -565,6 +569,8 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<List<Pivot>> findByTodoListList(List<TodoList> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (TodoList model in models) {
       find.or(this.todolistId.eq(model.id));
@@ -583,16 +589,20 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<int> detachTodoList(TodoList model) async {
     final dels = await findByTodoList(model.id);
-    await removeByTodoList(model.id);
-    final exp = Or();
-    for (final t in dels) {
-      exp.or(categoryBean.id.eq(t.categoryId));
+    if (dels.isNotEmpty) {
+      await removeByTodoList(model.id);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(categoryBean.id.eq(t.categoryId));
+      }
+      return await categoryBean.removeWhere(exp);
     }
-    return await categoryBean.removeWhere(exp);
+    return 0;
   }
 
   Future<List<Category>> fetchByTodoList(TodoList model) async {
     final pivots = await findByTodoList(model.id);
+// Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
     final exp = Or();
     for (final t in pivots) {
@@ -609,6 +619,8 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<List<Pivot>> findByCategoryList(List<Category> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Category model in models) {
       find.or(this.categoryId.eq(model.id));
@@ -627,16 +639,20 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<int> detachCategory(Category model) async {
     final dels = await findByCategory(model.id);
-    await removeByCategory(model.id);
-    final exp = Or();
-    for (final t in dels) {
-      exp.or(todoListBean.id.eq(t.todolistId));
+    if (dels.isNotEmpty) {
+      await removeByCategory(model.id);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(todoListBean.id.eq(t.todolistId));
+      }
+      return await todoListBean.removeWhere(exp);
     }
-    return await todoListBean.removeWhere(exp);
+    return 0;
   }
 
   Future<List<TodoList>> fetchByCategory(Category model) async {
     final pivots = await findByCategory(model.id);
+// Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
     final exp = Or();
     for (final t in pivots) {

@@ -38,7 +38,7 @@ class ProductItemsBean extends Bean<ProductItems> with _ProductItemsBean {
         super(adapter);
 
   ProductItemsPivotBean get productItemsPivotBean {
-    _productItemsPivotBean ??= new ProductItemsPivotBean(adapter);
+    _productItemsPivotBean ??= ProductItemsPivotBean(adapter);
     return _productItemsPivotBean;
   }
 
