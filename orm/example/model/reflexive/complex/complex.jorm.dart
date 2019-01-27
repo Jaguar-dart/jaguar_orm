@@ -196,6 +196,8 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   }
 
   Future<int> removeMany(List<ProductItems> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -342,6 +344,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<List<ProductItemsPivot>> findByProductList(List<Product> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Product model in models) {
       find.or(this.productId.eq(model.id));
@@ -360,16 +364,20 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<int> detachProduct(Product model) async {
     final dels = await findByProduct(model.id);
-    await removeByProduct(model.id);
-    final exp = Or();
-    for (final t in dels) {
-      exp.or(productItemsBean.id.eq(t.productListId));
+    if (dels.isNotEmpty) {
+      await removeByProduct(model.id);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(productItemsBean.id.eq(t.productListId));
+      }
+      return await productItemsBean.removeWhere(exp);
     }
-    return await productItemsBean.removeWhere(exp);
+    return 0;
   }
 
   Future<List<ProductItems>> fetchByProduct(Product model) async {
     final pivots = await findByProduct(model.id);
+// Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
     final exp = Or();
     for (final t in pivots) {
@@ -388,6 +396,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
       List<ProductItems> models,
       {bool preload: false,
       bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (ProductItems model in models) {
       find.or(this.productListId.eq(model.id));
@@ -406,16 +416,20 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<int> detachProductItems(ProductItems model) async {
     final dels = await findByProductItems(model.id);
-    await removeByProductItems(model.id);
-    final exp = Or();
-    for (final t in dels) {
-      exp.or(productBean.id.eq(t.productId));
+    if (dels.isNotEmpty) {
+      await removeByProductItems(model.id);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(productBean.id.eq(t.productId));
+      }
+      return await productBean.removeWhere(exp);
     }
-    return await productBean.removeWhere(exp);
+    return 0;
   }
 
   Future<List<Product>> fetchByProductItems(ProductItems model) async {
     final pivots = await findByProductItems(model.id);
+// Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
     final exp = Or();
     for (final t in pivots) {
@@ -652,6 +666,8 @@ abstract class _ProductBean implements Bean<Product> {
   }
 
   Future<int> removeMany(List<Product> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -671,6 +687,8 @@ abstract class _ProductBean implements Bean<Product> {
 
   Future<List<Product>> findByCategoryList(List<Category> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Category model in models) {
       find.or(this.categoryId.eq(model.id));
@@ -904,6 +922,8 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<int> removeMany(List<Category> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));

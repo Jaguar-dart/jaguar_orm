@@ -206,6 +206,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
   }
 
   Future<int> removeMany(List<Directory> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -225,6 +227,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
 
   Future<List<Directory>> findByDirectoryList(List<Directory> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Directory model in models) {
       find.or(this.parentId.eq(model.id));

@@ -136,6 +136,8 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<int> removeMany(List<User> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
