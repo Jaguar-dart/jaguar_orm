@@ -610,7 +610,7 @@ class Writer {
     final String args =
         _b.primary.map((Field f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
-    _w.writeln(', [bool cascade = false]) async {');
+    _w.writeln(', [bool cascade = false, bool orphanRemoval = true]) async {');
 
     _writeln('if (cascade) {');
     _w.writeln('final ${_b.modelType} newModel = ');
@@ -627,7 +627,7 @@ class Writer {
         _write(p.fields.map((f) => 'newModel.' + f.field).join(', '));
         _writeln(');');
       } else if (p is PreloadManyToMany) {
-        _write('await ${p.beanInstanceName}.detach${_b.modelType}(newModel);');
+        _write('await ${p.beanInstanceName}.detach${_b.modelType}(newModel, orphanRemoval: orphanRemoval);');
       }
     }
     _w.writeln('}');
@@ -923,20 +923,39 @@ class Writer {
 
   void _writeDetach(BelongsToAssociation m) {
     _writeln(
-        'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
+        'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model, {bool orphanRemoval = true,}) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
-    _writeln('if(dels.isNotEmpty) {');
+    _writeln('if(dels.isNotEmpty && orphanRemoval) {');
     _write('await removeBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
+    _writeln('final Find findRemaining = finder;');
+    _writeln('for(final t in dels) {');
+    _write('findRemaining.or(');
+    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    for (int i = 0; i < m.fields.length; i++) {
+      _write(
+          'this.${o.fields[i].field}.eq(t.${o.fields[i].field})');
+      if (i < m.fields.length - 1) {
+        _write('&');
+      }
+    }
+    _writeln(');');
+    _writeln('}');
+    _writeln('final remainingRelations = await findMany(findRemaining);');
+
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
-    _writeln('final exp = Or();');
+    //main and expression
+    _writeln('final exp = And();');
+    //helper Or expression
+    _writeln('final expObjectsToRemove = Or();');
     _writeln('for(final t in dels) {');
-    _write('exp.or(');
-    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    //element can be removed, if foreignFields does match removed element
+    _write('expObjectsToRemove.or(');
+
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -946,6 +965,22 @@ class Writer {
     }
     _writeln(');');
     _writeln('}');
+
+    _writeln('for(final t in remainingRelations) {');
+    //element cannot be removed if, there exists another relation to that element
+    _write('exp.and(');
+
+    for (int i = 0; i < o.fields.length; i++) {
+      _write(
+          '$beanName.${o.foreignFields[i].field}.ne(t.${o.fields[i].field})');
+      if (i < o.fields.length - 1) {
+        _write('&');
+      }
+    }
+    _writeln(');');
+    _writeln('}');
+    _writeln('exp.and(expObjectsToRemove);');
+
 
     _write('return await $beanName.removeWhere(exp);');
     _writeln('}');
