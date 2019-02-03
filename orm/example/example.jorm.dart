@@ -169,6 +169,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<int> removeMany(List<CartItem> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -184,6 +186,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
 
   Future<List<CartItem>> findByCartList(List<Cart> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Cart model in models) {
       find.or(this.cartId.eq(model.id));
@@ -402,6 +406,8 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<int> removeMany(List<Cart> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));

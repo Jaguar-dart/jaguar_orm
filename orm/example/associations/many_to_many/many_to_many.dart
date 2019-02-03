@@ -100,16 +100,16 @@ class PivotBean extends Bean<Pivot> with _PivotBean {
 
 /// The adapter
 final PgAdapter _adapter =
-    new PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database
   await _adapter.connect();
 
   // Create beans
-  final todolistBean = new TodoListBean(_adapter);
-  final categoryBean = new CategoryBean(_adapter);
-  final pivotBean = new PivotBean(_adapter);
+  final todolistBean = TodoListBean(_adapter);
+  final categoryBean = CategoryBean(_adapter);
+  final pivotBean = PivotBean(_adapter);
 
   // Drop old tables
   await pivotBean.drop();
@@ -123,14 +123,14 @@ main() async {
 
   // Cascaded Many-To-Many insert
   {
-    final todolist = new TodoList()
+    final todolist = TodoList()
       ..id = '1'
       ..description = 'List 1'
       ..categories = <Category>[
-        new Category()
+        Category()
           ..id = '10'
           ..name = 'Cat 10',
-        new Category()
+        Category()
           ..id = '11'
           ..name = 'Cat 11'
       ];
@@ -145,20 +145,20 @@ main() async {
 
   // Manual Many-To-Many insert
   {
-    TodoList todolist = new TodoList()
+    TodoList todolist = TodoList()
       ..id = '2'
       ..description = 'List 2';
     await todolistBean.insert(todolist, cascade: true);
 
     todolist = await todolistBean.find('2');
 
-    final category1 = new Category()
+    final category1 = Category()
       ..id = '20'
       ..name = 'Cat 20';
     await categoryBean.insert(category1);
     await pivotBean.attach(todolist, category1);
 
-    final category2 = new Category()
+    final category2 = Category()
       ..id = '21'
       ..name = 'Cat 21';
     await categoryBean.insert(category2);

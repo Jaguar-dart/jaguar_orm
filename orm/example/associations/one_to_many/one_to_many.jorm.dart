@@ -199,6 +199,8 @@ abstract class _AuthorBean implements Bean<Author> {
   }
 
   Future<int> removeMany(List<Author> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -362,6 +364,8 @@ abstract class _PostBean implements Bean<Post> {
   }
 
   Future<int> removeMany(List<Post> models) async {
+// Return if models is empty. If this is not done, all records will be removed!
+    if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
@@ -377,6 +381,8 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<List<Post>> findByAuthorList(List<Author> models,
       {bool preload: false, bool cascade: false}) async {
+// Return if models is empty. If this is not done, all the records will be returned!
+    if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Author model in models) {
       find.or(this.authorId.eq(model.id));

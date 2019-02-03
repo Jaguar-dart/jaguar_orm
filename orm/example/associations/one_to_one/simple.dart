@@ -9,15 +9,15 @@ import '../../model/associations/one_to_one/simple.dart';
 
 /// The adapter
 final adapter =
-    new PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
   // Connect to database
   await adapter.connect();
 
   // Create beans
-  final userBean = new UserBean(adapter);
-  final addressBean = new AddressBean(adapter);
+  final userBean = UserBean(adapter);
+  final addressBean = AddressBean(adapter);
 
   // Drop old tables
   await addressBean.drop();
@@ -29,10 +29,10 @@ main() async {
 
   // Cascaded One-To-One insert
   {
-    final user = new User()
+    final user = User()
       ..id = '1'
       ..name = 'Teja'
-      ..address = (new Address()
+      ..address = (Address()
         ..id = '1'
         ..street = 'Stockholm');
     await userBean.insert(user, cascade: true);
@@ -46,14 +46,14 @@ main() async {
 
   // Manual One-To-One insert
   {
-    User user = new User()
+    User user = User()
       ..id = '2'
       ..name = 'Kleak';
     await userBean.insert(user, cascade: true);
 
     user = await userBean.find('2');
 
-    final address = new Address()
+    final address = Address()
       ..id = '2'
       ..street = 'Stockholm';
     addressBean.associateUser(address, user);
