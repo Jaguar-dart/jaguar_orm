@@ -846,7 +846,7 @@ class Writer {
               '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = child, ');
         } else {
           _write(
-              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property}.add(child), ');
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = List.from(model.${p.property})..add(child), ');
         }
         _writeln('cascade: cascade);');
       } else if (p is PreloadManyToMany) {
