@@ -27,6 +27,13 @@ class Field<ValType> {
   ///     find.where(age.eq(20));
   Cond<ValType> eq(ValType value) => Cond.eq<ValType>(this, value);
 
+  /// Returns an "is" condition, i.e. 'where var IS null'
+  ///
+  ///     FindStatement find = new FindStatement();
+  ///     Field<int> author = new Field<int>('age');
+  ///     find.where(age.eq(null));
+  Cond<ValType> iq(ValType value) => Cond.iq<ValType>(this, value);
+
   /// Returns a "not equal to" condition
   ///
   ///     FindStatement find = FindStatement();

@@ -32,6 +32,10 @@ class Cond<ValType> extends Expression {
   static Cond<ValType> eq<ValType>(Field<ValType> field, ValType value) =>
       Cond<ValType>(field, Op.Eq, value);
 
+  /// DSL to create 'is to' relational condition
+  static Cond<ValType> iq<ValType>(Field<ValType> field, ValType value) =>
+      new Cond<ValType>(field, Op.Is, value);
+
   /// DSL to create 'is not equal to' relational condition
   static Cond<ValType> ne<ValType>(Field<ValType> field, ValType value) =>
       Cond<ValType>(field, Op.Ne, value);
@@ -94,6 +98,11 @@ class CondCol<ValType> extends Expression {
   static CondCol<ValType> eq<ValType>(
           Field<ValType> field, Field<ValType> value) =>
       CondCol<ValType>(field, Op.Eq, value);
+
+  /// DSL to create 'is to' relational condition
+  static CondCol<ValType> iq<ValType>(
+          Field<ValType> field, Field<ValType> value) =>
+      new CondCol<ValType>(field, Op.Is, value);
 
   /// DSL to create 'is not equal to' relational condition
   static CondCol<ValType> ne<ValType>(

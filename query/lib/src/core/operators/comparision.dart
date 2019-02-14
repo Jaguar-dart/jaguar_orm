@@ -30,4 +30,7 @@ class Op {
 
   /// 'is like' relational comparision operator
   static const Op Like = const Op._(6, 'LIKE');
+
+  ///'is' relational comparision operator
+  static const Op Is = const Op._(7, 'IS');
 }
