@@ -945,7 +945,8 @@ abstract class _CategoryBean implements Bean<Category> {
         (Category model) => [model.id],
         productBean.findByCategoryList,
         (Product model) => [model.categoryId],
-        (Category model, Product child) => model.products.add(child),
+        (Category model, Product child) =>
+            model.products = List.from(model.products)..add(child),
         cascade: cascade);
     return models;
   }

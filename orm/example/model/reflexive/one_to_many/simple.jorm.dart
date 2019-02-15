@@ -272,7 +272,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
         (Directory model) => [model.id],
         directoryBean.findByDirectoryList,
         (Directory model) => [model.parentId],
-        (Directory model, Directory child) => model.child.add(child),
+        (Directory model, Directory child) =>
+            model.child = List.from(model.child)..add(child),
         cascade: cascade);
     return models;
   }

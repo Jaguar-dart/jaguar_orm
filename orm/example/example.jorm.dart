@@ -429,7 +429,8 @@ abstract class _CartBean implements Bean<Cart> {
         (Cart model) => [model.id],
         cartItemBean.findByCartList,
         (CartItem model) => [model.cartId],
-        (Cart model, CartItem child) => model.items.add(child),
+        (Cart model, CartItem child) =>
+            model.items = List.from(model.items)..add(child),
         cascade: cascade);
     return models;
   }

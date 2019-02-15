@@ -222,7 +222,8 @@ abstract class _AuthorBean implements Bean<Author> {
         (Author model) => [model.id],
         postBean.findByAuthorList,
         (Post model) => [model.authorId],
-        (Author model, Post child) => model.posts.add(child),
+        (Author model, Post child) =>
+            model.posts = List.from(model.posts)..add(child),
         cascade: cascade);
     return models;
   }
