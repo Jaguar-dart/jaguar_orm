@@ -30,9 +30,9 @@ class Field<ValType> {
   /// Returns an "is" condition, i.e. 'where var IS null'
   ///
   ///     FindStatement find = new FindStatement();
-  ///     Field<int> author = new Field<int>('age');
-  ///     find.where(age.eq(null));
-  Cond<ValType> iq(ValType value) => Cond.iq<ValType>(this, value);
+  ///     Field<String> phone = new Field<String>('phone');
+  ///     find.where(phone.eq(null));
+  Cond<ValType> iss(ValType value) => Cond.iss<ValType>(this, value);
 
   /// Returns a "not equal to" condition
   ///
