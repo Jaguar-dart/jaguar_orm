@@ -17,7 +17,7 @@ String composeAnd(final And and) => and.expressions.map((Expression exp) {
     }).join(' AND ');
 
 String composeOr(final Or or) => or.expressions.map((Expression exp) {
-      StringBuffer sb = new StringBuffer();
+      final sb = StringBuffer();
 
       if (exp.length != 1) {
         sb.write('(');

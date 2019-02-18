@@ -27,11 +27,11 @@ class Field<ValType> {
   ///     find.where(age.eq(20));
   Cond<ValType> eq(ValType value) => Cond.eq<ValType>(this, value);
 
-  /// Returns an "is" condition, i.e. 'where var IS null'
+  /// Returns an "IS" condition, i.e. 'where var IS null'
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<String> phone = new Field<String>('phone');
-  ///     find.where(phone.eq(null));
+  ///     FindStatement find = FindStatement();
+  ///     Field<String> phone = Field<String>('phone');
+  ///     find.where(phone.iss(null));
   Cond<ValType> iss(ValType value) => Cond.iss<ValType>(this, value);
 
   /// Returns a "not equal to" condition
@@ -175,18 +175,18 @@ class Field<ValType> {
 
   /// Returns a "less than" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltCol(col('age', 'employee')));
   CondCol<ValType> ltF(String name, {String table}) =>
       CondCol.lt<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "set column" clause
   ///
-  ///     UpdateStatement update = new UpdateStatement();
-  ///     Field<int> age = new Field<int>('age');
+  ///     UpdateStatement update = UpdateStatement();
+  ///     Field<int> age = Field<int>('age');
   ///     update.set(age.set(20));
-  SetColumn<ValType> set(ValType value) => new SetColumn<ValType>(name, value);
+  SetColumn<ValType> set(ValType value) => SetColumn<ValType>(name, value);
 
   Cond<ValType> operator <(ValType other) {
     return lt(other);
@@ -285,8 +285,8 @@ class StrField extends Field<String> {
 
   /// Returns a "like" condition
   ///
-  ///     FindStatement find = new FindStatement();
-  ///     Field<String> author = new Field<String>('author');
+  ///     FindStatement find = FindStatement();
+  ///     Field<String> author = Field<String>('author');
   ///     find.where(author.like('%Mark%'));
   Cond<String> like(String value) => Cond.like(this, value);
 
