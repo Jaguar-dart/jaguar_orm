@@ -2,10 +2,11 @@ library query.compose;
 
 import 'package:jaguar_query/jaguar_query.dart';
 
-part 'insert.dart';
+part 'alter.dart';
 part 'create.dart';
 part 'delete.dart';
 part 'expression.dart';
+part 'insert.dart';
 part 'update.dart';
 
 String composeSelColumn(final SelColumn column) {
