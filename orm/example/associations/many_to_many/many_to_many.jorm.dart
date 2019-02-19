@@ -185,7 +185,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final TodoList newModel = await find(id);
       if (newModel != null) {
@@ -408,7 +408,7 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final Category newModel = await find(id);
       if (newModel != null) {

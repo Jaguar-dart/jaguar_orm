@@ -191,7 +191,7 @@ main() async {
   }
 
   // Cascaded removal of Many-To-Many relation
-  await todolistBean.remove('1', true);
+  await todolistBean.remove('1', cascade: true);
 
   // Debug print out
   {

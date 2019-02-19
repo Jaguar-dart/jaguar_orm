@@ -179,7 +179,7 @@ main() async {
   }
 
   // Cascaded removal of One-To-One relation
-  await authorBean.remove('1', true);
+  await authorBean.remove('1', cascade: true);
 
   // Preload many
   {

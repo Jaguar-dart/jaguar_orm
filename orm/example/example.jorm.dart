@@ -394,7 +394,7 @@ abstract class _CartBean implements Bean<Cart> {
     return model;
   }
 
-  Future<int> remove(int id, [bool cascade = false]) async {
+  Future<int> remove(int id, {bool cascade = false}) async {
     if (cascade) {
       final Cart newModel = await find(id);
       if (newModel != null) {

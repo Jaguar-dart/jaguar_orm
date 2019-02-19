@@ -194,7 +194,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final Directory newModel = await find(id);
       if (newModel != null) {

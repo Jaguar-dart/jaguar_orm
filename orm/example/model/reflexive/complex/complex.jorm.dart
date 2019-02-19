@@ -184,7 +184,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final ProductItems newModel = await find(id);
       if (newModel != null) {
@@ -654,7 +654,7 @@ abstract class _ProductBean implements Bean<Product> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final Product newModel = await find(id);
       if (newModel != null) {
@@ -910,7 +910,7 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  Future<int> remove(int id, [bool cascade = false]) async {
+  Future<int> remove(int id, {bool cascade = false}) async {
     if (cascade) {
       final Category newModel = await find(id);
       if (newModel != null) {

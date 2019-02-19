@@ -119,7 +119,7 @@ void main() {
       await userBean.insert(insert2, cascade: true);
       await userBean.insert(insert3, cascade: true);
 
-      await userBean.remove('2', true);
+      await userBean.remove('2', cascade: true);
 
       users = await userBean.getAll();
       await userBean.preloadAll(users);

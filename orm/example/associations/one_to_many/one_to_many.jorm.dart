@@ -187,7 +187,7 @@ abstract class _AuthorBean implements Bean<Author> {
     return model;
   }
 
-  Future<int> remove(String id, [bool cascade = false]) async {
+  Future<int> remove(String id, {bool cascade = false}) async {
     if (cascade) {
       final Author newModel = await find(id);
       if (newModel != null) {

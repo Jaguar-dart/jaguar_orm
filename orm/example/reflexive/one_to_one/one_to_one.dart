@@ -80,7 +80,7 @@ main() async {
   }
 
   // Cascaded removal of One-To-One relation
-  await dirBean.remove('1', true);
+  await dirBean.remove('1', cascade: true);
 
   {
     final users = await dirBean.getAll();

@@ -91,7 +91,7 @@ main() async {
   }
 
   // Cascaded removal of One-To-One relation
-  await userBean.remove('1', true);
+  await userBean.remove('1', cascade: true);
 
   {
     final users = await userBean.getAll();

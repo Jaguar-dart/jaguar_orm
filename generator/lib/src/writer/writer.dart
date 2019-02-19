@@ -610,7 +610,7 @@ class Writer {
     final String args =
         _b.primary.map((Field f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
-    _w.writeln(', [bool cascade = false]) async {');
+    _w.writeln(', {bool cascade = false}) async {');
 
     _writeln('if (cascade) {');
     _w.writeln('final ${_b.modelType} newModel = ');
