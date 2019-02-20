@@ -102,6 +102,11 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   /// Deletes a record from the table
   Future<int> remove(Remove st) => _connection.execute(composeRemove(st));
 
+  @override
+  Future<void> alter(Alter statement) async {
+    await _connection.execute(composeAlter(statement));
+  }
+
   /// Creates the table
   Future<void> createTable(Create statement) async {
     await _connection.execute(composeCreate(statement));

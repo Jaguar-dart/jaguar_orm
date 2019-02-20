@@ -43,6 +43,8 @@ abstract class Adapter<ConnType> {
   /// Deletes the requested row
   Future<int> remove(Remove statement);
 
+  Future<void> alter(Alter statement);
+
   /// Creates the table
   Future<void> createTable(Create statement);
 

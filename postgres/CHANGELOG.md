@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.6
+
++ `Alter` statement
+
 ## 2.1.5
 
 + Conforming to new `Adapter` interface
