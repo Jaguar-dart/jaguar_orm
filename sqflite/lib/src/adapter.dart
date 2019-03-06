@@ -123,6 +123,12 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
     await connection.execute(strSt);
   }
 
+  @override
+  Future<void> alter(Alter st) async {
+    String strSt = composeAlter(st);
+    await connection.execute(strSt);
+  }
+
   T parseValue<T>(dynamic v) {
     if (T == String) {
       return v;

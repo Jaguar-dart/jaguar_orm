@@ -36,6 +36,32 @@ String composeCreateColumn(final CreateColumn col) {
   return sb.toString();
 }
 
+String composeType(final CreateColumn col) {
+  final sb = StringBuffer();
+
+  if (col is CreateInt) {
+    if (col.autoIncrement) {
+      sb.write(' SERIAL');
+    } else {
+      sb.write(' INT');
+    }
+  } else if (col is CreateBool) {
+    sb.write(' BOOLEAN');
+  } else if (col is CreateDateTime) {
+    sb.write(' TIMESTAMP');
+  } else if (col is CreateStr) {
+    sb.write(' VARCHAR(');
+    sb.write(col.length);
+    sb.write(')');
+  } else {
+    throw new Exception('Unknown columns to create ${col.runtimeType}!');
+  }
+
+  if (!col.isNullable) sb.write(' NOT NULL');
+
+  return sb.toString();
+}
+
 String composeCreate(final Create create) {
   final ImmutableCreateStatement info = create.asImmutable;
   final sb = new StringBuffer();
