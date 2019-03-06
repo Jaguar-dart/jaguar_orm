@@ -34,6 +34,13 @@ class Field<ValType> {
   ///     find.where(phone.iss(null));
   Cond<ValType> iss(ValType value) => Cond.iss<ValType>(this, value);
 
+  /// Returns an "IS NOT" condition, i.e. 'where var IS NOT null'
+  ///
+  ///     FindStatement find = FindStatement();
+  ///     Field<String> phone = Field<String>('phone');
+  ///     find.where(phone.isNot(null));
+  Cond<ValType> isNot(ValType value) => Cond.isNot<ValType>(this, value);
+
   /// Returns a "not equal to" condition
   ///
   ///     FindStatement find = FindStatement();
