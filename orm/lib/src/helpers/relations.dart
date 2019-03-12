@@ -54,7 +54,7 @@ class OneToXHelper {
       OneToXChildrenGetterForAll<Parent, Child> childFetcher,
       AssociationKeysGetter<Child> childAssociationGetter,
       AssociationSetter<Parent, Child> setter,
-      {bool cascade: false}) async {
+      {bool cascade = false}) async {
     if (parents.length == 0) return;
 
     final Map<HashableValues, Parent> map = {};

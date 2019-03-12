@@ -10,9 +10,9 @@ class AddColumn<T> implements AlterClause {
   String get name => column.name;
 
   static AddColumn<core.int> int(String name,
-      {core.bool isNullable: false,
-      core.bool autoIncrement: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool autoIncrement = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -31,8 +31,8 @@ class AddColumn<T> implements AlterClause {
   }
 
   static AddColumn<core.double> double(String name,
-      {core.bool isNullable: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -48,9 +48,9 @@ class AddColumn<T> implements AlterClause {
   }
 
   static AddColumn<String> string(String name,
-      {core.bool isNullable: false,
-      core.int length: 20,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.int length = 20,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -67,13 +67,13 @@ class AddColumn<T> implements AlterClause {
   }
 
   static AddColumn<core.bool> bool(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     return AddColumn(
         CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup));
   }
 
   static AddColumn<DateTime> datetime(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     return AddColumn(
         CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup));
   }
@@ -87,9 +87,9 @@ class ModifyColumn<T> implements AlterClause {
   String get name => column.name;
 
   static ModifyColumn<core.int> int(String name,
-      {core.bool isNullable: false,
-      core.bool autoIncrement: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool autoIncrement = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -108,8 +108,8 @@ class ModifyColumn<T> implements AlterClause {
   }
 
   static ModifyColumn<core.double> double(String name,
-      {core.bool isNullable: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -125,9 +125,9 @@ class ModifyColumn<T> implements AlterClause {
   }
 
   static ModifyColumn<String> string(String name,
-      {core.bool isNullable: false,
-      core.int length: 20,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.int length = 20,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -144,13 +144,13 @@ class ModifyColumn<T> implements AlterClause {
   }
 
   static ModifyColumn<core.bool> bool(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     return ModifyColumn(
         CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup));
   }
 
   static ModifyColumn<DateTime> datetime(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     return ModifyColumn(
         CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup));
   }
@@ -210,9 +210,9 @@ class Alter implements Statement {
   }
 
   Alter addInt(String name,
-      {core.bool isNullable: false,
-      core.bool autoIncrement: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool autoIncrement = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -228,8 +228,8 @@ class Alter implements Statement {
   }
 
   Alter addDouble(String name,
-      {core.bool isNullable: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -244,9 +244,9 @@ class Alter implements Statement {
   }
 
   Alter addString(String name,
-      {core.bool isNullable: false,
-      core.int length: 20,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.int length = 20,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -262,7 +262,7 @@ class Alter implements Statement {
   }
 
   Alter addBool(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     final cl =
         AddColumn.bool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     adds[name] = cl;
@@ -270,7 +270,7 @@ class Alter implements Statement {
   }
 
   Alter addDatetime(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     final cl = AddColumn.datetime(name,
         isNullable: isNullable, uniqueGroup: uniqueGroup);
     adds[name] = cl;
@@ -278,9 +278,9 @@ class Alter implements Statement {
   }
 
   Alter modifyInt(String name,
-      {core.bool isNullable: false,
-      core.bool autoIncrement: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool autoIncrement = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -296,8 +296,8 @@ class Alter implements Statement {
   }
 
   Alter modifyDouble(String name,
-      {core.bool isNullable: false,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -312,9 +312,9 @@ class Alter implements Statement {
   }
 
   Alter modifyString(String name,
-      {core.bool isNullable: false,
-      core.int length: 20,
-      core.bool primary: false,
+      {core.bool isNullable = false,
+      core.int length = 20,
+      core.bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -330,7 +330,7 @@ class Alter implements Statement {
   }
 
   Alter modifyBool(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     final cl = ModifyColumn.bool(name,
         isNullable: isNullable, uniqueGroup: uniqueGroup);
     mods[name] = cl;
@@ -338,7 +338,7 @@ class Alter implements Statement {
   }
 
   Alter modifyDatetime(String name,
-      {core.bool isNullable: false, String uniqueGroup}) {
+      {core.bool isNullable = false, String uniqueGroup}) {
     final cl = ModifyColumn.datetime(name,
         isNullable: isNullable, uniqueGroup: uniqueGroup);
     mods[name] = cl;

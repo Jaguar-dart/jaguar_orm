@@ -5,7 +5,7 @@ class Drop implements Statement {
 
   final bool onlyIfExists;
 
-  Drop(/* String | Iterable<String> */ table, {this.onlyIfExists: false}) {
+  Drop(/* String | Iterable<String> */ table, {this.onlyIfExists = false}) {
     if (table is String) _tables.add(table);
     if (table is Iterable) _tables.addAll(table);
   }

@@ -7,14 +7,14 @@ class Create implements Statement {
 
   final Map<String, CreateColumn> _columns = {};
 
-  Create(this.name, {this.ifNotExists: false}) {
+  Create(this.name, {this.ifNotExists = false}) {
     _immutable = ImmutableCreateStatement(this);
   }
 
   Create addInt(String name,
-      {bool isNullable: false,
-      bool autoIncrement: false,
-      bool primary: false,
+      {bool isNullable = false,
+      bool autoIncrement = false,
+      bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -48,8 +48,8 @@ class Create implements Statement {
   }
 
   Create addDouble(String name,
-      {bool isNullable: false,
-      bool primary: false,
+      {bool isNullable = false,
+      bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -65,23 +65,23 @@ class Create implements Statement {
     return this;
   }
 
-  Create addBool(String name, {bool isNullable: false, String uniqueGroup}) {
+  Create addBool(String name, {bool isNullable = false, String uniqueGroup}) {
     _columns[name] =
         CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
   }
 
   Create addDateTime(String name,
-      {bool isNullable: false, String uniqueGroup}) {
+      {bool isNullable = false, String uniqueGroup}) {
     _columns[name] =
         CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
   }
 
   Create addStr(String name,
-      {bool isNullable: false,
-      int length: 20,
-      bool primary: false,
+      {bool isNullable = false,
+      int length = 20,
+      bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -99,7 +99,7 @@ class Create implements Statement {
   }
 
   Create addPrimaryStr(String name,
-      {int length: 20,
+      {int length = 20,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {

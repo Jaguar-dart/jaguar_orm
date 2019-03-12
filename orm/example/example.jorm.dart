@@ -32,7 +32,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   List<SetColumn> toSetColumns(CartItem model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -72,7 +72,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addDouble(amount.name, isNullable: false);
@@ -84,7 +84,9 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<dynamic> insert(CartItem model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -96,7 +98,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<void> insertMany(List<CartItem> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
@@ -107,7 +109,9 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<dynamic> upsert(CartItem model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -119,7 +123,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<void> upsertMany(List<CartItem> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -132,10 +136,10 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<int> update(CartItem model,
-      {bool cascade: false,
-      bool associate: false,
+      {bool cascade = false,
+      bool associate = false,
       Set<String> only,
-      bool onlyNonNull: false}) async {
+      bool onlyNonNull = false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
@@ -143,7 +147,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<void> updateMany(List<CartItem> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -158,7 +162,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<CartItem> find(int id,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await findOne(find);
   }
@@ -179,13 +183,13 @@ abstract class _CartItemBean implements Bean<CartItem> {
   }
 
   Future<List<CartItem>> findByCart(int cartId,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.cartId.eq(cartId));
     return findMany(find);
   }
 
   Future<List<CartItem>> findByCartList(List<Cart> models,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
@@ -224,7 +228,7 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   List<SetColumn> toSetColumns(Cart model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -249,7 +253,7 @@ abstract class _CartBean implements Bean<Cart> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addDouble(amount.name, isNullable: false);
@@ -257,7 +261,9 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<dynamic> insert(Cart model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -276,7 +282,9 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<void> insertMany(List<Cart> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -296,7 +304,9 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<dynamic> upsert(Cart model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -315,7 +325,9 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<void> upsertMany(List<Cart> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -337,10 +349,10 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<int> update(Cart model,
-      {bool cascade: false,
-      bool associate: false,
+      {bool cascade = false,
+      bool associate = false,
       Set<String> only,
-      bool onlyNonNull: false}) async {
+      bool onlyNonNull = false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
@@ -362,7 +374,9 @@ abstract class _CartBean implements Bean<Cart> {
   }
 
   Future<void> updateMany(List<Cart> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -385,7 +399,8 @@ abstract class _CartBean implements Bean<Cart> {
     }
   }
 
-  Future<Cart> find(int id, {bool preload: false, bool cascade: false}) async {
+  Future<Cart> find(int id,
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Cart model = await findOne(find);
     if (preload && model != null) {
@@ -415,14 +430,14 @@ abstract class _CartBean implements Bean<Cart> {
     return adapter.remove(remove);
   }
 
-  Future<Cart> preload(Cart model, {bool cascade: false}) async {
+  Future<Cart> preload(Cart model, {bool cascade = false}) async {
     model.items = await cartItemBean.findByCart(model.id,
         preload: cascade, cascade: cascade);
     return model;
   }
 
   Future<List<Cart>> preloadAll(List<Cart> models,
-      {bool cascade: false}) async {
+      {bool cascade = false}) async {
     models.forEach((Cart model) => model.items ??= []);
     await OneToXHelper.preloadAll<Cart, CartItem>(
         models,

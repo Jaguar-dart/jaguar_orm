@@ -26,7 +26,7 @@ abstract class _UserBean implements Bean<User> {
   }
 
   List<SetColumn> toSetColumns(User model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -56,7 +56,7 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addStr(name.name, isNullable: false);
@@ -65,7 +65,9 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<dynamic> insert(User model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -77,7 +79,7 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<void> insertMany(List<User> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
@@ -88,7 +90,9 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<dynamic> upsert(User model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
@@ -100,7 +104,7 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<void> upsertMany(List<User> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -113,10 +117,10 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<int> update(User model,
-      {bool cascade: false,
-      bool associate: false,
+      {bool cascade = false,
+      bool associate = false,
       Set<String> only,
-      bool onlyNonNull: false}) async {
+      bool onlyNonNull = false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
@@ -124,7 +128,7 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<void> updateMany(List<User> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -138,7 +142,8 @@ abstract class _UserBean implements Bean<User> {
     return;
   }
 
-  Future<User> find(int id, {bool preload: false, bool cascade: false}) async {
+  Future<User> find(int id,
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
     return await findOne(find);
   }

@@ -15,6 +15,6 @@ class GenBean {
   final Map<String, Relation> relations;
 
   const GenBean(
-      {this.columns: const <String, ColumnBase>{},
-      this.relations: const <String, Relation>{}});
+      {this.columns = const <String, ColumnBase>{},
+      this.relations = const <String, Relation>{}});
 }

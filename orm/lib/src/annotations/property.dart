@@ -46,9 +46,9 @@ class Column implements ColumnBase {
 
   const Column(
       {this.name,
-      this.isNullable: false,
+      this.isNullable = false,
       this.uniqueGroup,
-      this.auto: false,
+      this.auto = false,
       this.length});
 }
 
@@ -67,9 +67,9 @@ class PrimaryKey implements ColumnBase {
 
   const PrimaryKey(
       {this.name,
-      this.isNullable: false,
+      this.isNullable = false,
       this.uniqueGroup,
-      this.auto: false,
+      this.auto = false,
       this.length});
 }
 
@@ -93,9 +93,9 @@ class ForeignKey implements ForeignBase {
 
   const ForeignKey(this.toTable,
       {this.name,
-      this.isNullable: false,
+      this.isNullable = false,
       this.uniqueGroup,
-      this.refCol: 'id',
+      this.refCol = 'id',
       this.length});
 }
 
@@ -122,19 +122,19 @@ class BelongsTo implements ForeignBase {
 
   const BelongsTo(this.bean,
       {this.name,
-      this.isNullable: false,
+      this.isNullable = false,
       this.uniqueGroup,
       this.length,
-      this.refCol: 'id',
+      this.refCol = 'id',
       this.byHasMany})
       : toMany = false;
 
   const BelongsTo.many(this.bean,
       {this.name,
-      this.isNullable: false,
+      this.isNullable = false,
       this.uniqueGroup,
       this.length,
-      this.refCol: 'id',
+      this.refCol = 'id',
       this.byHasMany})
       : toMany = true;
 }

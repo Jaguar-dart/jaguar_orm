@@ -15,9 +15,9 @@ class CreateInt implements CreateColumn<int> {
   final String uniqueGroup;
 
   const CreateInt(this.name,
-      {this.isNullable: false,
-      this.autoIncrement: false,
-      this.isPrimary: false,
+      {this.isNullable = false,
+      this.autoIncrement = false,
+      this.isPrimary = false,
       this.foreignKey,
       this.uniqueGroup});
 
@@ -46,8 +46,8 @@ class CreateDouble extends CreateColumn<double> {
   final String uniqueGroup;
 
   CreateDouble(this.name,
-      {this.isNullable: false,
-      this.isPrimary: false,
+      {this.isNullable = false,
+      this.isPrimary = false,
       this.foreignKey,
       this.uniqueGroup});
 
@@ -70,7 +70,7 @@ class CreateBool extends CreateColumn<bool> {
   final Foreign foreignKey = null;
 
   CreateBool(this.name,
-      {this.isNullable: false, this.isPrimary: false, this.uniqueGroup});
+      {this.isNullable = false, this.isPrimary = false, this.uniqueGroup});
 }
 
 /// Clause to create datetime column in SQL table.
@@ -86,8 +86,8 @@ class CreateDateTime extends CreateColumn<DateTime> {
   final String uniqueGroup;
 
   CreateDateTime(this.name,
-      {this.isNullable: false,
-      this.isPrimary: false,
+      {this.isNullable = false,
+      this.isPrimary = false,
       this.foreignKey,
       this.uniqueGroup});
 }
@@ -107,14 +107,14 @@ class CreateStr extends CreateColumn<String> {
   final String uniqueGroup;
 
   CreateStr(this.name,
-      {this.isNullable: false,
-      this.isPrimary: false,
-      this.length: 20,
+      {this.isNullable = false,
+      this.isPrimary = false,
+      this.length = 20,
       this.foreignKey,
       this.uniqueGroup});
 
   CreateStr.primary(this.name,
-      {this.length: 20, this.foreignKey, this.uniqueGroup})
+      {this.length = 20, this.foreignKey, this.uniqueGroup})
       : isPrimary = true,
         isNullable = false;
 }

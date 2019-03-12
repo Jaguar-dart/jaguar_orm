@@ -23,7 +23,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   List<SetColumn> toSetColumns(TodoList model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -45,7 +45,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(description.name, length: 50, isNullable: false);
@@ -53,7 +53,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<dynamic> insert(TodoList model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.insert(insert);
@@ -71,7 +73,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<void> insertMany(List<TodoList> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -91,7 +95,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<dynamic> upsert(TodoList model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.upsert(upsert);
@@ -109,7 +115,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<void> upsertMany(List<TodoList> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -131,10 +139,10 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<int> update(TodoList model,
-      {bool cascade: false,
-      bool associate: false,
+      {bool cascade = false,
+      bool associate = false,
       Set<String> only,
-      bool onlyNonNull: false}) async {
+      bool onlyNonNull = false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
@@ -152,7 +160,9 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<void> updateMany(List<TodoList> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -176,7 +186,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<TodoList> find(String id,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
     final TodoList model = await findOne(find);
     if (preload && model != null) {
@@ -206,13 +216,13 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return adapter.remove(remove);
   }
 
-  Future<TodoList> preload(TodoList model, {bool cascade: false}) async {
+  Future<TodoList> preload(TodoList model, {bool cascade = false}) async {
     model.categories = await pivotBean.fetchByTodoList(model);
     return model;
   }
 
   Future<List<TodoList>> preloadAll(List<TodoList> models,
-      {bool cascade: false}) async {
+      {bool cascade = false}) async {
     for (TodoList model in models) {
       var temp = await pivotBean.fetchByTodoList(model);
       if (model.categories == null)
@@ -247,7 +257,7 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   List<SetColumn> toSetColumns(Category model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -268,7 +278,7 @@ abstract class _CategoryBean implements Bean<Category> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(id.name, primary: true, length: 50, isNullable: false);
     st.addStr(name.name, length: 50, isNullable: false);
@@ -276,7 +286,9 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<dynamic> insert(Category model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.insert(insert);
@@ -294,7 +306,9 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<void> insertMany(List<Category> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -314,7 +328,9 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<dynamic> upsert(Category model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.upsert(upsert);
@@ -332,7 +348,9 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<void> upsertMany(List<Category> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -354,10 +372,10 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<int> update(Category model,
-      {bool cascade: false,
-      bool associate: false,
+      {bool cascade = false,
+      bool associate = false,
       Set<String> only,
-      bool onlyNonNull: false}) async {
+      bool onlyNonNull = false}) async {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
@@ -375,7 +393,9 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<void> updateMany(List<Category> models,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
@@ -399,7 +419,7 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<Category> find(String id,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
     final Category model = await findOne(find);
     if (preload && model != null) {
@@ -429,13 +449,13 @@ abstract class _CategoryBean implements Bean<Category> {
     return adapter.remove(remove);
   }
 
-  Future<Category> preload(Category model, {bool cascade: false}) async {
+  Future<Category> preload(Category model, {bool cascade = false}) async {
     model.todolists = await pivotBean.fetchByCategory(model);
     return model;
   }
 
   Future<List<Category>> preloadAll(List<Category> models,
-      {bool cascade: false}) async {
+      {bool cascade = false}) async {
     for (Category model in models) {
       var temp = await pivotBean.fetchByCategory(model);
       if (model.todolists == null)
@@ -470,7 +490,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   List<SetColumn> toSetColumns(Pivot model,
-      {bool update = false, Set<String> only, bool onlyNonNull: false}) {
+      {bool update = false, Set<String> only, bool onlyNonNull = false}) {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
@@ -493,7 +513,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists: false}) async {
+  Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addStr(todolistId.name,
         foreignTable: todoListBean.tableName,
@@ -509,14 +529,16 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<dynamic> insert(Pivot model,
-      {bool cascade: false, bool onlyNonNull: false, Set<String> only}) async {
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.insert(insert);
   }
 
   Future<void> insertMany(List<Pivot> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
@@ -527,14 +549,16 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<dynamic> upsert(Pivot model,
-      {bool cascade: false, Set<String> only, bool onlyNonNull: false}) async {
+      {bool cascade = false,
+      Set<String> only,
+      bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     return adapter.upsert(upsert);
   }
 
   Future<void> upsertMany(List<Pivot> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -547,7 +571,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<void> updateMany(List<Pivot> models,
-      {bool onlyNonNull: false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -562,13 +586,13 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<List<Pivot>> findByTodoList(String todolistId,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.todolistId.eq(todolistId));
     return findMany(find);
   }
 
   Future<List<Pivot>> findByTodoListList(List<TodoList> models,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
@@ -612,13 +636,13 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<List<Pivot>> findByCategory(String categoryId,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.categoryId.eq(categoryId));
     return findMany(find);
   }
 
   Future<List<Pivot>> findByCategoryList(List<Category> models,
-      {bool preload: false, bool cascade: false}) async {
+      {bool preload = false, bool cascade = false}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
@@ -662,7 +686,7 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<dynamic> attach(TodoList one, Category two,
-      {bool upsert: false}) async {
+      {bool upsert = false}) async {
     final ret = Pivot();
     ret.todolistId = one.id;
     ret.categoryId = two.id;

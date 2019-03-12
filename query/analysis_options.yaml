@@ -3,10 +3,12 @@
 # The commented part below is just for inspiration. Read the guide here:
 #   https://www.dartlang.org/guides/language/analysis-options
 
+linter:
+  rules:
+    #     # see catalog here: http://dart-lang.github.io/linter/lints/
+    - hash_and_equals
+    - prefer_equal_for_default_values
+
 analyzer:
 #   exclude:
 #     - path/to/excluded/files/**
-# linter:
-#   rules:
-#     # see catalog here: http://dart-lang.github.io/linter/lints/
-#     - hash_and_equals

@@ -105,12 +105,12 @@ class CondCol<ValType> extends Expression {
 
   /// DSL to create 'IS' relational condition
   static CondCol<ValType> iss<ValType>(
-        Field<ValType> field, Field<ValType> value) =>
+          Field<ValType> field, Field<ValType> value) =>
       CondCol<ValType>(field, Op.Is, value);
 
   /// DSL to create 'IS NOT' relational condition
   static CondCol<ValType> isNot<ValType>(
-        Field<ValType> field, Field<ValType> value) =>
+          Field<ValType> field, Field<ValType> value) =>
       CondCol<ValType>(field, Op.IsNot, value);
 
   /// DSL to create 'is not equal to' relational condition

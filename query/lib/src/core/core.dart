@@ -62,11 +62,11 @@ class Sql {
   static Remove remove(String table) => Remove(table);
 
   /// Returns a new [Create] statement
-  static Create create(String table, {bool ifNotExists: false}) =>
+  static Create create(String table, {bool ifNotExists = false}) =>
       Create(table, ifNotExists: ifNotExists);
 
   /// Returns a new [Drop] statement
-  static Drop drop(String table, {bool onlyIfExists: false}) =>
+  static Drop drop(String table, {bool onlyIfExists = false}) =>
       Drop(table, onlyIfExists: onlyIfExists);
 
   /// Returns a new [CreateDb] statement

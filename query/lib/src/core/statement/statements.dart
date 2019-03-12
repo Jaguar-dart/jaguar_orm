@@ -11,7 +11,7 @@ class SelColumn {
 class CountSelColumn extends SelColumn {
   final bool isDistinct;
 
-  CountSelColumn(String name, {String alias, this.isDistinct: false})
+  CountSelColumn(String name, {String alias, this.isDistinct = false})
       : super(name, alias);
 }
 

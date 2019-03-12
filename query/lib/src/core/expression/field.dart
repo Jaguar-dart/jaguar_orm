@@ -227,9 +227,9 @@ class IntField extends Field<int> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool autoIncrement: false,
-      bool primary: false,
-      bool isNullable: false,
+      {bool autoIncrement = false,
+      bool primary = false,
+      bool isNullable = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -258,8 +258,8 @@ class DoubleField extends Field<double> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool isNullable: false,
-      bool primary: false,
+      {bool isNullable = false,
+      bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -299,9 +299,9 @@ class StrField extends Field<String> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool isNullable: false,
-      int length: 20,
-      bool primary: false,
+      {bool isNullable = false,
+      int length = 20,
+      bool primary = false,
       String foreignTable,
       String foreignCol,
       String uniqueGroup}) {
@@ -333,7 +333,7 @@ class BoolField extends Field<bool> {
   BoolField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool isNullable: false, String uniqueGroup}) {
+  void create(Create statement, {bool isNullable = false, String uniqueGroup}) {
     statement.addBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
   }
 }

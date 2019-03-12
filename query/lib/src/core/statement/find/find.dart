@@ -110,7 +110,7 @@ class Find implements Statement, Whereable {
     return this;
   }
 
-  Find count(String column, {String alias, bool isDistinct: false}) {
+  Find count(String column, {String alias, bool isDistinct = false}) {
     _column.add(CountSelColumn(column, alias: alias, isDistinct: isDistinct));
     return this;
   }
