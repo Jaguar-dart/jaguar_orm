@@ -33,4 +33,7 @@ class Op {
 
   /// 'IS' relational comparision operator
   static const Op Is = const Op._(7, 'IS');
+
+  /// 'IS NOT' relational comparision operator
+  static const Op IsNot = const Op._(8, 'IS NOT');
 }
