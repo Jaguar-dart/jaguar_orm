@@ -11,7 +11,7 @@ String composeInsertMany(final InsertMany st) {
   sb.write(' SELECT ');
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
-    sb.write('${composeValue(info.values[0][key])} AS \'${key}\'');
+    sb.write('${composeValue(info.values[0][key])} AS \'$key\'');
     if (i < keys.length - 1) {
       sb.write(', ');
     }

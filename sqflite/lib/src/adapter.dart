@@ -17,7 +17,13 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
 
   SqfliteAdapter(this.path, {this.version});
 
+  @Deprecated("Use fromConnection instead")
   SqfliteAdapter.FromConnection(sqf.Database connection)
+      : _connection = connection,
+        path = null,
+        version = null;
+
+  SqfliteAdapter.fromConnection(sqf.Database connection)
       : _connection = connection,
         path = null,
         version = null;
