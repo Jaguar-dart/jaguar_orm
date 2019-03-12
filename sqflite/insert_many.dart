@@ -60,12 +60,13 @@ class PostBean {
       if (only.contains(msg.name)) ret.add(msg.set(model.msg));
       if (only.contains(author.name)) ret.add(author.set(model.author));
     }
+
+    return ret;
   }
 
   /// Inserts many posts into table
   Future insertMany(List<Post> posts) async {
-    InsertMany inserter = Sql
-        .insertMany(tableName)
+    InsertMany inserter = Sql.insertMany(tableName)
         .addAll(posts.map((post) => toSetColumns(post)));
 
     return await _adapter.insertMany(inserter);

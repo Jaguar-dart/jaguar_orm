@@ -49,8 +49,7 @@ class PostBean {
 
   /// Inserts a new post into table
   Future insert(Post post) async {
-    Insert inserter = Sql
-        .insert(tableName)
+    Insert inserter = Sql.insert(tableName)
         .set(id, post.id)
         .set(msg, post.msg)
         .set(author, post.author)
