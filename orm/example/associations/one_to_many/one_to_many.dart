@@ -48,7 +48,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
       : postBean = PostBean(adapter),
         super(adapter);
 
-  Future createTable({bool ifNotExists: false}) {
+  Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('name', length: 50);
@@ -71,7 +71,7 @@ class PostBean extends Bean<Post> with _PostBean {
 
   PostBean(Adapter adapter) : super(adapter);
 
-  Future createTable({bool ifNotExists: false}) {
+  Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)
         .addStr('id', primary: true, length: 50)
         .addStr('message', length: 150)

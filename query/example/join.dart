@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
-import 'package:jaguar_query_postgres/composer.dart';
 import 'package:jaguar_query/jaguar_query.dart';
 
 class Author {
