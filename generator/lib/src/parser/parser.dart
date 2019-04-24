@@ -356,10 +356,6 @@ class ParsedBean {
         .map((DartObject i) => parseColumn(f, i))
         .toList();
 
-    if (fields.length > 1) {
-      throw Exception('Only one Column annotation is allowed on a Field!');
-    }
-
     if (fields.length == 0) return null;
 
     return fields.first;
