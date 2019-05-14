@@ -356,6 +356,10 @@ class ParsedBean {
         .map((DartObject i) => parseColumn(f, i))
         .toList();
 
+    if (fields.length > 1) {
+      throw Exception('Only one Column annotation is allowed on a Field!');
+    }
+
     if (fields.length == 0) return null;
 
     return fields.first;
@@ -429,6 +433,7 @@ class ParsedBean {
 Field parseColumn(FieldElement f, DartObject obj) {
   final String colName = obj.getField('name').toStringValue();
   final bool isNullable = obj.getField('isNullable').toBoolValue();
+  final bool isPrimary = obj.getField('isPrimary').toBoolValue();
   final String unique = obj.getField('uniqueGroup').toStringValue();
   final bool autoIncrement = obj.getField('auto').toBoolValue();
   final int length = obj.getField('length').toIntValue();
@@ -458,7 +463,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
 
     return Field(f.type.name, f.name, colName,
         isNullable: isNullable,
-        isPrimary: false,
+        isPrimary: isPrimary,
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,
@@ -477,7 +482,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     Foreign fore = BelongsToForeign(bean, refCol, byHasMany, toMany);
     return Field(f.type.name, f.name, colName,
         isNullable: isNullable,
-        isPrimary: false,
+        isPrimary: isPrimary,
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,
