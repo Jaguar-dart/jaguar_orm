@@ -433,7 +433,6 @@ class ParsedBean {
 Field parseColumn(FieldElement f, DartObject obj) {
   final String colName = obj.getField('name').toStringValue();
   final bool isNullable = obj.getField('isNullable').toBoolValue();
-  final bool isPrimary = obj.getField('isPrimary').toBoolValue();
   final String unique = obj.getField('uniqueGroup').toStringValue();
   final bool autoIncrement = obj.getField('auto').toBoolValue();
   final int length = obj.getField('length').toIntValue();
@@ -458,6 +457,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
   } else if (isForeignKey.isAssignableFromType(obj.type)) {
     final String table = obj.getField('toTable').toStringValue();
     final String refCol = obj.getField('refCol').toStringValue();
+    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
 
     Foreign fore = TableForeign(table, refCol);
 
@@ -474,6 +474,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     final String refCol = obj.getField('refCol').toStringValue();
     final bool byHasMany = obj.getField('byHasMany').toBoolValue();
     final bool toMany = obj.getField('toMany').toBoolValue();
+    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
 
     if (!isBean.isAssignableFromType(bean)) {
       throw Exception("Non-bean type provided!");
