@@ -124,7 +124,7 @@ abstract class Preload {
 
   String get modelName => getModelForBean(bean).name;
 
-  String get property;
+  Property get property;
 
   List<Field> get fields;
 
@@ -133,11 +133,18 @@ abstract class Preload {
   bool get hasMany;
 }
 
+class Property {
+  final String name;
+  final String foreignKeyColumn;
+
+  Property(this.name, {this.foreignKeyColumn = 'id'});
+}
+
 /// Contains information about `HasOne`, `HasMany` relationships
 class PreloadOneToX extends Preload {
   final DartType bean;
 
-  final String property;
+  final Property property;
 
   final List<Field> fields = <Field>[];
 
@@ -160,7 +167,7 @@ class PreloadManyToMany extends Preload {
 
   String get targetModelName => getModelForBean(targetBean).name;
 
-  final String property;
+  final Property property;
 
   final WriterModel targetInfo;
 

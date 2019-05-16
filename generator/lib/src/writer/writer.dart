@@ -34,11 +34,13 @@ class Writer {
     // TODO remove by foreign for non-beaned
 
     for (BelongsToAssociation ass in _b.belongTos.values) {
-      _writeFindOneByBeanedAssociation(ass);
-      _writeFindListByBeanedAssociationList(ass);
+      ass.foreignFields.forEach((Field f) {
+        _writeFindOneByBeanedAssociation(ass, f);
+        _writeFindListByBeanedAssociationList(ass, f);
+      });
       _removeByForeign(ass);
 
-      _writeAssociate(ass);
+      _writeAssociate(ass, _b.primary.first);
 
       if (ass.belongsToMany) {
         _writeDetach(ass);
@@ -47,8 +49,10 @@ class Writer {
     }
 
     for (BeanedForeignAssociation ass in _b.beanedForeignAssociations.values) {
-      _writeFindOneByBeanedAssociation(ass);
-      _writeFindListByBeanedAssociationList(ass);
+      ass.foreignFields.forEach((Field f) {
+        _writeFindOneByBeanedAssociation(ass, f);
+        _writeFindListByBeanedAssociationList(ass, f);
+      });
       // TODO remove
     }
 
@@ -243,7 +247,7 @@ class Writer {
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
     for (Preload p in _b.preloads) {
-      _w.writeln('if(model.${p.property} != null) {');
+      _w.writeln('if(model.${p.property.name} != null) {');
       _w.writeln('newModel ??= await find(');
       _write(_b.primary.map((f) {
         if (f.autoIncrement) return 'retId';
@@ -254,24 +258,24 @@ class Writer {
       if (!p.hasMany) {
         _write(_uncap(p.beanInstanceName));
         _writeln(
-            '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+            '.associate${_b.modelType}(model.' + p.property.name + ', newModel);');
         _write('await ' +
             _uncap(p.beanInstanceName) +
             '.upsert(model.' +
-            p.property +
+            p.property.name +
             ', cascade: cascade);');
       } else {
         if (p is PreloadOneToX) {
-          _write('model.' + p.property + '.forEach((x) => ');
+          _write('model.' + p.property.name + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
           _writeln('.associate${_b.modelType}(x, newModel));');
-          _writeln('for(final child in model.${p.property}) {');
+          _writeln('for(final child in model.${p.property.name}) {');
           _writeln('await ' +
               _uncap(p.beanInstanceName) +
               '.upsert(child, cascade: cascade);');
           _writeln('}');
         } else if (p is PreloadManyToMany) {
-          _writeln('for(final child in model.${p.property}) {');
+          _writeln('for(final child in model.${p.property.name}) {');
           _writeln(
               'await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
@@ -354,7 +358,7 @@ class Writer {
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
     for (Preload p in _b.preloads) {
-      _w.writeln('if(model.${p.property} != null) {');
+      _w.writeln('if(model.${p.property.name} != null) {');
       _w.writeln('newModel ??= await find(');
       _write(_b.primary.map((f) {
         if (f.autoIncrement) return 'retId';
@@ -365,24 +369,24 @@ class Writer {
       if (!p.hasMany) {
         _write(_uncap(p.beanInstanceName));
         _writeln(
-            '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+            '.associate${_b.modelType}(model.' + p.property.name + ', newModel);');
         _write('await ' +
             _uncap(p.beanInstanceName) +
             '.insert(model.' +
-            p.property +
+            p.property.name +
             ', cascade: cascade);');
       } else {
         if (p is PreloadOneToX) {
-          _write('model.' + p.property + '.forEach((x) => ');
+          _write('model.' + p.property.name + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
           _writeln('.associate${_b.modelType}(x, newModel));');
-          _writeln('for(final child in model.${p.property}) {');
+          _writeln('for(final child in model.${p.property.name}) {');
           _writeln('await ' +
               _uncap(p.beanInstanceName) +
               '.insert(child, cascade: cascade);');
           _writeln('}');
         } else if (p is PreloadManyToMany) {
-          _writeln('for(final child in model.${p.property}) {');
+          _writeln('for(final child in model.${p.property.name}) {');
           _writeln(
               'await ${p.targetBeanInstanceName}.insert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
@@ -464,7 +468,7 @@ class Writer {
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
     for (Preload p in _b.preloads) {
-      _w.writeln('if(model.${p.property} != null) {');
+      _w.writeln('if(model.${p.property.name} != null) {');
       if (p is PreloadOneToX) {
         _writeln('if(associate) {');
         _w.writeln('newModel ??= await find(');
@@ -476,9 +480,9 @@ class Writer {
         if (!p.hasMany) {
           _write(_uncap(p.beanInstanceName));
           _writeln(
-              '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+              '.associate${_b.modelType}(model.' + p.property.name + ', newModel);');
         } else {
-          _write('model.' + p.property + '.forEach((x) => ');
+          _write('model.' + p.property.name + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
           _writeln('.associate${_b.modelType}(x, newModel));');
         }
@@ -489,10 +493,10 @@ class Writer {
         _write('await ' +
             _uncap(p.beanInstanceName) +
             '.update(model.' +
-            p.property +
+            p.property.name +
             ', cascade: cascade, associate: associate);');
       } else {
-        _writeln('for(final child in model.${p.property}) {');
+        _writeln('for(final child in model.${p.property.name}) {');
         if (p is PreloadOneToX) {
           _writeln('await ' +
               _uncap(p.beanInstanceName) +
@@ -643,25 +647,23 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindOneByBeanedAssociation(BeanedAssociation m) {
+  void _writeFindOneByBeanedAssociation(BeanedAssociation m, Field foreignKey) {
     if (!m.byHasMany) {
       _w.write('Future<${_b.modelType}>');
     } else {
       _w.write('Future<List<${_b.modelType}>>');
     }
-    _w.write(' findBy${_cap(m.modelName)}(');
+    _w.write(' findBy${_cap(m.modelName)}With${_cap(foreignKey.colName)}(');
     final String args =
-        m.fields.map((Field f) => '${f.type} ${f.field}').join(',');
+        m.fields.where((Field f) => f.foreign.refCol == foreignKey.colName)
+            .map((Field f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
     _write(', {bool preload = false, bool cascade = false}');
     _w.writeln(') async {');
 
     _w.writeln('final Find find = finder.');
-    final String wheres = m.fields
-        .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
-        .join('.');
-    _w.write(wheres);
-    _w.writeln(';');
+    String f = m.fields.firstWhere((Field f) => f.foreign.refCol == foreignKey.colName).colName;
+    _w.write('where(this.$f.eq($f));');
 
     if (_b.preloads.length > 0) {
       if (!m.byHasMany) {
@@ -736,8 +738,8 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindListByBeanedAssociationList(BeanedAssociation m) {
-    _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}List(');
+  void _writeFindListByBeanedAssociationList(BeanedAssociation m, Field foreignKey) {
+    _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}ListWith${_cap(foreignKey.colName)}(');
     _write('List<${m.modelName}> models');
     _write(', {bool preload = false, bool cascade = false}');
     _writeln(') async {');
@@ -748,12 +750,7 @@ class Writer {
     _writeln('final Find find = finder;');
     _writeln('for (${m.modelName} model in models) {');
     _write('find.or(');
-    final wheres = <String>[];
-    for (int i = 0; i < m.fields.length; i++) {
-      wheres.add(
-          'this.${m.fields[i].field}.eq(model.${m.foreignFields[i].field})');
-    }
-    _w.write(wheres.join(' & '));
+    _write('this.${m.fields.where((Field f) => f.foreign.refCol == foreignKey.colName).first.colName}.eq(model.${foreignKey.colName})');
     _writeln(');');
     _writeln('}');
 
@@ -777,15 +774,17 @@ class Writer {
         'Future<${_b.modelType}> preload(${_b.modelType} model, {bool cascade = false}) async {');
     for (Preload p in _b.preloads) {
       _write('model.');
-      _write(p.property);
+      _write(p.property.name);
       _write(' = await ');
 
       if (p is PreloadOneToX) {
         _write(_uncap(p.beanInstanceName));
         _write('.findBy');
         _write(_b.modelType);
+        _write('With${_cap(p.property.foreignKeyColumn)}');
         _write('(');
         final String args = p.foreignFields
+            .where((Field f) => f.foreign.refCol == p.property.foreignKeyColumn)
             .map((Field f) => f.foreign.refCol)
             .map(_b.fieldByColName)
             .map((Field f) => 'model.${f.field}')
@@ -810,7 +809,7 @@ class Writer {
       if (p is PreloadOneToX) {
         if (p.hasMany) {
           _writeln(
-              'models.forEach((${_b.modelType} model) => model.${p.property} ??= []);');
+              'models.forEach((${_b.modelType} model) => model.${p.property.name} ??= []);');
         }
 
         _write('await OneToXHelper.');
@@ -820,7 +819,7 @@ class Writer {
         _write('(${_b.modelType} model) => [');
         {
           final String args = p.foreignFields
-              .map((Field f) => f.foreign.refCol)
+              .where((Field f) => p.property.foreignKeyColumn == f.foreign.refCol).map((Field f) => f.foreign.refCol)
               .map(_b.fieldByColName)
               .map((Field f) => 'model.${f.field}')
               .join(',');
@@ -831,32 +830,33 @@ class Writer {
         _write(_uncap(p.beanInstanceName));
         _write('.findBy');
         _write(_b.modelType);
-        _write('List, ');
+        _write('ListWith${_cap(p.property.foreignKeyColumn)}, ');
         //Arg4: ChildGetter
         _write('(${p.modelName} model) => [');
         {
           final String args =
-              p.foreignFields.map((Field f) => 'model.${f.field}').join(',');
+              p.foreignFields.where((Field f) => p.property.foreignKeyColumn == f.foreign.refCol)
+                  .map((Field f) => 'model.${f.field}').join(',');
           _write(args);
         }
         _write('], ');
         //Arg5: Setter
         if (!p.hasMany) {
           _write(
-              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = child, ');
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property.name} = child, ');
         } else {
           _write(
-              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property} = List.from(model.${p.property})..add(child), ');
+              '(${_b.modelType} model, ${p.modelName} child) => model.${p.property.name} = List.from(model.${p.property.name})..add(child), ');
         }
         _writeln('cascade: cascade);');
       } else if (p is PreloadManyToMany) {
         _writeln('for(${_b.modelType} model in models) {');
         _writeln(
             'var temp = await ${p.beanInstanceName}.fetchBy${_b.modelType}(model);');
-        _writeln('if(model.${p.property} == null) model.${p.property} = temp;');
+        _writeln('if(model.${p.property.name} == null) model.${p.property.name} = temp;');
         _writeln('else {');
-        _writeln('model.${p.property}.clear();');
-        _writeln('model.${p.property}.addAll(temp);');
+        _writeln('model.${p.property.name}.clear();');
+        _writeln('model.${p.property.name}.addAll(temp);');
         _writeln('}');
         _writeln('}');
       }
@@ -914,15 +914,17 @@ class Writer {
     }
   }
 
-  void _writeAssociate(BelongsToAssociation m) {
+  void _writeAssociate(BelongsToAssociation m, Field primaryField) {
     _write('void associate${_cap(m.modelName)}(');
     _write('${_b.modelType} child, ');
     _write('${m.modelName} parent');
     _writeln(') {');
-
+    bool hasManyForeignFields = m.fields.length > 1;
     for (int i = 0; i < m.fields.length; i++) {
+      if (hasManyForeignFields && !m.foreignFields[i].isPrimary) _writeln('if (child.${primaryField.colName} == parent.${m.foreignFields[i].field}) {');
       _writeln(
           'child.${m.fields[i].field} = parent.${m.foreignFields[i].field};');
+      if (hasManyForeignFields && !m.foreignFields[i].isPrimary) _writeln('}');
     }
 
     _writeln('}');

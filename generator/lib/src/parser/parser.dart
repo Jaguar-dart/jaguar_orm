@@ -375,6 +375,7 @@ class ParsedBean {
   void parseRelation(DartType curBean, FieldElement f, DartObject obj) {
     if (isHasOne.isExactlyType(obj.type) || isHasMany.isExactlyType(obj.type)) {
       final DartType bean = obj.getField('bean').toTypeValue();
+      final String foreignKeyColumn = obj.getField('foreignKeyColumn')?.toStringValue();
 
       if (!isBean.isAssignableFromType(bean)) {
         throw Exception("Non-bean type provided!");
@@ -392,8 +393,7 @@ class ParsedBean {
       }
 
       final bool hasMany = isHasMany.isExactlyType(obj.type);
-
-      preloads.add(PreloadOneToX(bean, f.name, g?.fields ?? [], hasMany));
+      preloads.add(PreloadOneToX(bean, Property(f.name, foreignKeyColumn: foreignKeyColumn), g?.fields ?? [], hasMany));
       return;
     } else if (isManyToMany.isExactlyType(obj.type)) {
       final DartType pivot = obj.getField('pivotBean').toTypeValue();
@@ -418,11 +418,11 @@ class ParsedBean {
         final WriterModel targetInfo =
             ParsedBean(target.element, doRelations: false).detect();
         preloads.add(PreloadManyToMany(
-            pivot, target, f.name, targetInfo, beanInfo, g?.fields));
+            pivot, target, Property(f.name), targetInfo, beanInfo, g?.fields));
         return;
       }
 
-      preloads.add(PreloadManyToMany(pivot, target, f.name, null, null, null));
+      preloads.add(PreloadManyToMany(pivot, target, Property(f.name), null, null, null));
       return;
     }
 
