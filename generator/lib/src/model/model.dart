@@ -73,8 +73,8 @@ class WriterModel {
   WriterModel(this.name, this.modelType, this.fields, this.primary,
       this.belongTos, this.beanedForeignAssociations, this.preloads);
 
-  Preload findHasXByAssociation(DartType association) {
-    return preloads.firstWhere((p) => p.bean == association,
+  Preload findHasXByAssociation(DartType association, bool byHasMany) {
+    return preloads.firstWhere((p) => p.bean == association && p.hasMany == byHasMany,
         orElse: () => null);
 
     /*

@@ -9,7 +9,7 @@ abstract class BeanedAssociation {
 
   List<Field> get foreignFields;
 
-  bool get byHasMany;
+  List<bool> get byHasMany;
 
   String get modelName;
 }
@@ -24,7 +24,7 @@ class BelongsToAssociation implements BeanedAssociation {
 
   final List<Field> foreignFields;
 
-  final bool byHasMany;
+  final List<bool> byHasMany;
 
   bool get belongsToMany => other is PreloadManyToMany;
 
@@ -53,7 +53,7 @@ class BeanedForeignAssociation extends ForeignAssociation
 
   final List<Field> foreignFields;
 
-  final bool byHasMany;
+  final List<bool> byHasMany;
 
   BeanedForeignAssociation(
       this.bean, this.fields, this.foreignFields, this.byHasMany)

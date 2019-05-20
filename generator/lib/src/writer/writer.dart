@@ -35,7 +35,7 @@ class Writer {
 
     for (BelongsToAssociation ass in _b.belongTos.values) {
       ass.foreignFields.forEach((Field f) {
-        _writeFindOneByBeanedAssociation(ass, f);
+        _writeFindOneByBeanedAssociation(ass, f, ass.byHasMany[ass.foreignFields.indexOf(f)]);
         _writeFindListByBeanedAssociationList(ass, f);
       });
       _removeByForeign(ass);
@@ -50,7 +50,7 @@ class Writer {
 
     for (BeanedForeignAssociation ass in _b.beanedForeignAssociations.values) {
       ass.foreignFields.forEach((Field f) {
-        _writeFindOneByBeanedAssociation(ass, f);
+        _writeFindOneByBeanedAssociation(ass, f, ass.byHasMany[ass.foreignFields.indexOf(f)]);
         _writeFindListByBeanedAssociationList(ass, f);
       });
       // TODO remove
@@ -647,8 +647,8 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindOneByBeanedAssociation(BeanedAssociation m, Field foreignKey) {
-    if (!m.byHasMany) {
+  void _writeFindOneByBeanedAssociation(BeanedAssociation m, Field foreignKey, bool byHasMany) {
+    if (!byHasMany) {
       _w.write('Future<${_b.modelType}>');
     } else {
       _w.write('Future<List<${_b.modelType}>>');
@@ -666,7 +666,7 @@ class Writer {
     _w.write('where(this.$f.eq($f));');
 
     if (_b.preloads.length > 0) {
-      if (!m.byHasMany) {
+      if (!byHasMany) {
         _write('final ${_b.modelType} model = await ');
         _writeln('findOne(find);');
 
@@ -687,7 +687,7 @@ class Writer {
       }
     } else {
       _write('return ');
-      if (!m.byHasMany) {
+      if (!byHasMany) {
         _writeln('findOne(find);');
       } else {
         _writeln('findMany(find);');

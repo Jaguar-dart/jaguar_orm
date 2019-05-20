@@ -87,10 +87,10 @@ class ParsedBean {
           ParsedBean(bean.element, doRelations: false, doAssociation: false)
               .detect();
 
-      final Preload other = info.findHasXByAssociation(clazz.type);
+      final Preload other = info.findHasXByAssociation(clazz.type, foreign.byHasMany);
+      //print('foreign: ${foreign.refCol}, bean: ${bean.name}, other.hasMany: ${other.hasMany}, foreign.byHasMany: ${foreign.byHasMany}, current.byHasMany: ${current?.byHasMany ?? null}');
 
       if (other == null) continue;
-
       if (current == null) {
         bool byHasMany = foreign.byHasMany;
         if (byHasMany != null) {
@@ -100,12 +100,15 @@ class ParsedBean {
         } else {
           byHasMany = other.hasMany;
         }
-        current = BelongsToAssociation(bean, [], [], other, byHasMany);
+        current = BelongsToAssociation(bean, [], [], other, List.of([byHasMany], growable: true));
         beanedAssociations[bean] = current;
       } else if (current is BelongsToAssociation) {
-        if (current.byHasMany != other.hasMany) {
+        //fixme: find out how to check this condition
+        /*if (current.byHasMany[current.fields
+            .indexWhere((Field f) => f.foreign.refCol == other.property.foreignKeyColumn)] != other.hasMany) {
           throw Exception('Mismatching association type!');
-        }
+        }*/
+        current.byHasMany.add(other.hasMany);
         if (current.belongsToMany != other is PreloadManyToMany) {
           throw Exception('Mismatching association type!');
         }
@@ -123,13 +126,13 @@ class ParsedBean {
       final BelongsToForeign foreign = f.foreign;
       final DartType bean = foreign.bean;
 
-      {
+
         final WriterModel info =
             ParsedBean(bean.element, doRelations: false, doAssociation: false)
                 .detect();
-        final Preload other = info.findHasXByAssociation(clazz.type);
+        final Preload other = info.findHasXByAssociation(clazz.type, foreign.byHasMany);
         if (other != null) continue;
-      }
+
 
       if (foreign.byHasMany == null)
         throw Exception(
@@ -138,12 +141,14 @@ class ParsedBean {
       BeanedForeignAssociation current = beanedForeignAssociations[bean];
 
       if (current == null) {
-        current = BeanedForeignAssociation(bean, [], [], foreign.byHasMany);
+        current = BeanedForeignAssociation(bean, [], [], List.of([foreign.byHasMany], growable: true));
         beanedForeignAssociations[bean] = current;
       } else if (current is BeanedForeignAssociation) {
-        if (current.byHasMany != foreign.byHasMany) {
+        //fixme: find out how to check this condition
+        /*if (current.byHasMany != foreign.byHasMany) {
           throw Exception('Mismatching association type!');
-        }
+        }*/
+        current.byHasMany.add(other.hasMany);
       } else {
         throw Exception('Table and bean associations mixed!');
       }
@@ -380,7 +385,6 @@ class ParsedBean {
       if (!isBean.isAssignableFromType(bean)) {
         throw Exception("Non-bean type provided!");
       }
-
       BelongsToAssociation g;
       if (doRelations) {
         if (bean != curBean) {
