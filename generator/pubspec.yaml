@@ -12,7 +12,10 @@ environment:
 
 dependencies:
   jaguar_query: ^2.2.8
-  jaguar_orm: ^2.2.6
+  jaguar_orm: #^2.2.6
+    git:
+      url: https://github.com/isaacfi/jaguar_orm.git
+      path: orm
   analyzer: ^0.34.0
   build: ^1.0.0
   logging: ^0.11.0

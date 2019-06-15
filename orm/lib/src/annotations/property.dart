@@ -73,11 +73,15 @@ class PrimaryKey implements ColumnBase {
       this.length});
 }
 
-abstract class ForeignBase implements ColumnBase {}
+abstract class ForeignBase implements ColumnBase {
+  bool get isPrimary;
+}
 
 class ForeignKey implements ForeignBase {
   /// Name of the column in database
   final String name;
+
+  final bool isPrimary;
 
   final bool isNullable;
 
@@ -93,6 +97,7 @@ class ForeignKey implements ForeignBase {
 
   const ForeignKey(this.toTable,
       {this.name,
+      this.isPrimary = false,
       this.isNullable = false,
       this.uniqueGroup,
       this.refCol = 'id',
@@ -104,6 +109,8 @@ class BelongsTo implements ForeignBase {
 
   /// Name of the column in database
   final String name;
+
+  final bool isPrimary;
 
   final bool isNullable;
 
@@ -122,6 +129,7 @@ class BelongsTo implements ForeignBase {
 
   const BelongsTo(this.bean,
       {this.name,
+      this.isPrimary = false,
       this.isNullable = false,
       this.uniqueGroup,
       this.length,
@@ -131,10 +139,12 @@ class BelongsTo implements ForeignBase {
 
   const BelongsTo.many(this.bean,
       {this.name,
+      this.isPrimary = false,
       this.isNullable = false,
       this.uniqueGroup,
       this.length,
       this.refCol = 'id',
       this.byHasMany})
       : toMany = true;
+
 }
