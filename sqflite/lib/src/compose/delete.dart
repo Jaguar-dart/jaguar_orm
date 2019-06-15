@@ -17,7 +17,7 @@ String composeRemove(final Remove st) {
   return sb.toString();
 }
 
-String composeDropDb(final DropDb st) => "CREATE DATABASE ${st.name}";
+String composeDropDb(final DropDb st) => "DROP DATABASE ${st.name}";
 
 String composeDrop(final Drop st) {
   return "DROP TABLE " +
