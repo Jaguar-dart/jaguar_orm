@@ -457,12 +457,13 @@ Field parseColumn(FieldElement f, DartObject obj) {
   } else if (isForeignKey.isAssignableFromType(obj.type)) {
     final String table = obj.getField('toTable').toStringValue();
     final String refCol = obj.getField('refCol').toStringValue();
+    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
 
     Foreign fore = TableForeign(table, refCol);
 
     return Field(f.type.name, f.name, colName,
         isNullable: isNullable,
-        isPrimary: false,
+        isPrimary: isPrimary,
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,
@@ -473,6 +474,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     final String refCol = obj.getField('refCol').toStringValue();
     final bool byHasMany = obj.getField('byHasMany').toBoolValue();
     final bool toMany = obj.getField('toMany').toBoolValue();
+    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
 
     if (!isBean.isAssignableFromType(bean)) {
       throw Exception("Non-bean type provided!");
@@ -481,7 +483,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     Foreign fore = BelongsToForeign(bean, refCol, byHasMany, toMany);
     return Field(f.type.name, f.name, colName,
         isNullable: isNullable,
-        isPrimary: false,
+        isPrimary: isPrimary,
         foreign: fore,
         autoIncrement: autoIncrement,
         length: length,

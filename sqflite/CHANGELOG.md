@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.10
+
++ Fixed `DROP DATABASE` bug
+
 ## 2.2.2
 
 + `upsert` and `upsertMany`

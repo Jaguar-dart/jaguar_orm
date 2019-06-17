@@ -92,6 +92,11 @@ String composeFind(final Find find) {
     sb.write(composeExpression(info.where));
   }
 
+  if (info.groupBy.length != 0) {
+    sb.write(' GROUP BY ');
+    sb.write(info.groupBy.join(', '));
+  }
+
   if (info.orderBy.length != 0) {
     sb.write(' ORDER BY ');
     sb.write(info.orderBy.map(composeOrderBy).join(', '));
@@ -105,11 +110,6 @@ String composeFind(final Find find) {
   if (info.offset is int) {
     sb.write(' OFFSET ');
     sb.write(info.offset);
-  }
-
-  if (info.groupBy.length != 0) {
-    sb.write(' GROUP BY ');
-    sb.write(info.groupBy.join(', '));
   }
 
   sb.write(';');
