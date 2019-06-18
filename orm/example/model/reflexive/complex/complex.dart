@@ -13,7 +13,7 @@ class ProductItems {
   ProductItems.make({this.id, this.name});
 
   /// fields
-  @PrimaryKey()
+  @primaryKey
   String id;
 
   @Column(isNullable: true)
@@ -52,10 +52,10 @@ class ProductItemsPivot {
   ProductItemsPivot.make(this.productId, this.productListId);
 
   /// fields
-  @BelongsTo.many(ProductBean)
+  @BelongsTo.many(ProductBean, references: 'id')
   String productId;
 
-  @BelongsTo.many(ProductItemsBean)
+  @BelongsTo.many(ProductItemsBean, references: 'id')
   String productListId;
 }
 
@@ -87,7 +87,7 @@ class Product {
   Product.make({this.id, this.name, this.sku, this.categoryId});
 
   /// fields
-  @PrimaryKey()
+  @primaryKey
   String id;
 
   @Column(isNullable: false)
@@ -96,7 +96,8 @@ class Product {
   @Column(isNullable: true)
   String name;
 
-  @BelongsTo(CategoryBean, isNullable: true, byHasMany: true)
+  @Column(isNullable: true)
+  @BelongsTo(CategoryBean, references: 'id', byHasMany: true)
   int categoryId;
 
   @ManyToMany(ProductItemsPivotBean, ProductItemsBean)
@@ -132,7 +133,7 @@ class ProductBean extends Bean<Product> with _ProductBean {
 }
 
 class Category {
-  @PrimaryKey()
+  @primaryKey
   int id;
 
   @HasMany(ProductBean)

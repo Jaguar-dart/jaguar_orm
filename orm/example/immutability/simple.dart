@@ -5,7 +5,8 @@ import 'package:meta/meta.dart';
 part 'simple.jorm.dart';
 
 class User {
-  @PrimaryKey(auto: true, isNullable: false)
+  @Column(isPrimary: true, isNullable: false)
+  @auto
   final int id;
 
   final String name;

@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:jaguar_orm/jaguar_orm.dart';
+import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 part 'simple.jorm.dart';
 
 class User {
-  @PrimaryKey(auto: true, isNullable: false)
+  @Column(isNullable: true, isPrimary: true)
+  @auto
   int id;
 
   String name;
 
-  @Column(isNullable: true)
   int age;
 
   User({this.id, this.name, this.age});

@@ -46,7 +46,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, isNullable: false);
+    st.addStr(id.name, primary: true, isNullable: true);
     st.addStr(name.name, isNullable: true);
     return adapter.createTable(st);
   }
@@ -285,11 +285,11 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     st.addStr(productId.name,
         foreignTable: productBean.tableName,
         foreignCol: 'id',
-        isNullable: false);
+        isNullable: true);
     st.addStr(productListId.name,
         foreignTable: productItemsBean.tableName,
         foreignCol: 'id',
-        isNullable: false);
+        isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -525,7 +525,7 @@ abstract class _ProductBean implements Bean<Product> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, isNullable: false);
+    st.addStr(id.name, primary: true, isNullable: true);
     st.addStr(sku.name, isNullable: false);
     st.addStr(name.name, isNullable: true);
     st.addInt(categoryId.name,
@@ -790,7 +790,7 @@ abstract class _CategoryBean implements Bean<Category> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, isNullable: false);
+    st.addInt(id.name, primary: true, isNullable: true);
     return adapter.createTable(st);
   }
 

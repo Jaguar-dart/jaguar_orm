@@ -5,13 +5,17 @@ import 'package:jaguar_orm/jaguar_orm.dart';
 part 'example.jorm.dart';
 
 class CartItem {
-  @PrimaryKey(auto: true)
+  @primaryKey
   int id;
+
   double amount;
+
   @Column(isNullable: true)
   String product;
+
   int quantity;
-  @BelongsTo(CartBean)
+
+  @BelongsTo(CartBean, references: 'id')
   int cartId;
 
   CartItem({this.amount, this.product, this.quantity, this.id});
@@ -57,10 +61,12 @@ class CartItemBean extends Bean<CartItem> with _CartItemBean {
 }
 
 class Cart {
-  @PrimaryKey(auto: true)
+  @primaryKey
   int id;
+
   @HasMany(CartItemBean)
   List<CartItem> items;
+
   double amount;
 
   Cart({this.id, this.amount = 0.0, this.items = const []});
@@ -71,10 +77,6 @@ class Cart {
       amount: amount ?? this.amount,
       items: items ?? this.items,
     );
-  }
-
-  String get amountLabel {
-    //return kCurrencyFormat.format(amount);
   }
 
   @override

@@ -54,8 +54,8 @@ abstract class _DirectoryBean implements Bean<Directory> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: false);
-    st.addStr(name.name, length: 50, isNullable: false);
+    st.addStr(id.name, primary: true, length: 50, isNullable: true);
+    st.addStr(name.name, length: 50, isNullable: true);
     st.addStr(parentId.name,
         foreignTable: directoryBean.tableName,
         foreignCol: 'id',

@@ -8,10 +8,11 @@ import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 part 'simple.jorm.dart';
 
 class User {
-  @PrimaryKey(length: 50)
+  @primaryKey
+  @VarChar(50)
   String id;
 
-  @Column(length: 50)
+  @VarChar(50)
   String name;
 
   @HasOne(AddressBean)
@@ -29,13 +30,14 @@ class User {
 }
 
 class Address {
-  @PrimaryKey(length: 50)
+  @primaryKey
+  @VarChar(50)
   String id;
 
-  @Column(length: 150)
+  @VarChar(150)
   String street;
 
-  @BelongsTo(UserBean)
+  @BelongsTo(UserBean, references: 'id')
   String userId;
 
   Address({this.id, this.street, this.userId});

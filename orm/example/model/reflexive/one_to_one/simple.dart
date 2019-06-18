@@ -1,6 +1,5 @@
 library example.has_one;
 
-import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
@@ -8,16 +7,18 @@ import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 part 'simple.jorm.dart';
 
 class Directory {
-  @PrimaryKey(length: 50)
+  @primaryKey
+  @VarChar(50)
   String id;
 
-  @Column(length: 50)
+  @VarChar(50)
   String name;
 
   @HasOne(DirectoryBean)
   Directory child;
 
-  @BelongsTo(DirectoryBean, isNullable: true)
+  @Column(isNullable: true)
+  @BelongsTo(DirectoryBean, references: 'id')
   String parentId;
 
   Directory({this.id, this.name, this.parentId});

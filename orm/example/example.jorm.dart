@@ -36,17 +36,13 @@ abstract class _CartItemBean implements Bean<CartItem> {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
-      if (model.id != null) {
-        ret.add(id.set(model.id));
-      }
+      ret.add(id.set(model.id));
       ret.add(amount.set(model.amount));
       ret.add(product.set(model.product));
       ret.add(quantity.set(model.quantity));
       ret.add(cartId.set(model.cartId));
     } else if (only != null) {
-      if (model.id != null) {
-        if (only.contains(id.name)) ret.add(id.set(model.id));
-      }
+      if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
       if (only.contains(product.name)) ret.add(product.set(model.product));
       if (only.contains(quantity.name)) ret.add(quantity.set(model.quantity));
@@ -74,12 +70,12 @@ abstract class _CartItemBean implements Bean<CartItem> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
-    st.addDouble(amount.name, isNullable: false);
+    st.addInt(id.name, primary: true, isNullable: true);
+    st.addDouble(amount.name, isNullable: true);
     st.addStr(product.name, isNullable: true);
-    st.addInt(quantity.name, isNullable: false);
+    st.addInt(quantity.name, isNullable: true);
     st.addInt(cartId.name,
-        foreignTable: cartBean.tableName, foreignCol: 'id', isNullable: false);
+        foreignTable: cartBean.tableName, foreignCol: 'id', isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -88,13 +84,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
       bool onlyNonNull = false,
       Set<String> only}) async {
     final Insert insert = inserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
-    var retId = await adapter.insert(insert);
-    if (cascade) {
-      CartItem newModel;
-    }
-    return retId;
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    return adapter.insert(insert);
   }
 
   Future<void> insertMany(List<CartItem> models,
@@ -113,13 +104,8 @@ abstract class _CartItemBean implements Bean<CartItem> {
       Set<String> only,
       bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
-    var retId = await adapter.upsert(upsert);
-    if (cascade) {
-      CartItem newModel;
-    }
-    return retId;
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    return adapter.upsert(upsert);
   }
 
   Future<void> upsertMany(List<CartItem> models,
@@ -232,14 +218,10 @@ abstract class _CartBean implements Bean<Cart> {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
-      if (model.id != null) {
-        ret.add(id.set(model.id));
-      }
+      ret.add(id.set(model.id));
       ret.add(amount.set(model.amount));
     } else if (only != null) {
-      if (model.id != null) {
-        if (only.contains(id.name)) ret.add(id.set(model.id));
-      }
+      if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(amount.name)) ret.add(amount.set(model.amount));
     } else /* if (onlyNonNull) */ {
       if (model.id != null) {
@@ -255,8 +237,8 @@ abstract class _CartBean implements Bean<Cart> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
-    st.addDouble(amount.name, isNullable: false);
+    st.addInt(id.name, primary: true, isNullable: true);
+    st.addDouble(amount.name, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -265,13 +247,12 @@ abstract class _CartBean implements Bean<Cart> {
       bool onlyNonNull = false,
       Set<String> only}) async {
     final Insert insert = inserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.insert(insert);
     if (cascade) {
       Cart newModel;
       if (model.items != null) {
-        newModel ??= await find(retId);
+        newModel ??= await find(model.id);
         model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         for (final child in model.items) {
           await cartItemBean.insert(child, cascade: cascade);
@@ -308,13 +289,12 @@ abstract class _CartBean implements Bean<Cart> {
       Set<String> only,
       bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       Cart newModel;
       if (model.items != null) {
-        newModel ??= await find(retId);
+        newModel ??= await find(model.id);
         model.items.forEach((x) => cartItemBean.associateCart(x, newModel));
         for (final child in model.items) {
           await cartItemBean.upsert(child, cascade: cascade);

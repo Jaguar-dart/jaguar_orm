@@ -1,5 +1,3 @@
-part of jaguar_orm.annotation;
-
 abstract class Relation {}
 
 class HasOne implements Relation {

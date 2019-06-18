@@ -8,16 +8,18 @@ import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 part 'simple.jorm.dart';
 
 class Directory {
-  @PrimaryKey(length: 50)
+  @primaryKey
+  @VarChar(50)
   String id;
 
-  @Column(length: 50)
+  @VarChar(50)
   String name;
 
   @HasMany(DirectoryBean)
   List<Directory> child;
 
-  @BelongsTo(DirectoryBean, isNullable: true)
+  @Column(isNullable: true)
+  @BelongsTo(DirectoryBean, references: 'id')
   String parentId;
 
   Directory({this.id, this.name, this.parentId});

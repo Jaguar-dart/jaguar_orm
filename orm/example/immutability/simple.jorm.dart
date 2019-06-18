@@ -60,7 +60,7 @@ abstract class _UserBean implements Bean<User> {
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
-    st.addStr(name.name, isNullable: false);
+    st.addStr(name.name, isNullable: true);
     st.addInt(age.name, isNullable: true);
     return adapter.createTable(st);
   }

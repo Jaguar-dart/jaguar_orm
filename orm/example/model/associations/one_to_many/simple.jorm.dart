@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of example.one_to_many;
+part of 'simple.dart';
 
 // **************************************************************************
 // BeanGenerator
@@ -46,8 +46,8 @@ abstract class _AuthorBean implements Bean<Author> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: false);
-    st.addStr(name.name, length: 50, isNullable: false);
+    st.addStr(id.name, primary: true, length: 50, isNullable: true);
+    st.addStr(name.name, length: 50, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -243,19 +243,19 @@ abstract class _AuthorBean implements Bean<Author> {
 
 abstract class _PostBean implements Bean<Post> {
   final id = StrField('id');
-  final authorId = StrField('author_id');
   final message = StrField('message');
+  final authorId = StrField('author_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
-        authorId.name: authorId,
         message.name: message,
+        authorId.name: authorId,
       };
   Post fromMap(Map map) {
     Post model = Post();
     model.id = adapter.parseValue(map['id']);
-    model.authorId = adapter.parseValue(map['author_id']);
     model.message = adapter.parseValue(map['message']);
+    model.authorId = adapter.parseValue(map['author_id']);
 
     return model;
   }
@@ -266,21 +266,21 @@ abstract class _PostBean implements Bean<Post> {
 
     if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
-      ret.add(authorId.set(model.authorId));
       ret.add(message.set(model.message));
+      ret.add(authorId.set(model.authorId));
     } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
-      if (only.contains(authorId.name)) ret.add(authorId.set(model.authorId));
       if (only.contains(message.name)) ret.add(message.set(model.message));
+      if (only.contains(authorId.name)) ret.add(authorId.set(model.authorId));
     } else /* if (onlyNonNull) */ {
       if (model.id != null) {
         ret.add(id.set(model.id));
       }
-      if (model.authorId != null) {
-        ret.add(authorId.set(model.authorId));
-      }
       if (model.message != null) {
         ret.add(message.set(model.message));
+      }
+      if (model.authorId != null) {
+        ret.add(authorId.set(model.authorId));
       }
     }
 
@@ -289,13 +289,13 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: false);
+    st.addStr(id.name, primary: true, length: 50, isNullable: true);
+    st.addStr(message.name, length: 150, isNullable: true);
     st.addStr(authorId.name,
         foreignTable: authorBean.tableName,
         foreignCol: 'id',
         length: 50,
-        isNullable: false);
-    st.addStr(message.name, length: 150, isNullable: false);
+        isNullable: true);
     return adapter.createTable(st);
   }
 

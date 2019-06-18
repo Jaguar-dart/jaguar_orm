@@ -46,8 +46,8 @@ abstract class _UserBean implements Bean<User> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: false);
-    st.addStr(name.name, length: 50, isNullable: false);
+    st.addStr(id.name, primary: true, length: 50, isNullable: true);
+    st.addStr(name.name, length: 50, isNullable: true);
     return adapter.createTable(st);
   }
 
@@ -282,10 +282,10 @@ abstract class _AddressBean implements Bean<Address> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: false);
-    st.addStr(street.name, length: 150, isNullable: false);
+    st.addStr(id.name, primary: true, length: 50, isNullable: true);
+    st.addStr(street.name, length: 150, isNullable: true);
     st.addStr(userId.name,
-        foreignTable: userBean.tableName, foreignCol: 'id', isNullable: false);
+        foreignTable: userBean.tableName, foreignCol: 'id', isNullable: true);
     return adapter.createTable(st);
   }
 
