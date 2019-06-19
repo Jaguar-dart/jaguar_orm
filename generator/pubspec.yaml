@@ -1,6 +1,6 @@
 name: jaguar_orm_gen
 description: Generator for jaguar_orm
-version: 2.2.27
+version: 4.1.2-dev
 authors:
   - Ravi Teja Gudapati <tejainece@gmail.com>
   - Kevin Segaud <segaud.kevin@gmail.com>
@@ -12,7 +12,7 @@ environment:
 
 dependencies:
   jaguar_query: ^2.2.8
-  jaguar_orm: ^2.2.6
+  jaguar_orm: ^4.1.1
   analyzer: ^0.36.0
   build: ^1.1.4
   source_gen: ^0.9.0
@@ -25,3 +25,7 @@ dev_dependencies:
   build_runner: ^1.5.0
   collection: ^1.14.10
   path: ^1.6.2
+
+dependency_overrides:
+  jaguar_orm:
+    path: ../orm

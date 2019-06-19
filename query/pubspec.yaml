@@ -1,6 +1,6 @@
 name: jaguar_query
 description: Dialect neutral, fluent Dart DSL to build SQL/NoSQL queries
-version: 2.2.8
+version: 4.1.1-dev
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -8,7 +8,7 @@ homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
   meta: ^1.1.5

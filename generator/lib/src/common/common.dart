@@ -4,46 +4,49 @@ import 'package:analyzer/dart/element/element.dart';
 
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
+import 'package:jaguar_orm/src/annotations/nextgen.dart' as next;
 
-final isGenBean = new TypeChecker.fromRuntime(GenBean);
+final isGenBean = TypeChecker.fromRuntime(GenBean);
 
-final isBean = new TypeChecker.fromRuntime(Bean);
+final isBean = TypeChecker.fromRuntime(Bean);
 
-final isIgnore = new TypeChecker.fromRuntime(IgnoreColumn);
+final isColumnDef = TypeChecker.fromRuntime(next.ColumnDef);
 
-final isColumnBase = new TypeChecker.fromRuntime(ColumnBase);
+final isColumn = TypeChecker.fromRuntime(next.Column);
 
-final isColumn = new TypeChecker.fromRuntime(Column);
+final isIgnore = TypeChecker.fromRuntime(next.IgnoreColumn);
 
-final isPrimaryKey = new TypeChecker.fromRuntime(PrimaryKey);
+final isVarChar = TypeChecker.fromRuntime(next.VarChar);
 
-final isForeignKey = new TypeChecker.fromRuntime(ForeignKey);
+final isIntCol = TypeChecker.fromRuntime(next.Int);
 
-final isBelongsTo = new TypeChecker.fromRuntime(BelongsTo);
+final isForeign = TypeChecker.fromRuntime(next.ForeignKey);
 
-final isRelation = new TypeChecker.fromRuntime(Relation);
+final isBelongsTo = TypeChecker.fromRuntime(next.BelongsTo);
 
-final isHasOne = new TypeChecker.fromRuntime(HasOne);
+final isRelation = TypeChecker.fromRuntime(Relation);
 
-final isHasMany = new TypeChecker.fromRuntime(HasMany);
+final isHasOne = TypeChecker.fromRuntime(HasOne);
 
-final isManyToMany = new TypeChecker.fromRuntime(ManyToMany);
+final isHasMany = TypeChecker.fromRuntime(HasMany);
 
-final isList = new TypeChecker.fromRuntime(List);
+final isManyToMany = TypeChecker.fromRuntime(ManyToMany);
 
-final isMap = new TypeChecker.fromRuntime(Map);
+final isList = TypeChecker.fromRuntime(List);
 
-final isString = new TypeChecker.fromRuntime(String);
+final isMap = TypeChecker.fromRuntime(Map);
 
-final isInt = new TypeChecker.fromRuntime(int);
+final isString = TypeChecker.fromRuntime(String);
 
-final isDouble = new TypeChecker.fromRuntime(double);
+final isInt = TypeChecker.fromRuntime(int);
 
-final isNum = new TypeChecker.fromRuntime(num);
+final isDouble = TypeChecker.fromRuntime(double);
 
-final isDateTime = new TypeChecker.fromRuntime(DateTime);
+final isNum = TypeChecker.fromRuntime(num);
 
-final isBool = new TypeChecker.fromRuntime(bool);
+final isDateTime = TypeChecker.fromRuntime(DateTime);
+
+final isBool = TypeChecker.fromRuntime(bool);
 
 bool isBuiltin(DartType type) {
   if (isString.isExactlyType(type)) return true;

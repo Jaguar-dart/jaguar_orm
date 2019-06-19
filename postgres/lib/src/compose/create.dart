@@ -19,7 +19,7 @@ String composeCreateColumn(final CreateColumn col) {
     sb.write(col.length);
     sb.write(')');
   } else {
-    throw new Exception('Unknown columns to create ${col.runtimeType}!');
+    throw Exception('Unknown columns to create ${col.runtimeType}!');
   }
 
   if (!col.isNullable) sb.write(' NOT NULL');
@@ -45,7 +45,7 @@ String composeType(final CreateColumn col) {
     sb.write(col.length);
     sb.write(')');
   } else {
-    throw new Exception('Unknown columns to create ${col.runtimeType}!');
+    throw Exception('Unknown columns to create ${col.runtimeType}!');
   }
 
   if (!col.isNullable) sb.write(' NOT NULL');
@@ -55,7 +55,7 @@ String composeType(final CreateColumn col) {
 
 String composeCreate(final Create create) {
   final ImmutableCreateStatement info = create.asImmutable;
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   sb.write('CREATE TABLE');
 

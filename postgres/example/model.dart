@@ -19,13 +19,13 @@ class Post {
 /// The bean
 class PostBean extends Bean<Post> {
   /// Field DSL for id column
-  final IntField id = new IntField('_id');
+  final IntField id = IntField('_id');
 
   /// Field DSL for msg column
-  final StrField msg = new StrField('msg');
+  final StrField msg = StrField('msg');
 
   /// Field DSL for author column
-  final StrField author = new StrField('author');
+  final StrField author = StrField('author');
 
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
@@ -53,7 +53,7 @@ class PostBean extends Bean<Post> {
   String get tableName => 'posts';
 
   Post fromMap(Map map) {
-    var post = new Post();
+    var post = Post();
 
     post.id = map['_id'];
     post.msg = map['msg'];
@@ -78,7 +78,7 @@ class PostBean extends Bean<Post> {
 
   /// Updates a post
   Future<int> updateAuthor(int id, String author) async {
-    Update updater = new Update(tableName, where: this.id.eq(id));
+    Update updater = Update(tableName, where: this.id.eq(id));
 
     updater.set(this.author, author);
 

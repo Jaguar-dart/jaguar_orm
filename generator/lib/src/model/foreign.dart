@@ -1,13 +1,13 @@
 part of jaguar_orm.generator.model;
 
-abstract class Foreign {
-  String get refCol;
+abstract class ForeignSpec implements ColumnDef {
+  String get references;
 }
 
-class BelongsToForeign implements Foreign {
+class BelongsToForeign implements ForeignSpec {
   final DartType bean;
 
-  final String refCol;
+  final String references;
 
   final DartType model;
 
@@ -15,7 +15,8 @@ class BelongsToForeign implements Foreign {
 
   final bool belongsToMany;
 
-  BelongsToForeign(this.bean, this.refCol, this.byHasMany, this.belongsToMany)
+  BelongsToForeign(
+      this.bean, this.references, this.byHasMany, this.belongsToMany)
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;
@@ -37,10 +38,10 @@ class BeanedForeign implements Foreign {
 }
 */
 
-class TableForeign implements Foreign {
+class TableForeign implements ForeignSpec {
   final String table;
 
-  final String refCol;
+  final String references;
 
-  TableForeign(this.table, this.refCol);
+  TableForeign(this.table, this.references);
 }

@@ -27,25 +27,25 @@ class Post {
 
 /// The adapter
 PgAdapter _adapter =
-    new PgAdapter('postgres://postgres:dart_jaguar@localhost/postgres');
+    PgAdapter('postgres://postgres:dart_jaguar@localhost/postgres');
 
 /// The bean
 class PostBean {
   /// Field DSL for id column
-  final IntField id = new IntField('_id');
+  final IntField id = IntField('_id');
 
   /// Field DSL for msg column
-  final StrField msg = new StrField('msg');
+  final StrField msg = StrField('msg');
 
   /// Field DSL for author column
-  final StrField author = new StrField('author');
+  final StrField author = StrField('author');
 
   /// Table name for the model this bean manages
   String get tableName => 'posts';
 
   /// Inserts a new post into table
   Future insert(Post post) async {
-    InsertStatement inserter = new InsertStatement()..into(tableName);
+    InsertStatement inserter = InsertStatement()..into(tableName);
 
     inserter.set(id.set(post.id));
     inserter.set(msg.set(post.msg));
@@ -56,7 +56,7 @@ class PostBean {
 
   /// Updates a post
   Future update(int id, String author) async {
-    UpdateStatement updater = new UpdateStatement()..into(tableName);
+    UpdateStatement updater = UpdateStatement()..into(tableName);
     updater.where(this.id.eq(id));
 
     updater.set(this.author.set(author));
@@ -66,13 +66,13 @@ class PostBean {
 
   /// Finds one post by [id]
   Future<Post> findOne(int id) async {
-    FindStatement updater = new FindStatement()..from(tableName);
+    FindStatement updater = FindStatement()..from(tableName);
 
     updater.where(this.id.eq(id));
 
     Map map = await _adapter.findOne(updater);
 
-    Post post = new Post();
+    Post post = Post();
     post.id = map['_id'];
     post.msg = map['msg'];
     post.author = map['author'];
@@ -82,14 +82,14 @@ class PostBean {
 
   /// Finds all posts
   Future<List<Post>> findAll() async {
-    FindStatement finder = new FindStatement()..from(tableName);
+    FindStatement finder = FindStatement()..from(tableName);
 
     List<Map> maps = await (await _adapter.find(finder)).toList();
 
-    List<Post> posts = new List<Post>();
+    List<Post> posts = List<Post>();
 
     for(Map map in maps) {
-      Post post = new Post();
+      Post post = Post();
 
       post.id = map['_id'];
       post.msg = map['msg'];
@@ -103,7 +103,7 @@ class PostBean {
 
   /// Deletes a post by [id]
   Future delete(int id) async {
-    DeleteStatement deleter = new DeleteStatement()..from(tableName);
+    DeleteStatement deleter = DeleteStatement()..from(tableName);
 
     deleter.where(this.id.eq(id));
 
@@ -112,7 +112,7 @@ class PostBean {
 
   /// Deletes all posts
   Future deleteAll() async {
-    DeleteStatement deleter = new DeleteStatement()..from(tableName);
+    DeleteStatement deleter = DeleteStatement()..from(tableName);
 
     await _adapter.delete(deleter);
   }
@@ -122,14 +122,14 @@ main() async {
   // Connect
   await _adapter.connect();
 
-  PostBean bean = new PostBean();
+  PostBean bean = PostBean();
 
   // Delete all
   await bean.deleteAll();
 
   // Insert some posts
-  await bean.insert(new Post.make(1, 'Whatever 1', 'mark'));
-  await bean.insert(new Post.make(2, 'Whatever 2', 'bob'));
+  await bean.insert(Post.make(1, 'Whatever 1', 'mark'));
+  await bean.insert(Post.make(2, 'Whatever 2', 'bob'));
 
   // Find one post
   Post post = await bean.findOne(1);
@@ -162,3 +162,8 @@ main() async {
   await _adapter.close();
 }
 ```
+
+# TODO
++ [ ] Postges arrays
++ [ ] Postgres hstore
++ [ ] Postgres jsonb

@@ -1,7 +1,7 @@
 part of query.compose;
 
 String composeAnd(final And and) => and.expressions.map((Expression exp) {
-      final sb = new StringBuffer();
+      final sb = StringBuffer();
 
       if (exp.length != 1) {
         sb.write('(');
@@ -46,7 +46,7 @@ String composeExpression(final Expression exp) {
   } else if (exp is InBetweenCol) {
     return '(${composeField(exp.field)} BETWEEN ${composeField(exp.low)} AND ${composeField(exp.high)})';
   } else {
-    throw new Exception('Unknown expression ${exp.runtimeType}!');
+    throw Exception('Unknown expression ${exp.runtimeType}!');
   }
 }
 
@@ -68,7 +68,7 @@ String composeValue(dynamic val) {
   } else if (val is Field) {
     return composeField(val);
   } else {
-    throw new Exception("Invalid type ${val.runtimeType}!");
+    throw Exception("Invalid type ${val.runtimeType}!");
   }
 }
 

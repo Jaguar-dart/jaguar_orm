@@ -2,7 +2,7 @@ part of query.compose;
 
 String composeInsert(final Insert st) {
   final ImmutableInsertStatement info = st.asImmutable;
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   sb.write('INSERT INTO ');
   sb.write(info.table);

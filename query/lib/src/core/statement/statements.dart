@@ -1,19 +1,52 @@
 part of query;
 
-class SelColumn {
-  final String name;
+abstract class SelExpr {}
+
+class SelClause {
+  final SelExpr expr;
 
   final String alias;
 
-  SelColumn(this.name, [this.alias]);
+  SelClause(this.expr, {this.alias});
 }
 
-class CountSelColumn extends SelColumn {
-  final bool isDistinct;
+/// Use [Sel] to either select a column or an expression.
+class Sel implements SelExpr {
+  final String name;
 
-  CountSelColumn(String name, {String alias, this.isDistinct = false})
-      : super(name, alias);
+  Sel(this.name);
 }
+
+class Func implements SelExpr {
+  final String name;
+
+  final List<SelExpr> args;
+
+  Func(this.name, {this.args: const []});
+}
+
+abstract class Funcs {
+  static Func count(SelExpr arg) => Func('COUNT', args: [arg]);
+
+  static Func max(SelExpr arg) => Func('MAX', args: [arg]);
+
+  static Func sum(SelExpr arg) => Func('SUM', args: [arg]);
+
+  static Func avg(SelExpr arg) => Func('AVG', args: [arg]);
+
+  static Func distinct(/* List<SelExpr> | SelExpr */ arg) {
+    if(arg is SelExpr) return Func('DISTINCT', args: [arg]);
+    if(arg is List<SelExpr>) Func('DISTINCT', args: arg);
+
+    throw UnsupportedError("$arg not supported!");
+  }
+}
+
+Func count(SelExpr arg) => Funcs.count(arg);
+
+Func max(SelExpr arg) => Funcs.max(arg);
+
+Func distinct(/* List<SelExpr> | SelExpr */ arg) => Funcs.distinct(arg);
 
 /// name:value pair used to set a column named [name] to [value]. Used during
 /// inserts and updates.

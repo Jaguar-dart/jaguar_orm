@@ -1,10 +1,10 @@
 part of query;
 
 /// Select SQL statement builder.
-class Find implements Statement, Whereable {
-  final _column = <SelColumn>[];
+class Find implements Statement, Whereable, RowSource {
+  final _column = <SelClause>[];
 
-  final TableName from;
+  AliasedRowSource _from;
 
   final _joins = <JoinedTable>[];
 
@@ -20,11 +20,21 @@ class Find implements Statement, Whereable {
 
   int _offset;
 
-  Find(String tableName, {String alias, Expression where})
-      : from = TableName(tableName, alias) {
+  Find(/* String | RowSource */ from, {String alias, Expression where}) {
+    if (from is String) {
+      from = Table(from);
+    }
+    if (from is RowSource) {
+      _from = AliasedRowSource(from, alias: alias);
+    } else {
+      throw UnsupportedError("");
+    }
+
     if (where != null) this.where(where);
     _immutable = ImmutableFindStatement(this);
   }
+
+  AliasedRowSource get from => _from;
 
   /// Adds a 'join' clause to the select statement
   Find addJoin(JoinedTable join) {
@@ -36,36 +46,36 @@ class Find implements Statement, Whereable {
   }
 
   /// Adds a 'inner join' clause to the select statement.
-  Find innerJoin(String tableName, [String alias]) {
-    _curJoin = JoinedTable.innerJoin(tableName, alias);
+  Find innerJoin(/* String | RowSource */ source, [String alias]) {
+    _curJoin = JoinedTable.innerJoin(source, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'left join' clause to the select statement.
-  Find leftJoin(String tableName, [String alias]) {
-    _curJoin = JoinedTable.leftJoin(tableName, alias);
+  Find leftJoin(/* String | RowSource */ source, [String alias]) {
+    _curJoin = JoinedTable.leftJoin(source, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'right join' clause to the select statement.
-  Find rightJoin(String tableName, [String alias]) {
-    _curJoin = JoinedTable.rightJoin(tableName, alias);
+  Find rightJoin(/* String | RowSource */ source, [String alias]) {
+    _curJoin = JoinedTable.rightJoin(source, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'full join' clause to the select statement.
-  Find fullJoin(String tableName, [String alias]) {
-    _curJoin = JoinedTable.fullJoin(tableName, alias);
+  Find fullJoin(/* String | RowSource */ source, [String alias]) {
+    _curJoin = JoinedTable.fullJoin(source, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds 'cross join' clause to the select statement.
-  Find crossJoin(String tableName, [String alias]) {
-    _curJoin = JoinedTable.crossJoin(tableName, alias);
+  Find crossJoin(/* String | RowSource */ source, [String alias]) {
+    _curJoin = JoinedTable.crossJoin(source, alias);
     _joins.add(_curJoin);
     return this;
   }
@@ -82,14 +92,14 @@ class Find implements Statement, Whereable {
   /// the column name.
   Find sel(String column, {String alias, String table}) {
     String col = (table == null ? '' : table + '.') + column;
-    _column.add(SelColumn(col, alias));
+    _column.add(SelClause(Sel(col), alias: alias));
     return this;
   }
 
   /// Selects a [column] to be fetched. Use [alias] to alias the column name.
   Find selAll([String table]) {
     String col = (table == null ? '' : table + '.') + '*';
-    _column.add(SelColumn(col));
+    _column.add(SelClause(Sel(col)));
     return this;
   }
 
@@ -99,19 +109,26 @@ class Find implements Statement, Whereable {
     if (table == null) {
       for (String columnName in columns) {
         final String name = columnName;
-        _column.add(SelColumn(name));
+        _column.add(SelClause(Sel(name)));
       }
     } else {
       for (String columnName in columns) {
         final String name = table + '.' + columnName;
-        _column.add(SelColumn(name));
+        _column.add(SelClause(Sel(name)));
       }
     }
     return this;
   }
 
-  Find count(String column, {String alias, bool isDistinct = false}) {
-    _column.add(CountSelColumn(column, alias: alias, isDistinct: isDistinct));
+  @Deprecated("Use count function instead!")
+  Find count(SelExpr expr, {String alias, bool isDistinct = false}) {
+    if (isDistinct) expr = Funcs.distinct(expr);
+    _column.add(SelClause(Funcs.count(expr), alias: alias));
+    return this;
+  }
+
+  Find selExpr(SelExpr expr, {String alias}) {
+    _column.add(SelClause(expr, alias: alias));
     return this;
   }
 
@@ -222,18 +239,17 @@ class ImmutableFindStatement {
   Find _find;
 
   ImmutableFindStatement(this._find)
-      : selects = UnmodifiableListView<SelColumn>(_find._column),
+      : selects = UnmodifiableListView<SelClause>(_find._column),
         joins = UnmodifiableListView<JoinedTable>(_find._joins),
         orderBy = UnmodifiableListView<OrderBy>(_find._orderBy),
         groupBy = UnmodifiableListView<String>(_find._groupBy);
 
-  TableName get from => _find.from;
+  AliasedRowSource get from => _find.from;
 
-  final UnmodifiableListView<SelColumn> selects;
+  final UnmodifiableListView<SelClause> selects;
 
   final UnmodifiableListView<JoinedTable> joins;
 
-  // TODO return immutable
   Expression get where => _find._where;
 
   final UnmodifiableListView<OrderBy> orderBy;

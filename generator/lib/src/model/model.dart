@@ -3,6 +3,7 @@ library jaguar_orm.generator.model;
 import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
+import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 part 'association.dart';
 part 'foreign.dart';
@@ -14,37 +15,33 @@ class Field {
 
   final bool isFinal;
 
+  final Column column;
+
+  final DataType dataType;
+
+  final ForeignSpec foreign;
+
+  Field(this.type, this.field,
+      {@required Column column,
+      @required this.dataType,
+      @required this.foreign,
+      @required this.isFinal})
+      : column = column ?? Column();
+
+  String get colName => column?.name ?? field;
+
   String get vType {
     try {
       return getValType(type);
     } catch (e) {
-      throw new FieldSpecException(field, e.toString());
+      throw FieldSpecException(field, e.toString());
     }
   }
 
-  final String colName;
-
-  final bool isNullable;
-
-  final bool autoIncrement;
-
-  final int length;
-
-  final bool isPrimary;
-
-  final Foreign foreign;
-
-  final String unique;
-
-  Field(this.type, this.field, String colName,
-      {@required this.isNullable,
-      @required this.autoIncrement,
-      @required this.length,
-      @required this.isPrimary,
-      @required this.foreign,
-      @required this.unique,
-      @required this.isFinal})
-      : colName = colName ?? field;
+  bool get isAuto {
+    if (dataType is Int) return (dataType as Int).auto;
+    return false;
+  }
 }
 
 class WriterModel {
@@ -76,14 +73,6 @@ class WriterModel {
   Preload findHasXByAssociation(DartType association) {
     return preloads.firstWhere((p) => p.bean == association,
         orElse: () => null);
-
-    /*
-    if (found == null) {
-      throw new Exception('Association not found!');
-    }
-
-    return found;
-    */
   }
 
   BelongsToAssociation getMatchingManyToMany(BelongsToAssociation val) {
@@ -111,7 +100,7 @@ String getValType(String type) {
     return 'DateTimeField';
   }
 
-  throw new Exception('Field type not recognised: $type!');
+  throw Exception('Field type not recognised: $type!');
 }
 
 /// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships

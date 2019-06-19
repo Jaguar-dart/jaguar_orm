@@ -1,7 +1,7 @@
 part of query.compose;
 
 String composeAlter(Alter st) {
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   sb.write('ALTER TABLE');
   sb.write(' ${st.table} ');

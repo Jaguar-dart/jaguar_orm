@@ -37,7 +37,8 @@ part 'table/table.dart';
 /// Main DSL class to create SQL statements
 class Sql {
   /// Creates a new [Find] statement
-  static Find find(String table, {String alias}) => Find(table, alias: alias);
+  static Find find(/* String | RowSource */ table, {String alias}) =>
+      Find(table, alias: alias);
 
   /// Creates a new [Upsert] statement
   static Upsert upsert(String table) => Upsert(table);

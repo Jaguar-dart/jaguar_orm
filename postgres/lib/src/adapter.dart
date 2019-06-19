@@ -34,7 +34,7 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   /// Connects to the database
   Future<void> connect() async {
     if (_connection == null)
-      _connection = new pg.PostgreSQLConnection(host, port, databaseName,
+      _connection = pg.PostgreSQLConnection(host, port, databaseName,
           username: username, password: password);
     if (_connection.isClosed) await connection.open();
   }

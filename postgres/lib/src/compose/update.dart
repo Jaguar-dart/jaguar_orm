@@ -2,7 +2,7 @@ part of query.compose;
 
 String composeUpdate(final Update st) {
   final ImmutableUpdateStatement info = st.asImmutable;
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   sb.write('UPDATE ');
   sb.write(info.tableName);

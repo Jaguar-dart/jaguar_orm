@@ -2,7 +2,7 @@ part of query.compose;
 
 String composeRemove(final Remove st) {
   final QueryRemoveInfo info = st.info;
-  final sb = new StringBuffer();
+  final sb = StringBuffer();
 
   sb.write('DELETE FROM ');
   sb.write(st.info.tableName);
@@ -11,8 +11,6 @@ String composeRemove(final Remove st) {
     sb.write(' WHERE ');
     sb.write(composeExpression(info.where));
   }
-
-  sb.write(';');
 
   return sb.toString();
 }

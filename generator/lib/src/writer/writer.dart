@@ -1,6 +1,7 @@
 library jaguar_orm.generator.writer;
 
 import 'package:jaguar_orm_gen/src/model/model.dart';
+import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 class Writer {
   final StringBuffer _w = StringBuffer();
@@ -118,7 +119,7 @@ class Writer {
       _write('(');
       _write('${f.field}.name');
 
-      if (f.isPrimary) {
+      if (f.column.isPrimary) {
         _write(', primary: true');
       }
 
@@ -126,29 +127,25 @@ class Writer {
         final foreign = f.foreign;
         if (foreign is BelongsToForeign) {
           _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
-          _write(", foreignCol: '${foreign.refCol}'");
+          _write(", foreignCol: '${foreign.references}'");
         } else {
           throw Exception('Unimplemented!');
         }
       }
 
-      if (f.autoIncrement) {
-        if (f.type != 'int') {
-          throw Exception('Auto increment is allowed only on int columns!');
+      if (f.dataType != null) {
+        if (f.dataType is Int) {
+          if (f.isAuto) {
+            _write(", autoIncrement: true");
+          }
+        } else if (f.dataType is VarChar) {
+          _write(", length: ${(f.dataType as VarChar).length}");
         }
-        _write(", autoIncrement: ${f.autoIncrement}");
       }
 
-      if (f.length != null) {
-        if (f.type != 'String') {
-          throw Exception('Length is allowed only on text columns!');
-        }
-        _write(", length: ${f.length}");
-      }
+      _write(', isNullable: ${f.column.isNullable}');
 
-      _write(', isNullable: ${f.isNullable}');
-
-      if (f.unique != null) _write(', uniqueGroup: "${f.unique}"');
+      if (f.column.unique != null) _write(', uniqueGroup: "${f.column.unique}"');
 
       _writeln(');');
     }
@@ -166,11 +163,11 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if (field.autoIncrement) {
+      if (field.isAuto) {
         _w.writeln("if(model.${field.field} != null) {");
       }
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
-      if (field.autoIncrement) {
+      if (field.isAuto) {
         _w.writeln("}");
       }
     });
@@ -179,12 +176,12 @@ class Writer {
 
     // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
-      if (field.autoIncrement) {
+      if (field.isAuto) {
         _w.writeln("if(model.${field.field} != null) {");
       }
       _w.writeln(
           "if(only.contains(${field.field}.name)) ret.add(${field.field}.set(model.${field.field}));");
-      if (field.autoIncrement) {
+      if (field.isAuto) {
         _w.writeln("}");
       }
     });
@@ -218,7 +215,7 @@ class Writer {
   }
 
   void _writeUpsert() {
-    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
+    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.isAuto)) {
       _w.writeln(
           'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false}) async {');
       _w.write('final Upsert upsert = upserter');
@@ -235,7 +232,7 @@ class Writer {
     _w.write(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
     for (Field f in _b.primary) {
-      if (f.autoIncrement) _w.write('.id(${f.field}.name)');
+      if (f.isAuto) _w.write('.id(${f.field}.name)');
     }
     _w.writeln(';');
     _w.writeln('var retId = await adapter.upsert(upsert);');
@@ -246,7 +243,7 @@ class Writer {
       _w.writeln('if(model.${p.property} != null) {');
       _w.writeln('newModel ??= await find(');
       _write(_b.primary.map((f) {
-        if (f.autoIncrement) return 'retId';
+        if (f.isAuto) return 'retId';
         return 'model.${f.field}';
       }).join(','));
       _writeln(');');
@@ -329,7 +326,7 @@ class Writer {
   }
 
   void _writeInsert() {
-    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
+    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.isAuto)) {
       _w.writeln(
           'Future<dynamic> insert(${_b.modelType} model, {bool cascade = false, bool onlyNonNull = false, Set<String> only}) async {');
       _w.write('final Insert insert = inserter');
@@ -346,7 +343,7 @@ class Writer {
     _w.write(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
     for (Field f in _b.primary) {
-      if (f.autoIncrement) _w.write('.id(${f.field}.name)');
+      if (f.isAuto) _w.write('.id(${f.field}.name)');
     }
     _w.writeln(';');
     _w.writeln('var retId = await adapter.insert(insert);');
@@ -357,7 +354,7 @@ class Writer {
       _w.writeln('if(model.${p.property} != null) {');
       _w.writeln('newModel ??= await find(');
       _write(_b.primary.map((f) {
-        if (f.autoIncrement) return 'retId';
+        if (f.isAuto) return 'retId';
         return 'model.${f.field}';
       }).join(','));
       _writeln(');');
@@ -786,7 +783,7 @@ class Writer {
         _write(_b.modelType);
         _write('(');
         final String args = p.foreignFields
-            .map((Field f) => f.foreign.refCol)
+            .map((Field f) => f.foreign.references)
             .map(_b.fieldByColName)
             .map((Field f) => 'model.${f.field}')
             .join(',');
@@ -820,7 +817,7 @@ class Writer {
         _write('(${_b.modelType} model) => [');
         {
           final String args = p.foreignFields
-              .map((Field f) => f.foreign.refCol)
+              .map((Field f) => f.foreign.references)
               .map(_b.fieldByColName)
               .map((Field f) => 'model.${f.field}')
               .join(',');

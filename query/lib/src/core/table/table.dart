@@ -1,15 +1,21 @@
 part of query;
 
-/// Table selector
-abstract class Table {}
-
-/// TableName
-class TableName implements Table {
-  final String tableName;
+class AliasedRowSource {
+  final RowSource source;
 
   final String alias;
 
-  TableName(this.tableName, [this.alias]);
+  AliasedRowSource(this.source, {this.alias});
+}
+
+/// Table selector
+abstract class RowSource {}
+
+/// TableName
+class Table implements RowSource {
+  final String name;
+
+  Table(this.name);
 }
 
 /// A SQL join type that can be used in 'SELECT' statements
@@ -38,16 +44,24 @@ class JoinType {
   static const JoinType CrossJoin = const JoinType._(4, 'CROSS JOIN');
 }
 
-class JoinedTable implements Table {
+class JoinedTable {
   final JoinType _type;
 
-  final TableName _to;
+  AliasedRowSource _to;
 
   final _on = And();
 
-  JoinedTable(this._type, String tableName, [String alias])
-      : _to = TableName(tableName, alias) {
+  JoinedTable(this._type, /* String | RowSource */ source, [String alias]) {
     _info = QueryJoinedTableInfo(this);
+
+    if (source is String) {
+      source = Table(source);
+    }
+    if (source is RowSource) {
+      _to = AliasedRowSource(source, alias: alias);
+    } else {
+      throw UnsupportedError("");
+    }
   }
 
   factory JoinedTable.innerJoin(String tableName, [String alias]) =>
@@ -99,7 +113,7 @@ class QueryJoinedTableInfo {
 
   JoinType get type => _inner._type;
 
-  TableName get to => _inner._to;
+  AliasedRowSource get to => _inner._to;
 
   // TODO immutable
   And get on => _inner._on;
