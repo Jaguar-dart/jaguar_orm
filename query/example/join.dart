@@ -26,20 +26,20 @@ class Post {
 
 main() async {
   final PgAdapter adapter =
-      new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+      PgAdapter('example', username: 'dart_jaguar', password: 'dart_jaguar');
   await adapter.connect();
 
   await Sql.drop(Post.tableName).exec(adapter);
   await Sql.drop(Author.tableName).exec(adapter);
 
   await Sql.create(Author.tableName)
-      .addPrimaryInt('id')
+      .addInt('id', isPrimary: true)
       .addStr('name', length: 50)
       .exec(adapter);
 
   await Sql.create(Post.tableName)
-      .addPrimaryInt('id')
-      .addInt('authorId', foreignTable: 'author', foreignCol: 'id')
+      .addInt('id', isPrimary: true)
+      .addInt('authorId', foreign: References('author', 'id'))
       .addStr('message', length: 150)
       .addInt('likes')
       .exec(adapter);

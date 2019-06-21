@@ -1,5 +1,5 @@
 import 'package:jaguar_query/jaguar_query.dart';
 
 main() {
-  Alter('people').addInt('id').addString('name');
+  // TODO Alter('people').addInt('id').addString('name');
 }

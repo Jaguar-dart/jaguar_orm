@@ -35,8 +35,8 @@ abstract class Funcs {
   static Func avg(SelExpr arg) => Func('AVG', args: [arg]);
 
   static Func distinct(/* List<SelExpr> | SelExpr */ arg) {
-    if(arg is SelExpr) return Func('DISTINCT', args: [arg]);
-    if(arg is List<SelExpr>) Func('DISTINCT', args: arg);
+    if (arg is SelExpr) return Func('DISTINCT', args: [arg]);
+    if (arg is List<SelExpr>) Func('DISTINCT', args: arg);
 
     throw UnsupportedError("$arg not supported!");
   }

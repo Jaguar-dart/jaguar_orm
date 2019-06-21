@@ -6,11 +6,11 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 
 main() {
-  final name = new StrField('name');
+  final name = StrField('name');
 
-  final age = new IntField('age');
+  final age = IntField('age');
 
-  final likes = new IntField('likes');
+  final likes = IntField('likes');
 
   final exp = ((age > 20) & (age < 35)) &
       ((likes.eq(0)) | (likes > 50)) &

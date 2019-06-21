@@ -228,18 +228,16 @@ class IntField extends Field<int> {
   /// Adds the field to create statement
   void create(Create statement,
       {bool autoIncrement = false,
-      bool primary = false,
-      bool isNullable = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      bool isPrimary = false,
+      bool nonNull = false,
+      References foreign,
+      List<Constraint> constraints = const []}) {
     statement.addInt(name,
-        isNullable: isNullable,
+        nonNull: nonNull,
         autoIncrement: autoIncrement,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        uniqueGroup: uniqueGroup);
+        isPrimary: isPrimary,
+        foreign: foreign,
+        constraints: constraints);
   }
 }
 
@@ -258,17 +256,15 @@ class DoubleField extends Field<double> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool isNullable = false,
-      bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      {bool nonNull = false,
+      bool isPrimary = false,
+      References foreign,
+      List<Constraint> constraints = const []}) {
     statement.addDouble(name,
-        isNullable: isNullable,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        uniqueGroup: uniqueGroup);
+        nonNull: nonNull,
+        isPrimary: isPrimary,
+        foreign: foreign,
+        constraints: constraints);
   }
 }
 
@@ -299,19 +295,17 @@ class StrField extends Field<String> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool isNullable = false,
+      {bool nonNull = false,
       int length = 20,
-      bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      bool isPrimary = false,
+      References foreign,
+      List<Constraint> constraints = const []}) {
     statement.addStr(name,
-        isNullable: isNullable,
+        nonNull: nonNull,
         length: length,
-        primary: primary,
-        foreignTable: foreignTable,
-        foreignCol: foreignCol,
-        uniqueGroup: uniqueGroup);
+        isPrimary: isPrimary,
+        foreign: foreign,
+        constraints: constraints);
   }
 }
 
@@ -321,9 +315,16 @@ class DateTimeField extends Field<DateTime> {
   DateTimeField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool isNullable, String uniqueGroup}) {
-    statement.addDateTime(name,
-        isNullable: isNullable, uniqueGroup: uniqueGroup);
+  void create(Create statement,
+      {bool nonNull = false,
+      bool isPrimary = false,
+      References foreign,
+      List<Constraint> constraints = const []}) {
+    statement.addTimestamp(name,
+        nonNull: nonNull,
+        isPrimary: isPrimary,
+        foreign: foreign,
+        constraints: constraints);
   }
 }
 
@@ -333,7 +334,8 @@ class BoolField extends Field<bool> {
   BoolField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool isNullable = false, String uniqueGroup}) {
-    statement.addBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
+  void create(Create statement,
+      {bool nonNull = false, List<Constraint> constraints = const []}) {
+    statement.addBool(name, constraints: constraints);
   }
 }

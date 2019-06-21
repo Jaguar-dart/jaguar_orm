@@ -19,8 +19,8 @@ class Post {
 
 main() {
   Create st = Sql.create('post')
-      .addStr('_id', primary: true)
-      .addStr('authorId', foreignTable: 'author', foreignCol: '_id')
+      .addStr('_id', isPrimary: true)
+      .addStr('authorId', foreign: References('author', '_id'))
       .addStr('author')
       .addStr('message', length: 100)
       .addInt('likes');

@@ -36,7 +36,7 @@ class Post {
         "likes": model.likes,
       };
 
-  static Post fromMap(Map map) => new Post()
+  static Post fromMap(Map map) => Post()
     ..id = map['_id']
     ..authorId = map['authorid']
     ..message = map['message']
@@ -44,10 +44,10 @@ class Post {
 }
 
 final PgAdapter adapter =
-    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 
 Future<void> dropTables() async {
-  final st = new Drop(['post', 'author'], onlyIfExists: true);
+  final st = Drop(['post', 'author'], onlyIfExists: true);
   print(composeDrop(st));
   await adapter.dropTable(st);
 }
@@ -55,15 +55,15 @@ Future<void> dropTables() async {
 Future<void> createTables() async {
   {
     await Sql.create('author', ifNotExists: true)
-        .addInt('_id', primary: true, autoIncrement: true)
+        .addInt('_id', isPrimary: true, autoIncrement: true)
         .addStr('name', length: 100)
         .exec(adapter);
   }
 
   {
     await Sql.create('post', ifNotExists: true)
-        .addInt('_id', primary: true, autoIncrement: true)
-        .addInt('authorId', foreignTable: 'author', foreignCol: '_id')
+        .addInt('_id', isPrimary: true, autoIncrement: true)
+        .addInt('authorId', foreign: References('author', '_id'))
         .addStr('message', length: 100)
         .addInt('likes')
         .exec(adapter);
@@ -75,7 +75,7 @@ Future<int> insertAuthor(String name) =>
 
 Future<List<Author>> getAuthors() async =>
     (await Sql.find('author').exec(adapter).many())
-        .map((Map map) => new Author()
+        .map((Map map) => Author()
           ..id = map['_id']
           ..name = map['name'])
         .toList();
@@ -83,7 +83,7 @@ Future<List<Author>> getAuthors() async =>
 Future<Author> getAuthorId(int id) async {
   Find st = Sql.find('author').where(Field('_id').eq(id));
   Map map = await adapter.findOne(st);
-  return new Author()
+  return Author()
     ..id = map['_id']
     ..name = map['name'];
 }
@@ -129,12 +129,12 @@ Future<Post> getPostByIdRelated(int id) async {
       .where(Field.inTable('post', '_id').eq(id));
   Map map = await adapter.findOne(st);
 
-  final post = new Post()
+  final post = Post()
     ..id = map['_id']
     ..authorId = map['authorId']
     ..message = map['message']
     ..likes = map['likes']
-    ..author = (new Author()
+    ..author = (Author()
       ..id = map['authorid']
       ..name = map['name']);
   return post;

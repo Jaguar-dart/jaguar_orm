@@ -11,6 +11,12 @@ import 'dart:core' as core;
 import 'package:jaguar_query/src/adapter/adapter.dart';
 import 'package:jaguar_query/src/operators/operators.dart' as q;
 
+import 'datatype/datatype.dart';
+import 'statement/create/create.dart';
+
+export 'statement/create/create.dart';
+export 'datatype/datatype.dart';
+
 part 'expression/and.dart';
 part 'expression/condition.dart';
 part 'expression/expressions.dart';
@@ -19,8 +25,6 @@ part 'expression/in_between.dart';
 part 'expression/or.dart';
 part 'operators/comparision.dart';
 part 'statement/alter.dart';
-part 'statement/create/column.dart';
-part 'statement/create/create.dart';
 part 'statement/create_db.dart';
 part 'statement/drop.dart';
 part 'statement/find/find.dart';

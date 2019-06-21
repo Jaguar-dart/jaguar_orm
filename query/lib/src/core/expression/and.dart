@@ -6,7 +6,7 @@ class And extends Expression {
   final _expressions = <Expression>[];
 
   And() {
-    _expOut = new UnmodifiableListView<Expression>(_expressions);
+    _expOut = UnmodifiableListView<Expression>(_expressions);
   }
 
   UnmodifiableListView<Expression> _expOut;
@@ -30,7 +30,7 @@ class And extends Expression {
 
   /// Creates a 'logical or' expression of this expression and the [other]
   Or or(Expression exp) {
-    Or ret = new Or();
+    Or ret = Or();
 
     if (this.length != 0) {
       ret = ret.or(this);
