@@ -26,7 +26,7 @@ class BelongsToForeign implements ForeignSpec {
   String get beanInstanceName => uncap(modelName) + 'Bean';
 }
 
-/*
+/* TODO
 class BeanedForeign implements Foreign {
   final DartType bean;
 

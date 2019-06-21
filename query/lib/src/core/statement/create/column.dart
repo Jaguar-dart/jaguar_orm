@@ -5,7 +5,7 @@ class CreateCol<T> implements Property {
 
   final DataType<T> type;
 
-  final bool nonNull;
+  final bool  notNull;
 
   final bool isPrimary;
 
@@ -14,7 +14,7 @@ class CreateCol<T> implements Property {
   final List<Constraint> constraints;
 
   CreateCol(this.name, this.type,
-      {this.nonNull = false,
+      {this. notNull = false,
       this.isPrimary: false,
       this.foreign,
       this.constraints = const []});

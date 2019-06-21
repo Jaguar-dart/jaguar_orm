@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// A 'logical or' expression of two or more expressions
 class Or extends Expression {

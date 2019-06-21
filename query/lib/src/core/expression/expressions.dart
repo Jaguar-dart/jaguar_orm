@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// An SQL expression
 abstract class Expression {

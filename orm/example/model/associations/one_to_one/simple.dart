@@ -9,10 +9,10 @@ part 'simple.jorm.dart';
 
 class User {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(50)
+  @Str(length: 50)
   String name;
 
   @HasOne(AddressBean)
@@ -31,10 +31,10 @@ class User {
 
 class Address {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(150)
+  @Str(length: 150)
   String street;
 
   @BelongsTo(UserBean, references: 'id')

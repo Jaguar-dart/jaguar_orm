@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class Update implements Statement, Settable, Whereable {
   final String name;

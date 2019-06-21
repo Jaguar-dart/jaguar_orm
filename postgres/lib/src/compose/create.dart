@@ -3,14 +3,18 @@ part of query.compose;
 String composeDataType(final DataType type) {
   if (type == null) throw Exception("Data type cannot be null!");
   if (type is Int) {
-    if (type.autoIncrement) {
+    if (type.auto) {
       return 'SERIAL';
     } else {
       return 'INT';
     }
   }
   // TODO double
-  else if (type is Bool) {
+  else if (type is Array) {
+    return composeDataType(type.itemType) + '[]';
+  } else if (type is HStore) {
+    return 'HSTORE';
+  } else if (type is Bool) {
     return 'BOOLEAN';
   } else if (type is Timestamp) {
     return 'TIMESTAMP';
@@ -29,7 +33,7 @@ String composeProperty(final Property col) {
   sb.write(' ');
   sb.write(composeDataType(col.type));
 
-  if (col.nonNull) sb.write(' NOT NULL');
+  if (col.notNull) sb.write(' NOT NULL');
 
   return sb.toString();
 }

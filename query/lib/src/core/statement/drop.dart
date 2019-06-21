@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class Drop implements Statement {
   final _tables = <String>[];

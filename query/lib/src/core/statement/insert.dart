@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// Insert SQL statement builder.
 ///

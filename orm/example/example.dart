@@ -10,7 +10,7 @@ class CartItem {
 
   double amount;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   String product;
 
   int quantity;

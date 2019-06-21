@@ -5,7 +5,7 @@ import 'package:jaguar_orm/src/annotations/nextgen.dart';
 part 'simple.jorm.dart';
 
 class User {
-  @Column(isNullable: true, isPrimary: true)
+  @Column(notNull: true, isPrimary: true)
   @auto
   int id;
 

@@ -9,16 +9,16 @@ part 'simple.jorm.dart';
 
 class Directory {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(50)
+  @Str(length: 50)
   String name;
 
   @HasMany(DirectoryBean)
   List<Directory> child;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   @BelongsTo(DirectoryBean, references: 'id')
   String parentId;
 

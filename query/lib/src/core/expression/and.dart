@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// A 'logical and' expression of two or more expressions
 class And extends Expression {

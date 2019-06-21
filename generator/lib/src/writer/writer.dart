@@ -101,53 +101,23 @@ class Writer {
     _w.writeln('Future<void> createTable({bool ifNotExists = false}) async {');
     _writeln('final st = Sql.create(tableName, ifNotExists: ifNotExists);');
     for (final Field f in _b.fields.values) {
-      _write('st.add');
-
-      if (f.type == 'String') {
-        _write('Str');
-      } else if (f.type == 'bool') {
-        _write('Bool');
-      } else if (f.type == 'int') {
-        _write('Int');
-      } else if (f.type == 'num' || f.type == 'double') {
-        _write('Double');
-      } else if (f.type == 'DateTime') {
-        _write('DateTime');
-      } else {
-        throw Exception('Invalid column data type!');
-      }
-      _write('(');
-      _write('${f.field}.name');
-
-      if (f.column.isPrimary) {
-        _write(', primary: true');
-      }
-
+      _write('st.addByType(${f.field}.name, ${f.dataType},');
+      if (f.column.isPrimary) _write('isPrimary: true,');
+      if (f.column.notNull) _write('notNull: ${f.column.notNull},');
       if (f.foreign != null) {
         final foreign = f.foreign;
         if (foreign is BelongsToForeign) {
-          _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
-          _write(", foreignCol: '${foreign.references}'");
+          _write(
+              'foreign: References(${foreign.beanInstanceName}.tableName, "${foreign.references}"),');
         } else {
           throw Exception('Unimplemented!');
         }
       }
-
-      if (f.dataType != null) {
-        if (f.dataType is Int) {
-          if (f.isAuto) {
-            _write(", autoIncrement: true");
-          }
-        } else if (f.dataType is VarChar) {
-          _write(", length: ${(f.dataType as VarChar).length}");
-        }
-      }
-
-      _write(', isNullable: ${f.column.isNullable}');
-
-      if (f.column.unique != null) _write(', uniqueGroup: "${f.column.unique}"');
-
       _writeln(');');
+
+      /* TODO
+      if (f.column.unique != null) _write(', uniqueGroup: "${f.column.unique}"');
+       */
     }
     _writeln('return adapter.createTable(st);');
     _w.writeln('}');

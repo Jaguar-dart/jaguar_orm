@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class Remove implements Statement, Whereable {
   final String name;

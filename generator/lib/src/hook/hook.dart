@@ -44,7 +44,7 @@ class BeanGenerator extends GeneratorForAnnotation<ant.GenBean> {
 
       return writer.toString();
     } catch (e, s) {
-      return '/*\nWhile generating for bean ${className}\n$e\n$s\n*/';
+      throw '/*\nWhile generating for bean ${className}\n$e\n$s\n*/';
     }
   }
 }

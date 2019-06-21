@@ -70,12 +70,29 @@ abstract class _CartItemBean implements Bean<CartItem> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, isNullable: true);
-    st.addDouble(amount.name, isNullable: true);
-    st.addStr(product.name, isNullable: true);
-    st.addInt(quantity.name, isNullable: true);
-    st.addInt(cartId.name,
-        foreignTable: cartBean.tableName, foreignCol: 'id', isNullable: true);
+    st.addByType(
+      id.name,
+      Int(),
+      isPrimary: true,
+    );
+    st.addByType(
+      amount.name,
+      null,
+    );
+    st.addByType(
+      product.name,
+      Str(),
+      notNull: true,
+    );
+    st.addByType(
+      quantity.name,
+      null,
+    );
+    st.addByType(
+      cartId.name,
+      Int(),
+      foreign: References(cartBean.tableName, "id"),
+    );
     return adapter.createTable(st);
   }
 
@@ -237,8 +254,15 @@ abstract class _CartBean implements Bean<Cart> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, isNullable: true);
-    st.addDouble(amount.name, isNullable: true);
+    st.addByType(
+      id.name,
+      Int(),
+      isPrimary: true,
+    );
+    st.addByType(
+      amount.name,
+      null,
+    );
     return adapter.createTable(st);
   }
 

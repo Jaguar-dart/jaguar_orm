@@ -1,6 +1,7 @@
 library query.compose;
 
 import 'package:jaguar_query/jaguar_query.dart';
+import 'package:jaguar_query_postgres/src/sql/array.dart';
 
 part 'alter.dart';
 part 'create.dart';

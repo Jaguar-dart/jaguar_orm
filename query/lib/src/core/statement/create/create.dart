@@ -2,6 +2,7 @@ library query.statement.create;
 
 import 'dart:collection';
 import 'package:jaguar_query/jaguar_query.dart';
+import 'package:jaguar_query/src/core/core.dart';
 import 'package:jaguar_query/src/core/datatype/property.dart';
 
 part 'column.dart';
@@ -17,14 +18,27 @@ class Create implements Statement {
     _immutable = ImmutableCreateStatement(this);
   }
 
+  Create addByType(String name, DataType type,
+      {bool notNull = false,
+      bool isPrimary = false,
+      References foreign,
+      List<Constraint> constraints = const []}) {
+    _columns[name] = CreateCol(name, type,
+         notNull: notNull,
+        isPrimary: isPrimary,
+        foreign: foreign,
+        constraints: constraints);
+    return this;
+  }
+
   Create addInt(String name,
-      {bool nonNull = false,
+      {bool notNull = false,
       bool autoIncrement = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
-    _columns[name] = CreateCol(name, Int(autoIncrement: autoIncrement),
-        nonNull: nonNull,
+    _columns[name] = CreateCol(name, Int(auto: autoIncrement),
+         notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -32,12 +46,12 @@ class Create implements Statement {
   }
 
   Create addDouble(String name,
-      {bool nonNull = false,
+      {bool  notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Double(),
-        nonNull: nonNull,
+         notNull:  notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -45,19 +59,19 @@ class Create implements Statement {
   }
 
   Create addBool(String name,
-      {bool nonNull = false, List<Constraint> constraints = const []}) {
+      {bool  notNull = false, List<Constraint> constraints = const []}) {
     _columns[name] =
-        CreateCol(name, Bool(), nonNull: nonNull, constraints: constraints);
+        CreateCol(name, Bool(),  notNull:  notNull, constraints: constraints);
     return this;
   }
 
   Create addTimestamp(String name,
-      {bool nonNull = false,
+      {bool  notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Timestamp(),
-        nonNull: nonNull,
+         notNull:  notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -65,13 +79,13 @@ class Create implements Statement {
   }
 
   Create addStr(String name,
-      {bool nonNull = false,
+      {bool  notNull = false,
       int length,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Str(length: length),
-        nonNull: nonNull,
+         notNull:  notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);

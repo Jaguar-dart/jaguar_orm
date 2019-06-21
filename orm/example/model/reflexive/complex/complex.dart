@@ -16,7 +16,7 @@ class ProductItems {
   @primaryKey
   String id;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   String name;
 
   @ManyToMany(ProductItemsPivotBean, ProductBean)
@@ -90,13 +90,13 @@ class Product {
   @primaryKey
   String id;
 
-  @Column(isNullable: false)
+  @Column(notNull: false)
   String sku;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   String name;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   @BelongsTo(CategoryBean, references: 'id', byHasMany: true)
   int categoryId;
 

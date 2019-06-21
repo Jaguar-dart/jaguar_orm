@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// A relational conditional expression
 class Cond<ValType> extends Expression {

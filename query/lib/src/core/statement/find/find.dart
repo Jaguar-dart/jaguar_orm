@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// Select SQL statement builder.
 class Find implements Statement, Whereable, RowSource {

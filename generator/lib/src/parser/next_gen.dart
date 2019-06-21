@@ -27,28 +27,19 @@ DartType getType(ConstantReader reader, String field) {
 Column readColumn(ConstantReader reader) {
   return Column(
       name: getString(reader, 'name'),
-      isNullable: getBool(reader, 'isNullable'),
-      unique: getString(reader, 'unique'),
+      notNull: getBool(reader, 'notNull'),
       isPrimary: getBool(reader, 'isPrimary'));
-}
-
-VarChar readVarChar(ConstantReader reader) {
-  return VarChar(getInt(reader, 'length'));
-}
-
-Int readInt(ConstantReader reader) {
-  return Int(auto: getBool(reader, 'auto'));
 }
 
 TableForeign readTableForeign(ConstantReader reader) {
   final String toTable = getString(reader, 'toTable');
   final String references = getString(reader, 'references');
 
-  if(references == null) {
+  if (references == null) {
     throw Exception("references cannot be null on ForeignKey!");
   }
 
-  if(toTable == null) {
+  if (toTable == null) {
     throw Exception("toTable cannot be null on ForeignKey!");
   }
 
@@ -61,11 +52,11 @@ BelongsToForeign readBelongsTo(ConstantReader reader) {
   final bool byHasMany = getBool(reader, 'byHasMany');
   final bool toMany = getBool(reader, 'toMany');
 
-  if(references == null) {
+  if (references == null) {
     throw Exception("references cannot be null on BelongsTo!");
   }
 
-  if(bean == null) {
+  if (bean == null) {
     throw Exception("bean cannot be null on BelongsTo!");
   }
 
@@ -83,10 +74,6 @@ List<ColumnDef> _filterColumnDef(FieldElement f) {
 
     if (reader.instanceOf(isColumn)) {
       ret.add(readColumn(reader));
-    } else if (reader.instanceOf(isVarChar)) {
-      ret.add(readVarChar(reader));
-    } else if (reader.instanceOf(isIntCol)) {
-      ret.add(readInt(reader));
     } else if (reader.instanceOf(isForeign)) {
       ret.add(readTableForeign(reader));
     } else if (reader.instanceOf(isBelongsTo)) {
@@ -97,14 +84,39 @@ List<ColumnDef> _filterColumnDef(FieldElement f) {
   return ret;
 }
 
+Map<Type, String> _defaultDataTypeDef = const {
+  int: "Int()",
+  double: "Double()",
+  bool: "Bool()",
+  DateTime: "Timestamp()",
+  String: "Str()",
+  Duration: "Interval()",
+};
+
+String _makeDataType(FieldElement f) {
+  ElementAnnotation annot = firstAnnotationOf(f, isDataType);
+
+  // TODO proper error
+  if (annot == null) {
+    final ret = _defaultDataTypeDef[toDartType(f.type)];
+    if (ret == null) throw Exception("Unknownd type!");
+    return ret;
+  }
+
+  return annot.toSource();
+}
+
 Field _parseField(FieldElement f) {
   final metadata = _filterColumnDef(f);
 
-  if(metadata.isEmpty) return null;
+  if (metadata.isEmpty) return null;
 
+  final dataType = _makeDataType(f);
   Column column = metadata.firstWhere((c) => c is Column, orElse: () => null);
+  /* TODO
   DataType dataType =
       metadata.firstWhere((c) => c is DataType, orElse: () => null);
+   */
 
   ForeignSpec foreign =
       metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);

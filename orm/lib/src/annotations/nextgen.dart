@@ -7,16 +7,14 @@ abstract class ColumnDef {}
 class Column implements ColumnDef {
   final String name;
 
-  final bool isNullable;
+  final bool notNull;
 
   final bool isPrimary;
 
-  final String unique;
-
-  const Column(
-      {this.name, this.isNullable = true, this.isPrimary = false, this.unique});
+  const Column({this.name, this.notNull = false, this.isPrimary = false});
 }
 
+/*
 abstract class DataType implements ColumnDef {}
 
 class Int implements DataType {
@@ -32,6 +30,7 @@ class VarChar implements DataType {
 }
 
 const auto = Int(auto: true);
+ */
 
 abstract class ForeignBase implements ColumnDef {
   String get references;

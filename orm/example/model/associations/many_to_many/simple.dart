@@ -5,10 +5,10 @@ part 'simple.jorm.dart';
 
 class Category {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(50)
+  @Str(length: 50)
   String name;
 
   @ManyToMany(PivotBean, TodoListBean)
@@ -19,10 +19,10 @@ class Category {
 
 class TodoList {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(50)
+  @Str(length: 50)
   String description;
 
   @ManyToMany(PivotBean, CategoryBean)
@@ -33,11 +33,11 @@ class TodoList {
 
 class Pivot {
   @BelongsTo.many(TodoListBean, references: 'id')
-  @VarChar(50)
+  @Str(length: 50)
   String todolistId;
 
   @BelongsTo.many(CategoryBean, references: 'id')
-  @VarChar(50)
+  @Str(length: 50)
   String categoryId;
 }
 

@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class UpdateMany implements Statement /*, Whereable */ {
   String name;

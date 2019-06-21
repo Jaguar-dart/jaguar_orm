@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// Relational comparision operator
 class Op {

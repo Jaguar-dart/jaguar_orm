@@ -4,25 +4,23 @@ import 'package:analyzer/dart/element/element.dart';
 
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart' as next;
+import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 final isGenBean = TypeChecker.fromRuntime(GenBean);
 
 final isBean = TypeChecker.fromRuntime(Bean);
 
-final isColumnDef = TypeChecker.fromRuntime(next.ColumnDef);
+final isColumnDef = TypeChecker.fromRuntime(ColumnDef);
 
-final isColumn = TypeChecker.fromRuntime(next.Column);
+final isColumn = TypeChecker.fromRuntime(Column);
 
-final isIgnore = TypeChecker.fromRuntime(next.IgnoreColumn);
+final isIgnore = TypeChecker.fromRuntime(IgnoreColumn);
 
-final isVarChar = TypeChecker.fromRuntime(next.VarChar);
+final isDataType = TypeChecker.fromRuntime(DataType);
 
-final isIntCol = TypeChecker.fromRuntime(next.Int);
+final isForeign = TypeChecker.fromRuntime(ForeignKey);
 
-final isForeign = TypeChecker.fromRuntime(next.ForeignKey);
-
-final isBelongsTo = TypeChecker.fromRuntime(next.BelongsTo);
+final isBelongsTo = TypeChecker.fromRuntime(BelongsTo);
 
 final isRelation = TypeChecker.fromRuntime(Relation);
 
@@ -54,6 +52,8 @@ bool isBuiltin(DartType type) {
   if (isDouble.isExactlyType(type)) return true;
   if (isNum.isExactlyType(type)) return true;
   if (isBool.isExactlyType(type)) return true;
+  // TODO DateTime
+  // TODO Duration
 
   return false;
 }
@@ -77,3 +77,22 @@ class FieldSpecException {
 
 String uncap(String str) =>
     str.substring(0, 1).toLowerCase() + str.substring(1);
+
+ElementAnnotation firstAnnotationOf(Element e, TypeChecker check) {
+  for(ElementAnnotation ea in e.metadata) {
+    if(check.isAssignableFrom(e)) return ea;
+  }
+  return null;
+}
+
+Type toDartType(DartType type) {
+  if (isString.isExactlyType(type)) return String;
+  if (isInt.isExactlyType(type)) return int;
+  if (isDouble.isExactlyType(type)) return double;
+  if (isNum.isExactlyType(type)) return double;
+  if (isBool.isExactlyType(type)) return bool;
+  // TODO DateTime
+  // TODO Duration
+
+  return null;
+}

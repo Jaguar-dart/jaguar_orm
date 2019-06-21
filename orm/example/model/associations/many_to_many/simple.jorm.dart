@@ -47,8 +47,15 @@ abstract class _TodoListBean implements Bean<TodoList> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: true);
-    st.addStr(description.name, length: 50, isNullable: true);
+    st.addByType(
+      id.name,
+      Str(),
+      isPrimary: true,
+    );
+    st.addByType(
+      description.name,
+      null,
+    );
     return adapter.createTable(st);
   }
 
@@ -280,8 +287,15 @@ abstract class _CategoryBean implements Bean<Category> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: true);
-    st.addStr(name.name, length: 50, isNullable: true);
+    st.addByType(
+      id.name,
+      Str(),
+      isPrimary: true,
+    );
+    st.addByType(
+      name.name,
+      null,
+    );
     return adapter.createTable(st);
   }
 
@@ -515,16 +529,16 @@ abstract class _PivotBean implements Bean<Pivot> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(todolistId.name,
-        foreignTable: todoListBean.tableName,
-        foreignCol: 'id',
-        length: 50,
-        isNullable: true);
-    st.addStr(categoryId.name,
-        foreignTable: categoryBean.tableName,
-        foreignCol: 'id',
-        length: 50,
-        isNullable: true);
+    st.addByType(
+      todolistId.name,
+      Str(),
+      foreign: References(todoListBean.tableName, "id"),
+    );
+    st.addByType(
+      categoryId.name,
+      Str(),
+      foreign: References(categoryBean.tableName, "id"),
+    );
     return adapter.createTable(st);
   }
 

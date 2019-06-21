@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class CreateDb implements Statement {
   final String name;

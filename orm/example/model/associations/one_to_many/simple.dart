@@ -5,10 +5,10 @@ part 'simple.jorm.dart';
 
 class Author {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(50)
+  @Str(length: 50)
   String name;
 
   List<Post> posts;
@@ -18,14 +18,14 @@ class Author {
 
 class Post {
   @primaryKey
-  @VarChar(50)
+  @Str(length: 50)
   String id;
 
-  @VarChar(150)
+  @Str(length: 150)
   String message;
 
   @BelongsTo(AuthorBean, references: 'id')
-  @VarChar(50)
+  @Str(length: 50)
   String authorId;
 
   String toString() => "Post($id, $authorId, $message)";
@@ -51,7 +51,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 
   Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)
-        .addStr('id', primary: true, length: 50)
+        .addStr('id', isPrimary: true, length: 50)
         .addStr('name', length: 50);
     return adapter.createTable(st);
   }
@@ -60,7 +60,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 }
 
 @GenBean(
-  /*
+/*
   columns: const {
     'id': const PrimaryKey(length: 50),
     'authorId': const ForeignKeyBelongsTo(AuthorBean, length: 50),
@@ -76,10 +76,10 @@ class PostBean extends Bean<Post> with _PostBean {
 
   Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)
-        .addStr('id', primary: true, length: 50)
+        .addStr('id', isPrimary: true, length: 50)
         .addStr('message', length: 150)
         .addStr('author_id',
-        length: 50, foreignTable: authorBean.tableName, foreignCol: 'id');
+            length: 50, foreign: References(authorBean.tableName, 'id'));
     return adapter.createTable(st);
   }
 

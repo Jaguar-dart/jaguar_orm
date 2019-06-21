@@ -17,7 +17,7 @@ class Field {
 
   final Column column;
 
-  final DataType dataType;
+  final String dataType;
 
   final ForeignSpec foreign;
 
@@ -39,7 +39,9 @@ class Field {
   }
 
   bool get isAuto {
+    /* TODO
     if (dataType is Int) return (dataType as Int).auto;
+     */
     return false;
   }
 }

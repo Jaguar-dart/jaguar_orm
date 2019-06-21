@@ -7,7 +7,7 @@ import 'package:analyzer/dart/constant/value.dart';
 
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'package:jaguar_orm_gen/src/model/model.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart';
+import 'package:jaguar_orm/jaguar_orm.dart' hide Field;
 
 part 'next_gen.dart';
 
@@ -81,7 +81,7 @@ class ParsedBean {
     _parseBelongsToAssociation();
 
     // Collect [BeanedForeignAssociation] from [BelongsToForeign]
-    _parseBeanedForeignAssociation();
+    // TODO _parseBeanedForeignAssociation();
 
     // Collect [TabledForeignAssociation] from [TableForeign]
     for (Field f in fields.values) {
@@ -175,8 +175,8 @@ class ParsedBean {
       BelongsToAssociation current = beanedAssociations[bean];
 
       final WriterModel info =
-      ParsedBean(bean.element, doRelations: false, doAssociation: false)
-          .detect();
+          ParsedBean(bean.element, doRelations: false, doAssociation: false)
+              .detect();
 
       final Preload other = info.findHasXByAssociation(clazz.type);
 
@@ -218,8 +218,8 @@ class ParsedBean {
 
       {
         final WriterModel info =
-        ParsedBean(bean.element, doRelations: false, doAssociation: false)
-            .detect();
+            ParsedBean(bean.element, doRelations: false, doAssociation: false)
+                .detect();
         final Preload other = info.findHasXByAssociation(clazz.type);
         if (other != null) continue;
       }
@@ -250,21 +250,18 @@ class ParsedBean {
       throw Exception("Beans must implement Bean interface!");
     }
 
-    final ElementAnnotation meta = clazz.metadata.firstWhere(
-        (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
-        orElse: () => null);
-    if (meta == null)
-      throw Exception("Cannot find or parse `GenBean` annotation!");
-    reader = ConstantReader(meta.computeConstantValue());
+    final DartObject meta = isGenBean.firstAnnotationOf(clazz);
+    if (meta == null) {
+      throw Exception("GenBean annotation not found for ${clazz.name}!");
+    }
+    reader = ConstantReader(meta);
 
     final InterfaceType interface = clazz.allSupertypes
         .firstWhere((InterfaceType i) => isBean.isExactlyType(i));
 
     model = interface.typeArguments.first;
 
-    if (model.isDynamic) {
-      throw Exception("Don't support Model of type dynamic!");
-    }
+    if (model.isDynamic) throw Exception("Model cannot be dynamic!");
   }
 
   /// Parses and populates [fields]
@@ -336,7 +333,7 @@ class ParsedBean {
           if (!field.isFinal || field.isSynthetic) continue;
         }
 
-        if (isIgnore.firstAnnotationOf(field) != null) {
+        if (isIgnore.hasAnnotationOf(field)) {
           ignores.add(field.name);
           continue;
         }

@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 /// An in-between conditional expression
 class Between<ValType> extends Expression {

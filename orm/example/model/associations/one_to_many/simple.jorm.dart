@@ -46,8 +46,15 @@ abstract class _AuthorBean implements Bean<Author> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: true);
-    st.addStr(name.name, length: 50, isNullable: true);
+    st.addByType(
+      id.name,
+      Str(),
+      isPrimary: true,
+    );
+    st.addByType(
+      name.name,
+      null,
+    );
     return adapter.createTable(st);
   }
 
@@ -289,13 +296,20 @@ abstract class _PostBean implements Bean<Post> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addStr(id.name, primary: true, length: 50, isNullable: true);
-    st.addStr(message.name, length: 150, isNullable: true);
-    st.addStr(authorId.name,
-        foreignTable: authorBean.tableName,
-        foreignCol: 'id',
-        length: 50,
-        isNullable: true);
+    st.addByType(
+      id.name,
+      Str(),
+      isPrimary: true,
+    );
+    st.addByType(
+      message.name,
+      null,
+    );
+    st.addByType(
+      authorId.name,
+      Str(),
+      foreign: References(authorBean.tableName, "id"),
+    );
     return adapter.createTable(st);
   }
 

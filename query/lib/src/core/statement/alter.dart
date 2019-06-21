@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 abstract class AlterClause {}
 
@@ -10,15 +10,15 @@ class AddColumn<T> implements AlterClause {
   String get name => column.name;
 
   static AddColumn<core.int> int(String name,
-      {core.bool nonNull = false,
+      {core.bool  notNull = false,
       core.bool autoIncrement = false,
       core.bool primary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
-      Int(autoIncrement: autoIncrement),
-      nonNull: nonNull,
+      Int(auto: autoIncrement),
+       notNull:  notNull,
       isPrimary: primary,
       foreign: foreign,
       constraints: constraints,
@@ -26,14 +26,14 @@ class AddColumn<T> implements AlterClause {
   }
 
   static AddColumn<core.double> double(String name,
-      {core.bool nonNull = false,
+      {core.bool  notNull = false,
       core.bool primary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
       Double(),
-      nonNull: nonNull,
+       notNull:  notNull,
       isPrimary: primary,
       foreign: foreign,
       constraints: constraints,
@@ -42,14 +42,14 @@ class AddColumn<T> implements AlterClause {
 
   static AddColumn<String> string(String name,
       {core.int length = 20,
-      core.bool nonNull = false,
+      core.bool  notNull = false,
       core.bool primary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
       Str(length: length),
-      nonNull: nonNull,
+       notNull:  notNull,
       isPrimary: primary,
       foreign: foreign,
       constraints: constraints,
@@ -57,24 +57,24 @@ class AddColumn<T> implements AlterClause {
   }
 
   static AddColumn<core.bool> bool(String name,
-      {core.bool nonNull = false, List<Constraint> constraints = const []}) {
+      {core.bool  notNull = false, List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
       Bool(),
-      nonNull: nonNull,
+       notNull:  notNull,
       constraints: constraints,
     ));
   }
 
   static AddColumn<DateTime> timestamp(String name,
-      {core.bool nonNull = false,
+      {core.bool  notNull = false,
       core.bool primary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
       Timestamp(),
-      nonNull: nonNull,
+       notNull:  notNull,
       isPrimary: primary,
       foreign: foreign,
       constraints: constraints,

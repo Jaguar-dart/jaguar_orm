@@ -5,13 +5,13 @@ import 'package:meta/meta.dart';
 part 'simple.jorm.dart';
 
 class User {
-  @Column(isPrimary: true, isNullable: false)
+  @Column(isPrimary: true, notNull: false)
   @auto
   final int id;
 
   final String name;
 
-  @Column(isNullable: true)
+  @Column(notNull: true)
   final int age;
 
   const User({@required this.id, @required this.name, @required this.age});

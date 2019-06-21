@@ -5,6 +5,8 @@ String composeRowSource(RowSource source) {
     return source.name;
   } else if (source is Find) {
     return '(' + composeFind(source) + ')';
+  } else if (source is Values) {
+    return '(' + composeValues(source) + ')';
   } else if (source is ToDialectAble) {
     final ret = (source as ToDialectAble).toDialect("postgres");
     if (ret is String) return ret;
@@ -22,6 +24,24 @@ String composeAliasedRowSource(AliasedRowSource source) {
   if (source.alias != null) {
     sb.write(' AS ${source.alias}');
   }
+
+  return sb.toString();
+}
+
+String composeRow(Row row) {
+  final sb = StringBuffer('(');
+  sb.write(row.columns.map((v) => composeValue(v)).join(','));
+  sb.write(')');
+  return sb.toString();
+}
+
+String composeValues(Values values) {
+  if (values.rows.isEmpty) throw Exception("Values cannot be empty!");
+  final sb = StringBuffer();
+
+  sb.write('VALUES ');
+
+  sb.write(values.rows.map(composeRow).join(','));
 
   return sb.toString();
 }

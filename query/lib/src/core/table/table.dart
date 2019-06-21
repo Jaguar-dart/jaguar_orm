@@ -1,4 +1,4 @@
-part of query;
+part of query.core;
 
 class AliasedRowSource {
   final RowSource source;
@@ -16,6 +16,18 @@ class Table implements RowSource {
   final String name;
 
   Table(this.name);
+}
+
+class Row {
+  final List<dynamic> columns;
+
+  Row(this.columns);
+}
+
+class Values implements RowSource {
+  final List<Row> rows;
+
+  Values(this.rows);
 }
 
 /// A SQL join type that can be used in 'SELECT' statements
