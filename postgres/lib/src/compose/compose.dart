@@ -4,6 +4,7 @@ import 'package:jaguar_query/jaguar_query.dart';
 
 part 'alter.dart';
 part 'create.dart';
+part 'create_db.dart';
 part 'delete.dart';
 part 'expression.dart';
 part 'find.dart';

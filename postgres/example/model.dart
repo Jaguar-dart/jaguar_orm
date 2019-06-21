@@ -64,7 +64,7 @@ class PostBean extends Bean<Post> {
 
   Future<void> createTable() async {
     await Create(tableName, ifNotExists: true)
-        .addInt('_id', primary: true)
+        .addInt('_id', isPrimary: true)
         .addStr('msg')
         .addStr('author')
         .exec(adapter);

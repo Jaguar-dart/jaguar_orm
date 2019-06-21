@@ -79,14 +79,14 @@ String composeOrderBy(final OrderBy orderBy) =>
     '${orderBy.columnName} ' + (orderBy.ascending ? 'ASC' : 'DESC');
 
 String composeSelExpr(SelExpr exp) {
-  if(exp is Sel) {
+  if (exp is Sel) {
     return exp.name;
-  } else if(exp is Func) {
+  } else if (exp is Func) {
     return composeFunc(exp);
-  } else if(exp is ToDialectAble) {
+  } else if (exp is ToDialectAble) {
     final ret = (exp as ToDialectAble).toDialect("postgres");
-    if(ret is String) return ret;
-    if(ret is SelExpr) return composeSelExpr(ret);
+    if (ret is String) return ret;
+    if (ret is SelExpr) return composeSelExpr(ret);
     throw UnsupportedError("Unsupported select expression $ret");
   }
   throw UnsupportedError("Unsupported select expression $exp");
