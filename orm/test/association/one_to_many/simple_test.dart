@@ -1,12 +1,12 @@
 import 'package:test/test.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
-import '../../example/model/associations/one_to_one/simple.dart';
+import '../../../example/model/associations/one_to_one/simple.dart';
 
 final adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 void main() {
-  group('OneToOne', () {
+  group('OneToMany', () {
     final userBean = UserBean(adapter);
     final addressBean = AddressBean(adapter);
 

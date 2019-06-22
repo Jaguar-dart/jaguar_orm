@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ignore_column.dart';
+part of 'unique.dart';
 
 // **************************************************************************
 // BeanGenerator
@@ -62,10 +62,12 @@ abstract class _UserBean implements Bean<User> {
       id.name,
       auto,
       isPrimary: true,
+      notNull: true,
     );
     st.addByType(
       name.name,
       Str(),
+      constraints: [unique],
     );
     st.addByType(
       age.name,

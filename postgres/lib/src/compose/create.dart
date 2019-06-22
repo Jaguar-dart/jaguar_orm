@@ -8,14 +8,12 @@ String composeDataType(final DataType type) {
     } else {
       return 'INT';
     }
-  }
-  // TODO double
-  else if (type is Array) {
+  } else if (type is prefix0.Double) {
+    return 'DECIMAL';
+  } else if (type is Array) {
     return composeDataType(type.itemType) + '[]';
   } else if (type is HStore) {
     return 'HSTORE';
-  } else if (type is Bool) {
-    return 'BOOLEAN';
   } else if (type is Timestamp) {
     return 'TIMESTAMP';
   } else if (type is Str) {

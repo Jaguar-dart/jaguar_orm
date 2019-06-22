@@ -16,6 +16,8 @@ final isColumn = TypeChecker.fromRuntime(Column);
 
 final isIgnore = TypeChecker.fromRuntime(IgnoreColumn);
 
+final isConstraint = TypeChecker.fromRuntime(Constraint);
+
 final isDataType = TypeChecker.fromRuntime(DataType);
 
 final isForeign = TypeChecker.fromRuntime(ForeignKey);
@@ -87,6 +89,10 @@ ElementAnnotation firstAnnotationOf(Element e, TypeChecker check) {
     }
   }
   return null;
+}
+
+bool isAnnotationOf(ElementAnnotation ea, TypeChecker check) {
+  return check.isAssignableFromType(ea.computeConstantValue().type);
 }
 
 Type toDartType(DartType type) {

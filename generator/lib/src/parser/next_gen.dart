@@ -111,23 +111,28 @@ Tuple2<String, bool> _makeDataType(FieldElement f) {
   return Tuple2(annot.toSource().substring(1), auto);
 }
 
+List<String> _parseConstraints(Element f) {
+  return f.metadata
+      .where((ea) => isAnnotationOf(ea, isConstraint))
+      .map((ea) => ea.toSource().substring(1))
+      .toList();
+}
+
 Field _parseField(FieldElement f) {
   final metadata = _filterColumnDef(f);
 
   final dataType = _makeDataType(f);
   Column column = metadata.firstWhere((c) => c is Column, orElse: () => null);
-  /* TODO
-  DataType dataType =
-      metadata.firstWhere((c) => c is DataType, orElse: () => null);
-   */
 
   ForeignSpec foreign =
       metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
+  final constraints = _parseConstraints(f);
 
   return Field(f.type.displayName, f.name,
       isAuto: dataType.item2,
       column: column,
       dataType: dataType.item1,
       foreign: foreign,
-      isFinal: f.isFinal && f.getter.isSynthetic);
+      isFinal: f.isFinal && f.getter.isSynthetic,
+      constraints: constraints);
 }

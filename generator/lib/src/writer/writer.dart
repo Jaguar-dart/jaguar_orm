@@ -113,11 +113,9 @@ class Writer {
           throw Exception('Unimplemented!');
         }
       }
+      if (f.constraints.isNotEmpty)
+        _write('constraints: [${f.constraints.join(',')}],');
       _writeln(');');
-
-      /* TODO
-      if (f.column.unique != null) _write(', uniqueGroup: "${f.column.unique}"');
-       */
     }
     _writeln('return adapter.createTable(st);');
     _w.writeln('}');

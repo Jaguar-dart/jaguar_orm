@@ -1,5 +1,6 @@
 library jaguar_orm.generator.model;
 
+import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
@@ -23,12 +24,15 @@ class Field {
 
   final bool isAuto;
 
+  final List<String> constraints;
+
   Field(this.type, this.field,
       {@required Column column,
       @required this.dataType,
       @required this.foreign,
       @required this.isFinal,
-      @required this.isAuto})
+      @required this.isAuto,
+      this.constraints: const []})
       : column = column ?? Column();
 
   String get colName => column?.name ?? field;

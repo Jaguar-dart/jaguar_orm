@@ -5,7 +5,7 @@ library example.basic;
 
 import 'dart:io';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
-import '../model/basic/simple.dart';
+import '../model/basic/ignore_column.dart';
 
 /// The adapter
 final _adapter =

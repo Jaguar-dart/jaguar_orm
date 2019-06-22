@@ -33,8 +33,10 @@ class References {
 abstract class Constraint {}
 
 /// SQL UNIQUE constraint
-class Unique {
+class Unique implements Constraint {
   final String group;
 
   const Unique({this.group});
 }
+
+const unique = Unique();
