@@ -48,12 +48,12 @@ abstract class _UserBean implements Bean<User> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(),
+      Str(length: 50),
       isPrimary: true,
     );
     st.addByType(
       name.name,
-      null,
+      Str(length: 50),
     );
     return adapter.createTable(st);
   }
@@ -145,9 +145,9 @@ abstract class _UserBean implements Bean<User> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       User newModel;
@@ -179,8 +179,9 @@ abstract class _UserBean implements Bean<User> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -291,12 +292,12 @@ abstract class _AddressBean implements Bean<Address> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(),
+      Str(length: 50),
       isPrimary: true,
     );
     st.addByType(
       street.name,
-      null,
+      Str(length: 150),
     );
     st.addByType(
       userId.name,
@@ -353,9 +354,9 @@ abstract class _AddressBean implements Bean<Address> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     return adapter.update(update);
   }
 
@@ -365,8 +366,9 @@ abstract class _AddressBean implements Bean<Address> {
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      data.add(toSetColumns(model,
+              only: only, onlyNonNull: onlyNonNull, update: true)
+          .toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);

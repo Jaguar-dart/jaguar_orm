@@ -77,7 +77,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
     );
     st.addByType(
       amount.name,
-      null,
+      Double(),
     );
     st.addByType(
       product.name,
@@ -86,7 +86,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
     );
     st.addByType(
       quantity.name,
-      null,
+      Int(),
     );
     st.addByType(
       cartId.name,
@@ -143,9 +143,9 @@ abstract class _CartItemBean implements Bean<CartItem> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     return adapter.update(update);
   }
 
@@ -155,8 +155,9 @@ abstract class _CartItemBean implements Bean<CartItem> {
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      data.add(toSetColumns(model,
+              only: only, onlyNonNull: onlyNonNull, update: true)
+          .toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);
@@ -261,7 +262,7 @@ abstract class _CartBean implements Bean<Cart> {
     );
     st.addByType(
       amount.name,
-      null,
+      Double(),
     );
     return adapter.createTable(st);
   }
@@ -357,9 +358,9 @@ abstract class _CartBean implements Bean<Cart> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       Cart newModel;
@@ -393,8 +394,9 @@ abstract class _CartBean implements Bean<Cart> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);

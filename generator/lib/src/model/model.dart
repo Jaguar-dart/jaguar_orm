@@ -21,28 +21,25 @@ class Field {
 
   final ForeignSpec foreign;
 
+  final bool isAuto;
+
   Field(this.type, this.field,
       {@required Column column,
       @required this.dataType,
       @required this.foreign,
-      @required this.isFinal})
+      @required this.isFinal,
+      @required this.isAuto})
       : column = column ?? Column();
 
   String get colName => column?.name ?? field;
 
+  // TODO
   String get vType {
     try {
       return getValType(type);
     } catch (e) {
       throw FieldSpecException(field, e.toString());
     }
-  }
-
-  bool get isAuto {
-    /* TODO
-    if (dataType is Int) return (dataType as Int).auto;
-     */
-    return false;
   }
 }
 

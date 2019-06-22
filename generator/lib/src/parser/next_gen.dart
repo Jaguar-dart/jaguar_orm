@@ -93,23 +93,26 @@ Map<Type, String> _defaultDataTypeDef = const {
   Duration: "Interval()",
 };
 
-String _makeDataType(FieldElement f) {
+Tuple2<String, bool> _makeDataType(FieldElement f) {
   ElementAnnotation annot = firstAnnotationOf(f, isDataType);
 
   // TODO proper error
   if (annot == null) {
-    final ret = _defaultDataTypeDef[toDartType(f.type)];
+    final dartType = toDartType(f.type);
+    if (dartType == null) throw Exception("Unknownd type!");
+    final ret = _defaultDataTypeDef[dartType];
     if (ret == null) throw Exception("Unknownd type!");
-    return ret;
+    return Tuple2(ret, false);
   }
 
-  return annot.toSource();
+  final auto =
+      getBool(ConstantReader(annot.computeConstantValue()), 'auto') ?? false;
+
+  return Tuple2(annot.toSource().substring(1), auto);
 }
 
 Field _parseField(FieldElement f) {
   final metadata = _filterColumnDef(f);
-
-  if (metadata.isEmpty) return null;
 
   final dataType = _makeDataType(f);
   Column column = metadata.firstWhere((c) => c is Column, orElse: () => null);
@@ -122,5 +125,9 @@ Field _parseField(FieldElement f) {
       metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
 
   return Field(f.type.displayName, f.name,
-      column: column, dataType: dataType, foreign: foreign, isFinal: f.isFinal);
+      isAuto: dataType.item2,
+      column: column,
+      dataType: dataType.item1,
+      foreign: foreign,
+      isFinal: f.isFinal && f.getter.isSynthetic);
 }

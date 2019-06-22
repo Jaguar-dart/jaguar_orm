@@ -4,7 +4,7 @@ import 'package:jaguar_orm_gen/src/model/model.dart';
 import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 class Writer {
-  final StringBuffer _w = StringBuffer();
+  final _w = StringBuffer();
 
   final WriterModel _b;
 
@@ -131,10 +131,9 @@ class Writer {
 
     _w.writeln('if(only == null && !onlyNonNull) {');
 
-    // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
       if (field.isAuto) {
-        _w.writeln("if(model.${field.field} != null) {");
+        _w.writeln("if(!update && model.${field.field} != null) {");
       }
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
       if (field.isAuto) {
@@ -144,7 +143,6 @@ class Writer {
 
     _w.writeln('} else if (only != null) {');
 
-    // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
       if (field.isAuto) {
         _w.writeln("if(model.${field.field} != null) {");
@@ -158,7 +156,6 @@ class Writer {
 
     _w.writeln('} else /* if (onlyNonNull) */ {');
 
-    // TODO if update, don't set primary key
     _b.fields.values.forEach((Field field) {
       _w.writeln("if(model.${field.field} != null) {");
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
@@ -411,7 +408,7 @@ class Writer {
           .join('.');
       _w.write(wheres);
       _w.writeln(
-          '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
+          '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull, update:true));');
       _w.writeln('return adapter.update(update);');
       _w.writeln('}');
       return;
@@ -425,7 +422,7 @@ class Writer {
         .join('.');
     _w.write(wheres);
     _w.writeln(
-        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
+        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull, update:true));');
     _w.writeln('final ret = adapter.update(update);');
 
     _w.writeln('if(cascade) {');
@@ -502,7 +499,7 @@ class Writer {
     _w.write('for (var i = 0; i < models.length; ++i) {');
     _w.write('var model = models[i];');
     _w.write(
-        'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());');
+        'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull, update:true).toList());');
 
     String wheres;
     for (var prim in _b.primary) {

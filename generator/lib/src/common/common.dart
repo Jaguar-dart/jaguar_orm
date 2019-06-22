@@ -44,6 +44,8 @@ final isNum = TypeChecker.fromRuntime(num);
 
 final isDateTime = TypeChecker.fromRuntime(DateTime);
 
+final isDuration = TypeChecker.fromRuntime(Duration);
+
 final isBool = TypeChecker.fromRuntime(bool);
 
 bool isBuiltin(DartType type) {
@@ -80,7 +82,9 @@ String uncap(String str) =>
 
 ElementAnnotation firstAnnotationOf(Element e, TypeChecker check) {
   for(ElementAnnotation ea in e.metadata) {
-    if(check.isAssignableFrom(e)) return ea;
+    if(check.isAssignableFromType(ea.computeConstantValue().type)) {
+      return ea;
+    }
   }
   return null;
 }
@@ -91,8 +95,8 @@ Type toDartType(DartType type) {
   if (isDouble.isExactlyType(type)) return double;
   if (isNum.isExactlyType(type)) return double;
   if (isBool.isExactlyType(type)) return bool;
-  // TODO DateTime
-  // TODO Duration
+  if(isDateTime.isExactlyType(type)) return DateTime;
+  if(isDuration.isExactlyType(type)) return Duration;
 
   return null;
 }

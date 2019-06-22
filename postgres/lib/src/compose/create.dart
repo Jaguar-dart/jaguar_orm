@@ -4,7 +4,7 @@ String composeDataType(final DataType type) {
   if (type == null) throw Exception("Data type cannot be null!");
   if (type is Int) {
     if (type.auto) {
-      return 'SERIAL';
+      return 'INT GENERATED ALWAYS AS IDENTITY';
     } else {
       return 'INT';
     }

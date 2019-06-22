@@ -48,12 +48,12 @@ abstract class _AuthorBean implements Bean<Author> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(),
+      Str(length: 50),
       isPrimary: true,
     );
     st.addByType(
       name.name,
-      null,
+      Str(length: 50),
     );
     return adapter.createTable(st);
   }
@@ -149,9 +149,9 @@ abstract class _AuthorBean implements Bean<Author> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       Author newModel;
@@ -184,8 +184,9 @@ abstract class _AuthorBean implements Bean<Author> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -298,16 +299,16 @@ abstract class _PostBean implements Bean<Post> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(),
+      Str(length: 50),
       isPrimary: true,
     );
     st.addByType(
       message.name,
-      null,
+      Str(length: 150),
     );
     st.addByType(
       authorId.name,
-      Str(),
+      Str(length: 50),
       foreign: References(authorBean.tableName, "id"),
     );
     return adapter.createTable(st);
@@ -360,9 +361,9 @@ abstract class _PostBean implements Bean<Post> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     return adapter.update(update);
   }
 
@@ -372,8 +373,9 @@ abstract class _PostBean implements Bean<Post> {
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      data.add(toSetColumns(model,
+              only: only, onlyNonNull: onlyNonNull, update: true)
+          .toList());
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updaters.addAll(data, where);

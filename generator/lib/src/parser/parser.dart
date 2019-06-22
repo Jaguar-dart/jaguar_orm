@@ -1,5 +1,6 @@
 library jaguar_orm.generator.parser;
 
+import 'package:tuple/tuple.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -340,20 +341,10 @@ class ParsedBean {
 
         if (field.isStatic) continue;
 
-        final val = _parseField(field);
-
-        if (val is Field) {
+        if (!_relation(clazz.type, field)) {
+          final val = _parseField(field);
           fields[val.field] = val;
           if (val.column.isPrimary) primaries.add(val);
-        } else {
-          if (!_relation(clazz.type, field)) {
-            final vf = Field(field.type.name, field.name,
-                column: Column(),
-                dataType: null,
-                foreign: null,
-                isFinal: field.isFinal && field.getter.isSynthetic);
-            fields[vf.field] = vf;
-          }
         }
       } catch (e, s) {
         throw FieldParseException(field.name, e, s);

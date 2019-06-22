@@ -150,9 +150,9 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       ProductItems newModel;
@@ -182,8 +182,9 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -351,8 +352,9 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      data.add(toSetColumns(model,
+              only: only, onlyNonNull: onlyNonNull, update: true)
+          .toList());
       where.add(null);
     }
     final UpdateMany update = updaters.addAll(data, where);
@@ -649,9 +651,9 @@ abstract class _ProductBean implements Bean<Product> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       Product newModel;
@@ -681,8 +683,9 @@ abstract class _ProductBean implements Bean<Product> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
@@ -914,9 +917,9 @@ abstract class _CategoryBean implements Bean<Category> {
       bool associate = false,
       Set<String> only,
       bool onlyNonNull = false}) async {
-    final Update update = updater
-        .where(this.id.eq(model.id))
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    final Update update = updater.where(this.id.eq(model.id)).setMany(
+        toSetColumns(model,
+            only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update);
     if (cascade) {
       Category newModel;
@@ -951,8 +954,9 @@ abstract class _CategoryBean implements Bean<Category> {
       final List<Expression> where = [];
       for (var i = 0; i < models.length; ++i) {
         var model = models[i];
-        data.add(
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        data.add(toSetColumns(model,
+                only: only, onlyNonNull: onlyNonNull, update: true)
+            .toList());
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updaters.addAll(data, where);
