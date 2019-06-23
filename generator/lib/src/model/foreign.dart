@@ -38,10 +38,10 @@ class BeanedForeign implements Foreign {
 }
 */
 
-class TableForeign implements ForeignSpec {
+class ReferencesForeign implements ForeignSpec {
   final String table;
 
   final String references;
 
-  TableForeign(this.table, this.references);
+  ReferencesForeign(this.table, this.references);
 }

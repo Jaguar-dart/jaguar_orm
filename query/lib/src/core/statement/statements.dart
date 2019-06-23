@@ -22,7 +22,7 @@ class Func implements SelExpr {
 
   final List<SelExpr> args;
 
-  Func(this.name, {this.args: const []});
+  Func(this.name, {this.args = const []});
 }
 
 abstract class Funcs {

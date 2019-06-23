@@ -15,7 +15,7 @@ class CreateCol<T> implements Property {
 
   CreateCol(this.name, this.type,
       {this. notNull = false,
-      this.isPrimary: false,
+      this.isPrimary = false,
       this.foreign,
       this.constraints = const []});
 }

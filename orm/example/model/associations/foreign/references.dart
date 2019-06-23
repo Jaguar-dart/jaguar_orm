@@ -1,21 +1,20 @@
 library example.has_one;
 
-import 'dart:async';
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-part 'simple.jorm.dart';
+part 'references.jorm.dart';
 
 class User {
   @primaryKey
-  @Str(length: 50)
-  String id;
+  @auto
+  int id;
 
   @Str(length: 50)
   String name;
 
-  @HasOne(AddressBean)
+  @ignoreColumn
   Address address;
 
   User({this.id, this.name, this.address});
@@ -34,14 +33,17 @@ class User {
 
 class Address {
   @primaryKey
-  @Str(length: 50)
-  String id;
+  @auto
+  int id;
 
   @Str(length: 150)
   String street;
 
-  @BelongsTo(UserBean, references: 'id')
-  String userId;
+  @References('oto_simple_user', 'id')
+  int userId;
+
+  @References('oto_simple_user', 'name')
+  String userName;
 
   Address({this.id, this.street, this.userId});
 

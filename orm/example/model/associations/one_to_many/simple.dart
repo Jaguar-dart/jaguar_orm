@@ -11,6 +11,7 @@ class Author {
   @Str(length: 50)
   String name;
 
+  @HasMany(PostBean)
   List<Post> posts;
 
   String toString() => "Author($id, $name, $posts)";
@@ -31,17 +32,7 @@ class Post {
   String toString() => "Post($id, $authorId, $message)";
 }
 
-@GenBean(
-  /* TODO
-  columns: const {
-    'id': const PrimaryKey(length: 50),
-    'name': const Column(length: 50)
-  },
-  */
-  relations: const {
-    'posts': const HasMany(PostBean),
-  },
-)
+@GenBean()
 class AuthorBean extends Bean<Author> with _AuthorBean {
   final PostBean postBean;
 
@@ -59,15 +50,7 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
   String get tableName => 'otm_simple_author';
 }
 
-@GenBean(
-/*
-  columns: const {
-    'id': const PrimaryKey(length: 50),
-    'authorId': const ForeignKeyBelongsTo(AuthorBean, length: 50),
-    'message': const Column(length: 150),
-  },
-   */
-)
+@GenBean()
 class PostBean extends Bean<Post> with _PostBean {
   AuthorBean _authorBean;
   AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);

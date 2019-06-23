@@ -70,8 +70,13 @@ class WriterModel {
   Field fieldByColName(String colName) => fields.values
       .firstWhere((Field f) => f.colName == colName, orElse: () => null);
 
-  WriterModel(this.name, this.modelType, this.fields, this.primary,
-      this.belongTos, this.beanedForeignAssociations, this.preloads);
+  WriterModel(this.name,
+      {@required this.modelType,
+      @required this.fields,
+      @required this.primary,
+      @required this.belongTos,
+      @required this.beanedForeignAssociations,
+      @required this.preloads});
 
   Preload findHasXByAssociation(DartType association) {
     return preloads.firstWhere((p) => p.bean == association,

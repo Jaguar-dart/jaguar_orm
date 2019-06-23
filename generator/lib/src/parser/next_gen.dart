@@ -31,19 +31,19 @@ Column readColumn(ConstantReader reader) {
       isPrimary: getBool(reader, 'isPrimary'));
 }
 
-TableForeign readTableForeign(ConstantReader reader) {
-  final String toTable = getString(reader, 'toTable');
-  final String references = getString(reader, 'references');
+ReferencesForeign readReferences(ConstantReader reader) {
+  final String table = getString(reader, 'table');
+  final String col = getString(reader, 'col');
 
-  if (references == null) {
-    throw Exception("references cannot be null on ForeignKey!");
+  if (table == null) {
+    throw Exception("table of a Reference is mandatory!");
   }
 
-  if (toTable == null) {
-    throw Exception("toTable cannot be null on ForeignKey!");
+  if (col == null) {
+    throw Exception("col of a Reference is mandatory!");
   }
 
-  return TableForeign(toTable, references);
+  return ReferencesForeign(table, col);
 }
 
 BelongsToForeign readBelongsTo(ConstantReader reader) {
@@ -74,8 +74,8 @@ List<ColumnDef> _filterColumnDef(FieldElement f) {
 
     if (reader.instanceOf(isColumn)) {
       ret.add(readColumn(reader));
-    } else if (reader.instanceOf(isForeign)) {
-      ret.add(readTableForeign(reader));
+    } else if (reader.instanceOf(isReferences)) {
+      ret.add(readReferences(reader));
     } else if (reader.instanceOf(isBelongsTo)) {
       ret.add(readBelongsTo(reader));
     }
@@ -99,7 +99,7 @@ Tuple2<String, bool> _makeDataType(FieldElement f) {
   // TODO proper error
   if (annot == null) {
     final dartType = toDartType(f.type);
-    if (dartType == null) throw Exception("Unknownd type!");
+    if (dartType == null) throw Exception("Unknown type!");
     final ret = _defaultDataTypeDef[dartType];
     if (ret == null) throw Exception("Unknownd type!");
     return Tuple2(ret, false);

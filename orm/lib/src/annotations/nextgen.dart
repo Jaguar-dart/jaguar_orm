@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 export 'relations.dart';
+export 'package:jaguar_query/jaguar_query.dart' show References;
 
 abstract class ColumnDef {}
 
@@ -14,46 +15,14 @@ class Column implements ColumnDef {
   const Column({this.name, this.notNull = false, this.isPrimary = false});
 }
 
-/*
-abstract class DataType implements ColumnDef {}
-
-class Int implements DataType {
-  final bool auto;
-
-  const Int({this.auto = false});
-}
-
-class VarChar implements DataType {
-  final int length;
-
-  const VarChar(this.length);
-}
-
-const auto = Int(auto: true);
- */
-
-abstract class ForeignBase implements ColumnDef {
-  String get references;
-}
-
-class ForeignKey implements ForeignBase {
-  final String toTable;
-
-  final String references;
-
-  const ForeignKey(this.toTable, {@required this.references});
-}
-
-class BelongsTo implements ForeignBase {
+class BelongsTo implements ColumnDef {
   final Type bean;
 
   /// The field/column in the foreign bean
   final String references;
 
-  // TODO what is this?
   final bool byHasMany;
 
-  // TODO what is this?
   final bool toMany;
 
   const BelongsTo(this.bean, {@required this.references, this.byHasMany})

@@ -22,6 +22,9 @@ class User {
     return false;
   }
 
+  @override
+  int get hashCode => super.hashCode;
+
   String toString() => "User($id, $name)";
 }
 

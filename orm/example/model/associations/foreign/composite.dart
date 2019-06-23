@@ -5,7 +5,7 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-part 'simple.jorm.dart';
+part 'composite.jorm.dart';
 
 class User {
   @primaryKey
@@ -27,6 +27,9 @@ class User {
       return id == other.id && name == other.name && address == other.address;
     return false;
   }
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 class Address {
@@ -52,6 +55,9 @@ class Address {
       return id == other.id && street == other.street && userId == other.userId;
     return false;
   }
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 @GenBean()

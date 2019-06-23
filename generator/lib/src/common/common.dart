@@ -20,7 +20,7 @@ final isConstraint = TypeChecker.fromRuntime(Constraint);
 
 final isDataType = TypeChecker.fromRuntime(DataType);
 
-final isForeign = TypeChecker.fromRuntime(ForeignKey);
+final isReferences = TypeChecker.fromRuntime(References);
 
 final isBelongsTo = TypeChecker.fromRuntime(BelongsTo);
 
