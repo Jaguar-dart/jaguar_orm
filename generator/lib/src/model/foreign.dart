@@ -4,7 +4,7 @@ abstract class ForeignSpec implements ColumnDef {
   String get references;
 }
 
-class BelongsToForeign implements ForeignSpec {
+class BelongsToSpec implements ForeignSpec {
   final DartType bean;
 
   final String references;
@@ -15,7 +15,7 @@ class BelongsToForeign implements ForeignSpec {
 
   final bool belongsToMany;
 
-  BelongsToForeign(
+  BelongsToSpec(
       this.bean, this.references, this.byHasMany, this.belongsToMany)
       : model = getModelForBean(bean);
 
@@ -24,6 +24,18 @@ class BelongsToForeign implements ForeignSpec {
   String get modelName => model.name;
 
   String get beanInstanceName => uncap(modelName) + 'Bean';
+}
+
+class ReferencesSpec implements ForeignSpec {
+  final String table;
+
+  final String references;
+
+  final String name;
+
+  // TODO association
+
+  ReferencesSpec(this.table, this.references, {this.name});
 }
 
 /* TODO
@@ -37,11 +49,3 @@ class BeanedForeign implements Foreign {
   BeanedForeign(this.bean, this.refCol) : model = getModelForBean(bean);
 }
 */
-
-class ReferencesForeign implements ForeignSpec {
-  final String table;
-
-  final String references;
-
-  ReferencesForeign(this.table, this.references);
-}

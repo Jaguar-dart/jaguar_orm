@@ -20,14 +20,16 @@ class CreateCol<T> implements Property {
       this.constraints = const []});
 }
 
-class References {
+class References implements Constraint {
   /// The table in which foreign key references the column [col]
   final String table;
 
   /// References column in table [table]
   final String col;
 
-  const References(this.table, this.col);
+  final String name;
+
+  const References(this.table, this.col, {this.name});
 }
 
 abstract class Constraint {}
@@ -40,3 +42,8 @@ class Unique implements Constraint {
 }
 
 const unique = Unique();
+
+// TODO Index constraint
+
+// TODO Check constraint
+

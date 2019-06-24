@@ -25,10 +25,14 @@ class BelongsTo implements ColumnDef {
 
   final bool toMany;
 
-  const BelongsTo(this.bean, {@required this.references, this.byHasMany})
+  final String name;
+
+  const BelongsTo(this.bean,
+      {@required this.references, this.byHasMany, this.name})
       : toMany = false;
 
-  const BelongsTo.many(this.bean, {@required this.references, this.byHasMany})
+  const BelongsTo.many(this.bean,
+      {@required this.references, this.byHasMany, this.name})
       : toMany = true;
 }
 

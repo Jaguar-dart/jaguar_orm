@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:jaguar_orm/jaguar_orm.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart';
+import 'package:jaguar_orm/src/annotations/column.dart';
 
 part 'unique.jorm.dart';
 

@@ -1,28 +1,28 @@
 part of jaguar_orm.generator.model;
 
-abstract class BeanedAssociation {
+abstract class Association {
   DartType get bean;
 
   DartType get model;
 
-  List<Field> get fields;
+  List<ParsedField> get fields;
 
-  List<Field> get foreignFields;
+  List<ParsedField> get foreignFields;
 
   bool get byHasMany;
 
   String get modelName;
 }
 
-/// Model that contains information to write find method by foreign relation
-class BelongsToAssociation implements BeanedAssociation {
+/// [BelongsTo] association has a complementing [Relation]
+class BelongsToAssociationByRelation implements Association {
   final DartType bean;
 
   final DartType model;
 
-  final List<Field> fields;
+  final List<ParsedField> fields;
 
-  final List<Field> foreignFields;
+  final List<ParsedField> foreignFields;
 
   final bool byHasMany;
 
@@ -30,7 +30,7 @@ class BelongsToAssociation implements BeanedAssociation {
 
   final Preload other;
 
-  BelongsToAssociation(
+  BelongsToAssociationByRelation(
       this.bean, this.fields, this.foreignFields, this.other, this.byHasMany)
       : model = getModelForBean(bean);
 
@@ -43,32 +43,33 @@ class BelongsToAssociation implements BeanedAssociation {
 
 abstract class ForeignAssociation {}
 
-class BeanedForeignAssociation extends ForeignAssociation
-    implements BeanedAssociation {
+/// [BelongsTo] association does not have a complementing [Relation].
+class BelongToAssociationWithoutRelation extends ForeignAssociation
+    implements Association {
   final DartType bean;
 
   final DartType model;
 
-  final List<Field> fields;
+  final List<ParsedField> fields;
 
-  final List<Field> foreignFields;
+  final List<ParsedField> foreignFields;
 
   final bool byHasMany;
 
-  BeanedForeignAssociation(
+  BelongToAssociationWithoutRelation(
       this.bean, this.fields, this.foreignFields, this.byHasMany)
       : model = getModelForBean(bean);
 
   String get modelName => model.name;
 }
 
-class TabledForeignAssociation extends ForeignAssociation {
+class ReferenceAssociation extends ForeignAssociation {
   final DartType bean;
 
   final DartType model;
 
-  final List<Field> fields;
+  final List<ParsedField> fields;
 
-  TabledForeignAssociation(this.bean, this.fields)
+  ReferenceAssociation(this.bean, this.fields)
       : model = getModelForBean(bean);
 }

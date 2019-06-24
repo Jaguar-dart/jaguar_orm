@@ -1,29 +1,5 @@
 part of 'parser.dart';
 
-String getString(ConstantReader reader, String field) {
-  ConstantReader value = reader.read(field);
-  if (value.isNull) return null;
-  return value.stringValue;
-}
-
-bool getBool(ConstantReader reader, String field) {
-  ConstantReader value = reader.read(field);
-  if (value.isNull) return null;
-  return value.boolValue;
-}
-
-int getInt(ConstantReader reader, String field) {
-  ConstantReader value = reader.read(field);
-  if (value.isNull) return null;
-  return value.intValue;
-}
-
-DartType getType(ConstantReader reader, String field) {
-  ConstantReader value = reader.read(field);
-  if (value.isNull) return null;
-  return value.typeValue;
-}
-
 Column readColumn(ConstantReader reader) {
   return Column(
       name: getString(reader, 'name'),
@@ -31,7 +7,7 @@ Column readColumn(ConstantReader reader) {
       isPrimary: getBool(reader, 'isPrimary'));
 }
 
-ReferencesForeign readReferences(ConstantReader reader) {
+ReferencesSpec readReferences(ConstantReader reader) {
   final String table = getString(reader, 'table');
   final String col = getString(reader, 'col');
 
@@ -43,10 +19,10 @@ ReferencesForeign readReferences(ConstantReader reader) {
     throw Exception("col of a Reference is mandatory!");
   }
 
-  return ReferencesForeign(table, col);
+  return ReferencesSpec(table, col);
 }
 
-BelongsToForeign readBelongsTo(ConstantReader reader) {
+BelongsToSpec readBelongsTo(ConstantReader reader) {
   final DartType bean = getType(reader, 'bean');
   final String references = getString(reader, 'references');
   final bool byHasMany = getBool(reader, 'byHasMany');
@@ -60,7 +36,7 @@ BelongsToForeign readBelongsTo(ConstantReader reader) {
     throw Exception("bean cannot be null on BelongsTo!");
   }
 
-  return BelongsToForeign(bean, references, byHasMany, toMany);
+  return BelongsToSpec(bean, references, byHasMany, toMany);
 }
 
 List<ColumnDef> _filterColumnDef(FieldElement f) {
@@ -69,8 +45,6 @@ List<ColumnDef> _filterColumnDef(FieldElement f) {
   for (ElementAnnotation annot in f.metadata) {
     final obj = annot.computeConstantValue();
     final reader = ConstantReader(obj);
-
-    if (!reader.instanceOf(isColumnDef)) continue;
 
     if (reader.instanceOf(isColumn)) {
       ret.add(readColumn(reader));
@@ -118,17 +92,17 @@ List<String> _parseConstraints(Element f) {
       .toList();
 }
 
-Field _parseField(FieldElement f) {
+ParsedField _parseField(FieldElement f) {
   final metadata = _filterColumnDef(f);
 
   final dataType = _makeDataType(f);
   Column column = metadata.firstWhere((c) => c is Column, orElse: () => null);
 
   ForeignSpec foreign =
-      metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
+  metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
   final constraints = _parseConstraints(f);
 
-  return Field(f.type.displayName, f.name,
+  return ParsedField(f.type.displayName, f.name,
       isAuto: dataType.item2,
       column: column,
       dataType: dataType.item1,

@@ -1,15 +1,22 @@
-abstract class Relation {}
+abstract class Relation {
+  /// Links reference by name
+  String get linkByName;
+}
 
 class HasOne implements Relation {
   final Type bean;
 
-  const HasOne(this.bean);
+  final String linkByName;
+
+  const HasOne(this.bean, {this.linkByName});
 }
 
 class HasMany implements Relation {
   final Type bean;
 
-  const HasMany(this.bean);
+  final String linkByName;
+
+  const HasMany(this.bean, {this.linkByName});
 }
 
 class ManyToMany implements Relation {
@@ -17,5 +24,7 @@ class ManyToMany implements Relation {
 
   final Type targetBean;
 
-  const ManyToMany(this.pivotBean, this.targetBean);
+  final String linkByName;
+
+  const ManyToMany(this.pivotBean, this.targetBean, {this.linkByName});
 }

@@ -4,12 +4,15 @@ import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart';
+import 'package:jaguar_orm/src/annotations/column.dart';
+import 'preloads.dart';
+
+export 'preloads.dart';
 
 part 'association.dart';
 part 'foreign.dart';
 
-class Field {
+class ParsedField {
   final String type;
 
   final String field;
@@ -26,7 +29,7 @@ class Field {
 
   final List<String> constraints;
 
-  Field(this.type, this.field,
+  ParsedField(this.type, this.field,
       {@required Column column,
       @required this.dataType,
       @required this.foreign,
@@ -47,44 +50,48 @@ class Field {
   }
 }
 
-class WriterModel {
-  final String name;
+class ParsedBean extends UnAssociatedBean {
+  /// A map of bean to [BelongsToAssociationByRelation]
+  final Map<DartType, BelongsToAssociationByRelation> associationsWithRelations;
 
-  final String modelType;
+  /// A map of association to [BelongToAssociationWithoutRelation]
+  final Map<DartType, BelongToAssociationWithoutRelation> associationsWithoutRelations;
 
-  final Map<String, Field> fields;
+  ParsedBean(
+    String name, {
+    @required String modelType,
+    @required Map<String, ParsedField> fields,
+    @required List<ParsedField> primary,
+    @required Map<String, ReferencesSpec> references,
+    @required List<Preload> preloads,
+    @required Map<String, RelationSpec> relations,
+    @required this.associationsWithRelations,
+    @required this.associationsWithoutRelations,
+  }) : super(name, modelType,
+            fields: fields,
+            primary: primary,
+            references: references,
+            relations: relations,
+            preloads: preloads);
 
-  final List<Field> primary;
-
-  /// A map of bean to [BelongsToAssociation]
-  final Map<DartType, BelongsToAssociation> belongTos;
-
-  /// A map of association to [BeanedForeignAssociation]
-  final Map<DartType, BeanedForeignAssociation> beanedForeignAssociations;
-
-  /// A map of association to [ForeignKey]
-  // TODO final Map<String, BaseForeignKey> getByForeignTabled;
-
-  final List<Preload> preloads;
-
-  Field fieldByColName(String colName) => fields.values
-      .firstWhere((Field f) => f.colName == colName, orElse: () => null);
-
-  WriterModel(this.name,
-      {@required this.modelType,
-      @required this.fields,
-      @required this.primary,
-      @required this.belongTos,
-      @required this.beanedForeignAssociations,
-      @required this.preloads});
-
-  Preload findHasXByAssociation(DartType association) {
-    return preloads.firstWhere((p) => p.bean == association,
-        orElse: () => null);
+  factory ParsedBean.fromPreAssociated(
+    UnAssociatedBean bean, {
+        @required Map<DartType, BelongsToAssociationByRelation> belongTos,
+    @required Map<DartType, BelongToAssociationWithoutRelation> beanedForeignAssociations,
+  }) {
+    return ParsedBean(bean.name,
+        modelType: bean.modelType,
+        fields: bean.fields,
+        primary: bean.primary,
+        references: bean.references,
+        preloads: bean.preloads,
+        relations: bean.relations,
+        associationsWithRelations: belongTos,
+        associationsWithoutRelations: beanedForeignAssociations);
   }
 
-  BelongsToAssociation getMatchingManyToMany(BelongsToAssociation val) {
-    for (BelongsToAssociation f in belongTos.values) {
+  BelongsToAssociationByRelation getMatchingManyToMany(BelongsToAssociationByRelation val) {
+    for (BelongsToAssociationByRelation f in associationsWithRelations.values) {
       if (!f.belongsToMany) continue;
 
       if (f == val) continue;
@@ -111,64 +118,34 @@ String getValType(String type) {
   throw Exception('Field type not recognised: $type!');
 }
 
-/// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships
-abstract class Preload {
-  DartType get bean;
+class UnAssociatedBean {
+  final String name;
 
-  String get beanName => bean.name;
+  final String modelType;
 
-  String get beanInstanceName => uncap(modelName) + 'Bean';
+  final Map<String, ParsedField> fields;
 
-  String get modelName => getModelForBean(bean).name;
+  final List<ParsedField> primary;
 
-  String get property;
+  final List<Preload> preloads;
 
-  List<Field> get fields;
+  final Map<String, ReferencesSpec> references;
 
-  List<Field> get foreignFields;
+  /// Map of field name to relation.
+  final Map<String, RelationSpec> relations;
 
-  bool get hasMany;
-}
+  UnAssociatedBean(this.name, this.modelType,
+      {@required this.fields,
+      @required this.primary,
+      @required this.relations,
+      @required this.references,
+      @required this.preloads});
 
-/// Contains information about `HasOne`, `HasMany` relationships
-class PreloadOneToX extends Preload {
-  final DartType bean;
+  Preload findHasXByAssociation(DartType association) {
+    return preloads.firstWhere((p) => p.bean == association,
+        orElse: () => null);
+  }
 
-  final String property;
-
-  final List<Field> fields = <Field>[];
-
-  final List<Field> foreignFields;
-
-  /// true for `HasMany`. false for `HasOne`
-  final bool hasMany;
-
-  PreloadOneToX(this.bean, this.property, this.foreignFields, this.hasMany);
-}
-
-class PreloadManyToMany extends Preload {
-  final DartType bean;
-
-  final DartType targetBean;
-
-  String get targetBeanName => targetBean.name;
-
-  String get targetBeanInstanceName => uncap(targetModelName) + 'Bean';
-
-  String get targetModelName => getModelForBean(targetBean).name;
-
-  final String property;
-
-  final WriterModel targetInfo;
-
-  final WriterModel beanInfo;
-
-  final List<Field> fields = <Field>[];
-
-  final List<Field> foreignFields;
-
-  final bool hasMany = true;
-
-  PreloadManyToMany(this.bean, this.targetBean, this.property, this.targetInfo,
-      this.beanInfo, this.foreignFields);
+  ParsedField fieldByColName(String colName) => fields.values
+      .firstWhere((ParsedField f) => f.colName == colName, orElse: () => null);
 }

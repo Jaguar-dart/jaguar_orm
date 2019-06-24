@@ -37,7 +37,7 @@ class BeanGenerator extends GeneratorForAnnotation<ant.GenBean> {
       print("Generating bean for $className ...");
 
       /// Morph [ParsedBean] to [WriterModel]
-      final WriterModel bean = ParsedBean(element).detect();
+      final ParsedBean bean = BeanParser(element).parse();
 
       /// Write the info
       final writer = Writer(bean);

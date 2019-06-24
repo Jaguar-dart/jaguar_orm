@@ -1,10 +1,11 @@
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/constant/value.dart';
 
 import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart';
+import 'package:jaguar_orm/src/annotations/column.dart';
 
 final isGenBean = TypeChecker.fromRuntime(GenBean);
 
@@ -105,4 +106,34 @@ Type toDartType(DartType type) {
   if(isDuration.isExactlyType(type)) return Duration;
 
   return null;
+}
+
+
+
+String getString(/* ConstantReader | DartObject */ reader, String field) {
+  if(reader is DartObject) reader = ConstantReader(reader);
+  ConstantReader value = reader.read(field);
+  if (value.isNull) return null;
+  return value.stringValue;
+}
+
+bool getBool(/* ConstantReader | DartObject */ reader, String field) {
+  if(reader is DartObject) reader = ConstantReader(reader);
+  ConstantReader value = reader.read(field);
+  if (value.isNull) return null;
+  return value.boolValue;
+}
+
+int getInt(/* ConstantReader | DartObject */ reader, String field) {
+  if(reader is DartObject) reader = ConstantReader(reader);
+  ConstantReader value = reader.read(field);
+  if (value.isNull) return null;
+  return value.intValue;
+}
+
+DartType getType(/* ConstantReader | DartObject */ reader, String field) {
+  if(reader is DartObject) reader = ConstantReader(reader);
+  ConstantReader value = reader.read(field);
+  if (value.isNull) return null;
+  return value.typeValue;
 }

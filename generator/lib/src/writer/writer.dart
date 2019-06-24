@@ -1,12 +1,11 @@
 library jaguar_orm.generator.writer;
 
 import 'package:jaguar_orm_gen/src/model/model.dart';
-import 'package:jaguar_orm/src/annotations/nextgen.dart';
 
 class Writer {
   final _w = StringBuffer();
 
-  final WriterModel _b;
+  final ParsedBean _b;
 
   Writer(this._b) {
     _generate();
@@ -15,7 +14,7 @@ class Writer {
   void _generate() {
     _w.writeln('abstract class _${_b.name} implements Bean<${_b.modelType}> {');
 
-    for (Field field in _b.fields.values) {
+    for (ParsedField field in _b.fields.values) {
       _writeln(
           "final ${field.field} = ${field.vType}('${_camToSnak(field.colName)}');");
     }
@@ -34,7 +33,7 @@ class Writer {
 
     // TODO remove by foreign for non-beaned
 
-    for (BelongsToAssociation ass in _b.belongTos.values) {
+    for (BelongsToAssociationByRelation ass in _b.associationsWithRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
       _removeByForeign(ass);
@@ -47,7 +46,7 @@ class Writer {
       }
     }
 
-    for (BeanedForeignAssociation ass in _b.beanedForeignAssociations.values) {
+    for (BelongToAssociationWithoutRelation ass in _b.associationsWithoutRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
       // TODO remove
@@ -68,7 +67,7 @@ class Writer {
     _w.writeln('Map<String, Field> _fields;');
 
     _w.writeln('Map<String, Field> get fields => _fields ??= {');
-    for (Field f in _b.fields.values) {
+    for (ParsedField f in _b.fields.values) {
       _w.writeln('${f.field}.name: ${f.field},');
     }
     _w.writeln('};');
@@ -77,7 +76,7 @@ class Writer {
   void _writeFromMap() {
     _w.writeln('${_b.modelType} fromMap(Map map) {');
     _w.write('${_b.modelType} model = ${_b.modelType}(');
-    _b.fields.values.forEach((Field field) {
+    _b.fields.values.forEach((ParsedField field) {
       if (field.isFinal) {
         _w.write(
             '${field.field}: adapter.parseValue(map[\'${_camToSnak(field.colName)}\']),');
@@ -85,7 +84,7 @@ class Writer {
     });
     _w.writeln(');');
 
-    _b.fields.values.forEach((Field field) {
+    _b.fields.values.forEach((ParsedField field) {
       if (!field.isFinal) {
         _w.writeln(
             "model.${field.field} = adapter.parseValue(map['${_camToSnak(field.colName)}']);");
@@ -100,13 +99,13 @@ class Writer {
   void _writeCreate() {
     _w.writeln('Future<void> createTable({bool ifNotExists = false}) async {');
     _writeln('final st = Sql.create(tableName, ifNotExists: ifNotExists);');
-    for (final Field f in _b.fields.values) {
+    for (final ParsedField f in _b.fields.values) {
       _write('st.addByType(${f.field}.name, ${f.dataType},');
       if (f.column.isPrimary) _write('isPrimary: true,');
       if (f.column.notNull) _write('notNull: ${f.column.notNull},');
       if (f.foreign != null) {
         final foreign = f.foreign;
-        if (foreign is BelongsToForeign) {
+        if (foreign is BelongsToSpec) {
           _write(
               'foreign: References(${foreign.beanInstanceName}.tableName, "${foreign.references}"),');
         } else {
@@ -129,7 +128,7 @@ class Writer {
 
     _w.writeln('if(only == null && !onlyNonNull) {');
 
-    _b.fields.values.forEach((Field field) {
+    _b.fields.values.forEach((ParsedField field) {
       if (field.isAuto) {
         _w.writeln("if(!update && model.${field.field} != null) {");
       }
@@ -141,7 +140,7 @@ class Writer {
 
     _w.writeln('} else if (only != null) {');
 
-    _b.fields.values.forEach((Field field) {
+    _b.fields.values.forEach((ParsedField field) {
       if (field.isAuto) {
         _w.writeln("if(model.${field.field} != null) {");
       }
@@ -154,7 +153,7 @@ class Writer {
 
     _w.writeln('} else /* if (onlyNonNull) */ {');
 
-    _b.fields.values.forEach((Field field) {
+    _b.fields.values.forEach((ParsedField field) {
       _w.writeln("if(model.${field.field} != null) {");
       _w.writeln("ret.add(${field.field}.set(model.${field.field}));");
       _w.writeln("}");
@@ -196,7 +195,7 @@ class Writer {
     _w.write('final Upsert upsert = upserter');
     _w.write(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
-    for (Field f in _b.primary) {
+    for (ParsedField f in _b.primary) {
       if (f.isAuto) _w.write('.id(${f.field}.name)');
     }
     _w.writeln(';');
@@ -307,7 +306,7 @@ class Writer {
     _w.write('final Insert insert = inserter');
     _w.write(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
-    for (Field f in _b.primary) {
+    for (ParsedField f in _b.primary) {
       if (f.isAuto) _w.write('.id(${f.field}.name)');
     }
     _w.writeln(';');
@@ -402,7 +401,7 @@ class Writer {
           'Future<int> update(${_b.modelType} model, {bool cascade = false, bool associate = false, Set<String> only, bool onlyNonNull = false}) async {');
       _w.write('final Update update = updater.');
       final String wheres = _b.primary
-          .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
+          .map((ParsedField f) => 'where(this.${f.field}.eq(model.${f.field}))')
           .join('.');
       _w.write(wheres);
       _w.writeln(
@@ -416,7 +415,7 @@ class Writer {
         'Future<int> update(${_b.modelType} model, {bool cascade = false, bool associate = false, Set<String> only, bool onlyNonNull = false}) async {');
     _w.write('final Update update = updater.');
     final String wheres = _b.primary
-        .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
+        .map((ParsedField f) => 'where(this.${f.field}.eq(model.${f.field}))')
         .join('.');
     _w.write(wheres);
     _w.writeln(
@@ -525,13 +524,13 @@ class Writer {
 
     _write('Future<${_b.modelType}> find(');
     final String args =
-        _b.primary.map((Field f) => '${f.type} ${f.field}').join(',');
+        _b.primary.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _write(args);
     _write(', {bool preload = false, bool cascade = false}');
     _writeln(') async {');
     _writeln('final Find find = finder.');
     final String wheres = _b.primary
-        .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
+        .map((ParsedField f) => 'where(this.${f.field}.eq(${f.field}))')
         .join('.');
     _write(wheres);
     _writeln(';');
@@ -554,12 +553,12 @@ class Writer {
     if (_b.preloads.length == 0) {
       _w.writeln('Future<int> remove(');
       final String args =
-          _b.primary.map((Field f) => '${f.type} ${f.field}').join(',');
+          _b.primary.map((ParsedField f) => '${f.type} ${f.field}').join(',');
       _w.write(args);
       _w.writeln(') async {');
       _w.writeln('final Remove remove = remover.');
       final String wheres = _b.primary
-          .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
+          .map((ParsedField f) => 'where(this.${f.field}.eq(${f.field}))')
           .join('.');
       _w.write(wheres);
       _w.writeln(';');
@@ -570,7 +569,7 @@ class Writer {
 
     _w.writeln('Future<int> remove(');
     final String args =
-        _b.primary.map((Field f) => '${f.type} ${f.field}').join(',');
+        _b.primary.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
     _w.writeln(', {bool cascade = false}) async {');
 
@@ -597,7 +596,7 @@ class Writer {
 
     _w.writeln('final Remove remove = remover.');
     final String wheres = _b.primary
-        .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
+        .map((ParsedField f) => 'where(this.${f.field}.eq(${f.field}))')
         .join('.');
     _w.write(wheres);
     _w.writeln(';');
@@ -605,7 +604,7 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindOneByBeanedAssociation(BeanedAssociation m) {
+  void _writeFindOneByBeanedAssociation(Association m) {
     if (!m.byHasMany) {
       _w.write('Future<${_b.modelType}>');
     } else {
@@ -613,14 +612,14 @@ class Writer {
     }
     _w.write(' findBy${_cap(m.modelName)}(');
     final String args =
-        m.fields.map((Field f) => '${f.type} ${f.field}').join(',');
+        m.fields.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
     _write(', {bool preload = false, bool cascade = false}');
     _w.writeln(') async {');
 
     _w.writeln('final Find find = finder.');
     final String wheres = m.fields
-        .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
+        .map((ParsedField f) => 'where(this.${f.field}.eq(${f.field}))')
         .join('.');
     _w.write(wheres);
     _w.writeln(';');
@@ -669,7 +668,7 @@ class Writer {
     _writeln('for(final model in models) {');
     _write('remove.or(');
     final String wheres = _b.primary
-        .map((Field f) => 'this.${f.field}.eq(model.${f.field})')
+        .map((ParsedField f) => 'this.${f.field}.eq(model.${f.field})')
         .join('|');
     _w.write(wheres);
     _writeln(');');
@@ -679,17 +678,17 @@ class Writer {
     return;
   }
 
-  void _removeByForeign(BelongsToAssociation m) {
+  void _removeByForeign(BelongsToAssociationByRelation m) {
     _w.write('Future<int>');
     _w.write(' removeBy${_cap(m.modelName)}(');
     final String args =
-        m.fields.map((Field f) => '${f.type} ${f.field}').join(',');
+        m.fields.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
     _w.writeln(') async {');
 
     _w.writeln('final Remove rm = remover.');
     final String wheres = m.fields
-        .map((Field f) => 'where(this.${f.field}.eq(${f.field}))')
+        .map((ParsedField f) => 'where(this.${f.field}.eq(${f.field}))')
         .join('.');
     _w.write(wheres);
     _w.writeln(';');
@@ -698,7 +697,7 @@ class Writer {
     _w.writeln('}');
   }
 
-  void _writeFindListByBeanedAssociationList(BeanedAssociation m) {
+  void _writeFindListByBeanedAssociationList(Association m) {
     _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}List(');
     _write('List<${m.modelName}> models');
     _write(', {bool preload = false, bool cascade = false}');
@@ -748,9 +747,9 @@ class Writer {
         _write(_b.modelType);
         _write('(');
         final String args = p.foreignFields
-            .map((Field f) => f.foreign.references)
+            .map((ParsedField f) => f.foreign.references)
             .map(_b.fieldByColName)
-            .map((Field f) => 'model.${f.field}')
+            .map((ParsedField f) => 'model.${f.field}')
             .join(',');
         _write(args);
         _write(', preload: cascade, cascade: cascade');
@@ -782,9 +781,9 @@ class Writer {
         _write('(${_b.modelType} model) => [');
         {
           final String args = p.foreignFields
-              .map((Field f) => f.foreign.references)
+              .map((ParsedField f) => f.foreign.references)
               .map(_b.fieldByColName)
-              .map((Field f) => 'model.${f.field}')
+              .map((ParsedField f) => 'model.${f.field}')
               .join(',');
           _write(args);
         }
@@ -798,7 +797,7 @@ class Writer {
         _write('(${p.modelName} model) => [');
         {
           final String args =
-              p.foreignFields.map((Field f) => 'model.${f.field}').join(',');
+              p.foreignFields.map((ParsedField f) => 'model.${f.field}').join(',');
           _write(args);
         }
         _write('], ');
@@ -850,7 +849,7 @@ class Writer {
       }
     }
 
-    for (BelongsToAssociation f in _b.belongTos.values) {
+    for (BelongsToAssociationByRelation f in _b.associationsWithRelations.values) {
       if (f.belongsToMany) {
         if (written.contains(f.beanInstanceName)) continue;
         written.add(f.beanInstanceName);
@@ -862,9 +861,9 @@ class Writer {
       }
     }
 
-    for (Field f in _b.fields.values) {
-      if (f.foreign is BelongsToForeign) {
-        BelongsToForeign fb = f.foreign;
+    for (ParsedField f in _b.fields.values) {
+      if (f.foreign is BelongsToSpec) {
+        BelongsToSpec fb = f.foreign;
         if (written.contains(fb.beanInstanceName)) continue;
         written.add(fb.beanInstanceName);
 
@@ -876,7 +875,7 @@ class Writer {
     }
   }
 
-  void _writeAssociate(BelongsToAssociation m) {
+  void _writeAssociate(BelongsToAssociationByRelation m) {
     _write('void associate${_cap(m.modelName)}(');
     _write('${_b.modelType} child, ');
     _write('${m.modelName} parent');
@@ -890,7 +889,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeDetach(BelongsToAssociation m) {
+  void _writeDetach(BelongsToAssociationByRelation m) {
     _writeln(
         'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
@@ -905,7 +904,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
-    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    BelongsToAssociationByRelation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -922,7 +921,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeFetchOther(BelongsToAssociation m) {
+  void _writeFetchOther(BelongsToAssociationByRelation m) {
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
     final String targetModel = (m.other as PreloadManyToMany).targetModelName;
@@ -938,7 +937,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
-    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    BelongsToAssociationByRelation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -954,13 +953,13 @@ class Writer {
   }
 
   void _writeAttach() {
-    final BelongsToAssociation m = _b.belongTos.values.firstWhere(
-        (BelongsToAssociation f) =>
-            f is BelongsToAssociation && f.belongsToMany,
+    final BelongsToAssociationByRelation m = _b.associationsWithRelations.values.firstWhere(
+        (BelongsToAssociationByRelation f) =>
+            f is BelongsToAssociationByRelation && f.belongsToMany,
         orElse: () => null);
     if (m == null) return;
 
-    final BelongsToAssociation m1 = _b.getMatchingManyToMany(m);
+    final BelongsToAssociationByRelation m1 = _b.getMatchingManyToMany(m);
 
     _writeln('Future<dynamic> attach(');
     if (m.modelName.compareTo(m1.modelName) > 0) {
