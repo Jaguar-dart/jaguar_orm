@@ -28,8 +28,7 @@ class BeanGenerator extends GeneratorForAnnotation<ant.GenBean> {
 
     try {
       if (element is! ClassElement) {
-        throw Exception(
-            "GenBean annotation can only be defined on a class.");
+        throw Exception("GenBean annotation can only be defined on a class.");
       }
 
       className = element.name;

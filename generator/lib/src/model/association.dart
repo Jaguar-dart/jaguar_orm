@@ -70,6 +70,5 @@ class ReferenceAssociation extends ForeignAssociation {
 
   final List<ParsedField> fields;
 
-  ReferenceAssociation(this.bean, this.fields)
-      : model = getModelForBean(bean);
+  ReferenceAssociation(this.bean, this.fields) : model = getModelForBean(bean);
 }

@@ -10,6 +10,7 @@ Column readColumn(ConstantReader reader) {
 ReferencesSpec readReferences(ConstantReader reader) {
   final String table = getString(reader, 'table');
   final String col = getString(reader, 'col');
+  final String name = getString(reader, 'name');
 
   if (table == null) {
     throw Exception("table of a Reference is mandatory!");
@@ -19,7 +20,7 @@ ReferencesSpec readReferences(ConstantReader reader) {
     throw Exception("col of a Reference is mandatory!");
   }
 
-  return ReferencesSpec(table, col);
+  return ReferencesSpec(table, col, name: name);
 }
 
 BelongsToSpec readBelongsTo(ConstantReader reader) {
@@ -27,6 +28,7 @@ BelongsToSpec readBelongsTo(ConstantReader reader) {
   final String references = getString(reader, 'references');
   final bool byHasMany = getBool(reader, 'byHasMany');
   final bool toMany = getBool(reader, 'toMany');
+  final String name = getString(reader, 'name');
 
   if (references == null) {
     throw Exception("references cannot be null on BelongsTo!");
@@ -36,7 +38,7 @@ BelongsToSpec readBelongsTo(ConstantReader reader) {
     throw Exception("bean cannot be null on BelongsTo!");
   }
 
-  return BelongsToSpec(bean, references, byHasMany, toMany);
+  return BelongsToSpec(bean, references, byHasMany, toMany, name: name);
 }
 
 List<ColumnDef> _filterColumnDef(FieldElement f) {
@@ -99,7 +101,7 @@ ParsedField _parseField(FieldElement f) {
   Column column = metadata.firstWhere((c) => c is Column, orElse: () => null);
 
   ForeignSpec foreign =
-  metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
+      metadata.firstWhere((c) => c is ForeignSpec, orElse: () => null);
   final constraints = _parseConstraints(f);
 
   return ParsedField(f.type.displayName, f.name,

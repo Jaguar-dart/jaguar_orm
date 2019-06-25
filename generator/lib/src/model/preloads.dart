@@ -38,7 +38,8 @@ class ManyToManySpec implements RelationSpec {
 
   final DartType targetBean;
 
-  ManyToManySpec(this.property, this.pivotBean, this.targetBean, this.linkByName);
+  ManyToManySpec(
+      this.property, this.pivotBean, this.targetBean, this.linkByName);
 }
 
 /// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships

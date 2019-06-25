@@ -84,8 +84,8 @@ String uncap(String str) =>
     str.substring(0, 1).toLowerCase() + str.substring(1);
 
 ElementAnnotation firstAnnotationOf(Element e, TypeChecker check) {
-  for(ElementAnnotation ea in e.metadata) {
-    if(check.isAssignableFromType(ea.computeConstantValue().type)) {
+  for (ElementAnnotation ea in e.metadata) {
+    if (check.isAssignableFromType(ea.computeConstantValue().type)) {
       return ea;
     }
   }
@@ -102,37 +102,35 @@ Type toDartType(DartType type) {
   if (isDouble.isExactlyType(type)) return double;
   if (isNum.isExactlyType(type)) return double;
   if (isBool.isExactlyType(type)) return bool;
-  if(isDateTime.isExactlyType(type)) return DateTime;
-  if(isDuration.isExactlyType(type)) return Duration;
+  if (isDateTime.isExactlyType(type)) return DateTime;
+  if (isDuration.isExactlyType(type)) return Duration;
 
   return null;
 }
 
-
-
 String getString(/* ConstantReader | DartObject */ reader, String field) {
-  if(reader is DartObject) reader = ConstantReader(reader);
+  if (reader is DartObject) reader = ConstantReader(reader);
   ConstantReader value = reader.read(field);
   if (value.isNull) return null;
   return value.stringValue;
 }
 
 bool getBool(/* ConstantReader | DartObject */ reader, String field) {
-  if(reader is DartObject) reader = ConstantReader(reader);
+  if (reader is DartObject) reader = ConstantReader(reader);
   ConstantReader value = reader.read(field);
   if (value.isNull) return null;
   return value.boolValue;
 }
 
 int getInt(/* ConstantReader | DartObject */ reader, String field) {
-  if(reader is DartObject) reader = ConstantReader(reader);
+  if (reader is DartObject) reader = ConstantReader(reader);
   ConstantReader value = reader.read(field);
   if (value.isNull) return null;
   return value.intValue;
 }
 
 DartType getType(/* ConstantReader | DartObject */ reader, String field) {
-  if(reader is DartObject) reader = ConstantReader(reader);
+  if (reader is DartObject) reader = ConstantReader(reader);
   ConstantReader value = reader.read(field);
   if (value.isNull) return null;
   return value.typeValue;

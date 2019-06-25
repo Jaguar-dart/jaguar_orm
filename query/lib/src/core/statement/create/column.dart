@@ -20,13 +20,14 @@ class CreateCol<T> implements Property {
       this.constraints = const []});
 }
 
-class References implements Constraint {
+class References {
   /// The table in which foreign key references the column [col]
   final String table;
 
   /// References column in table [table]
   final String col;
 
+  /// Name of the constraint
   final String name;
 
   const References(this.table, this.col, {this.name});

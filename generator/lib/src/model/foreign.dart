@@ -15,8 +15,10 @@ class BelongsToSpec implements ForeignSpec {
 
   final bool belongsToMany;
 
-  BelongsToSpec(
-      this.bean, this.references, this.byHasMany, this.belongsToMany)
+  final String name;
+
+  BelongsToSpec(this.bean, this.references, this.byHasMany, this.belongsToMany,
+      {this.name})
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;

@@ -91,6 +91,8 @@ class UnassociatedBeanParser {
       fields: fields,
       primary: primaries,
       relations: relations,
+      preloads: preloads,
+      // TODO references: ,
     );
 
     return ret;

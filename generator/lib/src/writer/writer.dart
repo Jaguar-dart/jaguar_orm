@@ -33,7 +33,8 @@ class Writer {
 
     // TODO remove by foreign for non-beaned
 
-    for (BelongsToAssociationByRelation ass in _b.associationsWithRelations.values) {
+    for (BelongsToAssociationByRelation ass
+        in _b.associationsWithRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
       _removeByForeign(ass);
@@ -46,7 +47,8 @@ class Writer {
       }
     }
 
-    for (BelongToAssociationWithoutRelation ass in _b.associationsWithoutRelations.values) {
+    for (BelongToAssociationWithoutRelation ass
+        in _b.associationsWithoutRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
       // TODO remove
@@ -107,7 +109,18 @@ class Writer {
         final foreign = f.foreign;
         if (foreign is BelongsToSpec) {
           _write(
-              'foreign: References(${foreign.beanInstanceName}.tableName, "${foreign.references}"),');
+              'foreign: References(${foreign.beanInstanceName}.tableName, "${foreign.references}"');
+          if (foreign.name != null) {
+            _write(', name: "${foreign.name}"');
+          }
+          _write('),');
+        } else if (foreign is ReferencesSpec) {
+          _write(
+              'foreign: References("${foreign.table}", "${foreign.references}"');
+          if (foreign.name != null) {
+            _write(', name: "${foreign.name}"');
+          }
+          _write('),');
         } else {
           throw Exception('Unimplemented!');
         }
@@ -796,8 +809,9 @@ class Writer {
         //Arg4: ChildGetter
         _write('(${p.modelName} model) => [');
         {
-          final String args =
-              p.foreignFields.map((ParsedField f) => 'model.${f.field}').join(',');
+          final String args = p.foreignFields
+              .map((ParsedField f) => 'model.${f.field}')
+              .join(',');
           _write(args);
         }
         _write('], ');
@@ -849,7 +863,8 @@ class Writer {
       }
     }
 
-    for (BelongsToAssociationByRelation f in _b.associationsWithRelations.values) {
+    for (BelongsToAssociationByRelation f
+        in _b.associationsWithRelations.values) {
       if (f.belongsToMany) {
         if (written.contains(f.beanInstanceName)) continue;
         written.add(f.beanInstanceName);
@@ -953,10 +968,11 @@ class Writer {
   }
 
   void _writeAttach() {
-    final BelongsToAssociationByRelation m = _b.associationsWithRelations.values.firstWhere(
-        (BelongsToAssociationByRelation f) =>
-            f is BelongsToAssociationByRelation && f.belongsToMany,
-        orElse: () => null);
+    final BelongsToAssociationByRelation m = _b.associationsWithRelations.values
+        .firstWhere(
+            (BelongsToAssociationByRelation f) =>
+                f is BelongsToAssociationByRelation && f.belongsToMany,
+            orElse: () => null);
     if (m == null) return;
 
     final BelongsToAssociationByRelation m1 = _b.getMatchingManyToMany(m);

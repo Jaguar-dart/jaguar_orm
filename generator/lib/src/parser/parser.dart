@@ -48,6 +48,8 @@ class BeanParser {
               .parse();
 
       for (ParsedField f in m.fields) {
+        // TODO linkByName
+
         ParsedField ff = info.fieldByColName(f.foreign.references);
 
         if (ff == null) {
