@@ -69,7 +69,16 @@ Map<Type, String> _defaultDataTypeDef = const {
   Duration: "Interval()",
 };
 
-Tuple2<String, bool> _makeDataType(FieldElement f) {
+Map<Type, String> _defaultDataType = const {
+  int: "Int",
+  double: "Double",
+  bool: "Bool",
+  DateTime: "Timestamp",
+  String: "Str",
+  Duration: "Interval",
+};
+
+Tuple3<String, String, bool> _makeDataType(FieldElement f) {
   ElementAnnotation annot = firstAnnotationOf(f, isDataType);
 
   // TODO proper error
@@ -78,13 +87,14 @@ Tuple2<String, bool> _makeDataType(FieldElement f) {
     if (dartType == null) throw Exception("Unknown type!");
     final ret = _defaultDataTypeDef[dartType];
     if (ret == null) throw Exception("Unknownd type!");
-    return Tuple2(ret, false);
+    return Tuple3(_defaultDataType[dartType], ret, false);
   }
 
   final auto =
       getBool(ConstantReader(annot.computeConstantValue()), 'auto') ?? false;
 
-  return Tuple2(annot.toSource().substring(1), auto);
+  return Tuple3(annot.computeConstantValue().type.displayName,
+      annot.toSource().substring(1), auto);
 }
 
 List<String> _parseConstraints(Element f) {
@@ -105,9 +115,10 @@ ParsedField _parseField(FieldElement f) {
   final constraints = _parseConstraints(f);
 
   return ParsedField(f.type.displayName, f.name,
-      isAuto: dataType.item2,
+      isAuto: dataType.item3,
       column: column,
       dataType: dataType.item1,
+      dataTypeDecl: dataType.item2,
       foreign: foreign,
       isFinal: f.isFinal && f.getter.isSynthetic,
       constraints: constraints);

@@ -102,7 +102,7 @@ class Writer {
     _w.writeln('Future<void> createTable({bool ifNotExists = false}) async {');
     _writeln('final st = Sql.create(tableName, ifNotExists: ifNotExists);');
     for (final ParsedField f in _b.fields.values) {
-      _write('st.addByType(${f.field}.name, ${f.dataType},');
+      _write('st.addByType(${f.field}.name, ${f.dataTypeDecl},');
       if (f.column.isPrimary) _write('isPrimary: true,');
       if (f.column.notNull) _write('notNull: ${f.column.notNull},');
       if (f.foreign != null) {

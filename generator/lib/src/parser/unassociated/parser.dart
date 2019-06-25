@@ -54,35 +54,6 @@ class UnassociatedBeanParser {
     // Parses Fields in the model
     _parseFields();
 
-    // Collect [TabledForeignAssociation] from [TableForeign]
-    for (ParsedField f in fields.values) {
-      if (f.foreign is! ReferencesSpec) continue;
-
-      // TODO throw UnimplementedError('ForeignKey that is not beaned!');
-
-      /*
-      final ForeignTabled foreign = f.foreign;
-      final String association = foreign.association;
-      FindByForeign current = findByForeign[association];
-
-      if (current == null) {
-        current =
-            FindByForeignTable(association, [], foreign.hasMany, foreign.table);
-        findByForeign[association] = current;
-      } else if (current is FindByForeignTable) {
-        if (current.table != foreign.table) {
-          throw Exception('Mismatching table for association!');
-        }
-        if (current.isMany != foreign.hasMany) {
-          throw Exception('Mismatching ForeignKey association type!');
-        }
-      } else {
-        throw Exception('Table and bean associations mixed!');
-      }
-      findByForeign[association].fields.add(f);
-       */
-    }
-
     _computePreloads();
 
     final ret = UnAssociatedBean(
@@ -261,3 +232,34 @@ class UnassociatedBeanParser {
     }
   }
 }
+
+/* TODO
+    // Collect [TabledForeignAssociation] from [TableForeign]
+    for (ParsedField f in fields.values) {
+      if (f.foreign is! ReferencesSpec) continue;
+
+      // TODO throw UnimplementedError('ForeignKey that is not beaned!');
+
+      /*
+      final ForeignTabled foreign = f.foreign;
+      final String association = foreign.association;
+      FindByForeign current = findByForeign[association];
+
+      if (current == null) {
+        current =
+            FindByForeignTable(association, [], foreign.hasMany, foreign.table);
+        findByForeign[association] = current;
+      } else if (current is FindByForeignTable) {
+        if (current.table != foreign.table) {
+          throw Exception('Mismatching table for association!');
+        }
+        if (current.isMany != foreign.hasMany) {
+          throw Exception('Mismatching ForeignKey association type!');
+        }
+      } else {
+        throw Exception('Table and bean associations mixed!');
+      }
+      findByForeign[association].fields.add(f);
+       */
+    }
+ */

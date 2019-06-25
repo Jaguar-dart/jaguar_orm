@@ -23,6 +23,8 @@ class ParsedField {
 
   final String dataType;
 
+  final String dataTypeDecl;
+
   final ForeignSpec foreign;
 
   final bool isAuto;
@@ -32,6 +34,7 @@ class ParsedField {
   ParsedField(this.type, this.field,
       {@required Column column,
       @required this.dataType,
+      @required this.dataTypeDecl,
       @required this.foreign,
       @required this.isFinal,
       @required this.isAuto,
@@ -40,14 +43,7 @@ class ParsedField {
 
   String get colName => column?.name ?? field;
 
-  // TODO
-  String get vType {
-    try {
-      return getValType(type);
-    } catch (e) {
-      throw FieldSpecException(field, e.toString());
-    }
-  }
+  String get vType => dataType + 'Field';
 }
 
 class ParsedBean extends UnAssociatedBean {
@@ -104,22 +100,6 @@ class ParsedBean extends UnAssociatedBean {
     }
     return null;
   }
-}
-
-String getValType(String type) {
-  if (type == 'String') {
-    return 'StrField';
-  } else if (type == 'bool') {
-    return 'BoolField';
-  } else if (type == 'int') {
-    return 'IntField';
-  } else if (type == 'num' || type == 'double') {
-    return 'DoubleField';
-  } else if (type == 'DateTime') {
-    return 'DateTimeField';
-  }
-
-  throw Exception('Field type not recognised: $type!');
 }
 
 class UnAssociatedBean {
