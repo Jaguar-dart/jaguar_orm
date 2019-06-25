@@ -90,9 +90,9 @@ class PreloadManyToMany extends Preload {
 
   final String property;
 
-  final ParsedBean targetInfo;
+  final UnAssociatedBean targetInfo;
 
-  final ParsedBean beanInfo;
+  final UnAssociatedBean beanInfo;
 
   final List<ParsedField> fields = <ParsedField>[];
 
