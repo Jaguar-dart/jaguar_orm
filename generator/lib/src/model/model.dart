@@ -51,8 +51,7 @@ class ParsedBean extends UnAssociatedBean {
   final Map<DartType, AssociationByRelation> associationsWithRelations;
 
   /// A map of association to [AssociationWithoutRelation]
-  final Map<DartType, AssociationWithoutRelation>
-      associationsWithoutRelations;
+  final Map<DartType, AssociationWithoutRelation> associationsWithoutRelations;
 
   ParsedBean(
     String name, {
@@ -73,8 +72,7 @@ class ParsedBean extends UnAssociatedBean {
     UnAssociatedBean bean, {
     @required Map<DartType, AssociationByRelation> belongTos,
     @required
-        Map<DartType, AssociationWithoutRelation>
-            beanedForeignAssociations,
+        Map<DartType, AssociationWithoutRelation> beanedForeignAssociations,
   }) {
     return ParsedBean(bean.name,
         modelType: bean.modelType,
@@ -86,8 +84,7 @@ class ParsedBean extends UnAssociatedBean {
         associationsWithoutRelations: beanedForeignAssociations);
   }
 
-  AssociationByRelation getMatchingManyToMany(
-      AssociationByRelation val) {
+  AssociationByRelation getMatchingManyToMany(AssociationByRelation val) {
     for (AssociationByRelation f in associationsWithRelations.values) {
       if (!f.belongsToMany) continue;
 

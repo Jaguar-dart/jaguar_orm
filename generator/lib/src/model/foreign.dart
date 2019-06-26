@@ -11,14 +11,11 @@ class BelongsToSpec implements ForeignSpec {
 
   final DartType model;
 
-  final bool byHasMany;
-
   final bool belongsToMany;
 
   final String name;
 
-  BelongsToSpec(this.bean, this.references, this.byHasMany, this.belongsToMany,
-      {this.name})
+  BelongsToSpec(this.bean, this.references, this.belongsToMany, {this.name})
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;

@@ -9,7 +9,7 @@ abstract class Association {
 
   List<ParsedField> get foreignFields;
 
-  bool get byHasMany;
+  bool get toMany;
 
   String get modelName;
 }
@@ -24,14 +24,14 @@ class AssociationByRelation implements Association {
 
   final List<ParsedField> foreignFields;
 
-  final bool byHasMany;
+  final bool toMany;
 
   bool get belongsToMany => other is PreloadManyToMany;
 
   final Preload other;
 
   AssociationByRelation(
-      this.bean, this.fields, this.foreignFields, this.other, this.byHasMany)
+      this.bean, this.fields, this.foreignFields, this.other, this.toMany)
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;
@@ -54,10 +54,10 @@ class AssociationWithoutRelation extends ForeignAssociation
 
   final List<ParsedField> foreignFields;
 
-  final bool byHasMany;
+  final bool toMany;
 
   AssociationWithoutRelation(
-      this.bean, this.fields, this.foreignFields, this.byHasMany)
+      this.bean, this.fields, this.foreignFields, this.toMany)
       : model = getModelForBean(bean);
 
   String get modelName => model.name;

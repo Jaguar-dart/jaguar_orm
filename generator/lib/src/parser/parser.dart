@@ -121,7 +121,7 @@ class BeanParser {
       if (other == null) continue;
 
       if (current == null) {
-        bool byHasMany = foreign.byHasMany;
+        bool byHasMany = other.hasMany;
         if (byHasMany != null) {
           if (byHasMany != other.hasMany) {
             throw Exception('Mismatching association type!');
@@ -132,7 +132,7 @@ class BeanParser {
         current = AssociationByRelation(bean, [], [], other, byHasMany);
         associationsWithRelations[bean] = current;
       } else if (current is AssociationByRelation) {
-        if (current.byHasMany != other.hasMany) {
+        if (current.toMany != other.hasMany) {
           throw Exception('Mismatching association type!');
         }
         if (current.belongsToMany != other is PreloadManyToMany) {
@@ -163,17 +163,18 @@ class BeanParser {
         if (other != null) continue;
       }
 
-      if (foreign.byHasMany == null)
+      if (foreign.belongsToMany == null)
         throw Exception(
             'For un-associated foreign keys, "byHasMany" must be specified!');
 
       AssociationWithoutRelation current = associationsWithoutRelations[bean];
 
       if (current == null) {
-        current = AssociationWithoutRelation(bean, [], [], foreign.byHasMany);
+        current =
+            AssociationWithoutRelation(bean, [], [], foreign.belongsToMany);
         associationsWithoutRelations[bean] = current;
       } else if (current is AssociationWithoutRelation) {
-        if (current.byHasMany != foreign.byHasMany) {
+        if (current.toMany != foreign.belongsToMany) {
           throw Exception('Mismatching association type!');
         }
       } else {

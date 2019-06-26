@@ -33,8 +33,7 @@ class Writer {
 
     // TODO remove by foreign for non-beaned
 
-    for (AssociationByRelation ass
-        in _b.associationsWithRelations.values) {
+    for (AssociationByRelation ass in _b.associationsWithRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
       _removeByForeign(ass);
@@ -618,7 +617,7 @@ class Writer {
   }
 
   void _writeFindOneByBeanedAssociation(Association m) {
-    if (!m.byHasMany) {
+    if (!m.toMany) {
       _w.write('Future<${_b.modelType}>');
     } else {
       _w.write('Future<List<${_b.modelType}>>');
@@ -638,7 +637,7 @@ class Writer {
     _w.writeln(';');
 
     if (_b.preloads.length > 0) {
-      if (!m.byHasMany) {
+      if (!m.toMany) {
         _write('final ${_b.modelType} model = await ');
         _writeln('findOne(find);');
 
@@ -659,7 +658,7 @@ class Writer {
       }
     } else {
       _write('return ');
-      if (!m.byHasMany) {
+      if (!m.toMany) {
         _writeln('findOne(find);');
       } else {
         _writeln('findMany(find);');
@@ -863,8 +862,7 @@ class Writer {
       }
     }
 
-    for (AssociationByRelation f
-        in _b.associationsWithRelations.values) {
+    for (AssociationByRelation f in _b.associationsWithRelations.values) {
       if (f.belongsToMany) {
         if (written.contains(f.beanInstanceName)) continue;
         written.add(f.beanInstanceName);

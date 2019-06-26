@@ -217,8 +217,10 @@ class UnassociatedBeanParser {
             throw Exception(
                 'Association $curBean not found! Field ${spec.property}.');
           }
-          final UnAssociatedBean targetInfo =
-              UnassociatedBeanParser(spec.targetBean.element, associatePreloads: false).parse();
+          final UnAssociatedBean targetInfo = UnassociatedBeanParser(
+                  spec.targetBean.element,
+                  associatePreloads: false)
+              .parse();
           preloads.add(PreloadManyToMany(spec.pivotBean, spec.targetBean,
               spec.property, targetInfo, beanInfo, g?.fields));
           return;

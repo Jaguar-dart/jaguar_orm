@@ -26,7 +26,6 @@ ReferencesSpec readReferences(ConstantReader reader) {
 BelongsToSpec readBelongsTo(ConstantReader reader) {
   final DartType bean = getType(reader, 'bean');
   final String references = getString(reader, 'references');
-  final bool byHasMany = getBool(reader, 'byHasMany');
   final bool toMany = getBool(reader, 'toMany');
   final String name = getString(reader, 'name');
 
@@ -38,7 +37,7 @@ BelongsToSpec readBelongsTo(ConstantReader reader) {
     throw Exception("bean cannot be null on BelongsTo!");
   }
 
-  return BelongsToSpec(bean, references, byHasMany, toMany, name: name);
+  return BelongsToSpec(bean, references, toMany, name: name);
 }
 
 List<ColumnDef> _filterColumnDef(FieldElement f) {
