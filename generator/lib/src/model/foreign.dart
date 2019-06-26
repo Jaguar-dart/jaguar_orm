@@ -13,6 +13,9 @@ class BelongsToSpec implements ForeignSpec {
 
   final bool belongsToMany;
 
+  /// Name of the foreign key.
+  ///
+  /// Is also used to connect to [Relation]. Same as [BelongsTo.name].
   final String name;
 
   BelongsToSpec(this.bean, this.references, this.belongsToMany, {this.name})

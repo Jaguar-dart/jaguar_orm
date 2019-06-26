@@ -115,7 +115,8 @@ class BeanParser {
           UnassociatedBeanParser(bean.element, associatePreloads: false)
               .parse();
 
-      final Preload otherPreload = info.findHasXByAssociation(clazz.type);
+      final Preload otherPreload =
+          info.findHasXByAssociation(clazz.type, name: foreign.name);
 
       // Skip [BelongTo]s without complementing [Relation]
       if (otherPreload == null) continue;
@@ -164,7 +165,8 @@ class BeanParser {
         final UnAssociatedBean info =
             UnassociatedBeanParser(bean.element, associatePreloads: false)
                 .parse();
-        final Preload other = info.findHasXByAssociation(clazz.type);
+        final Preload other =
+            info.findHasXByAssociation(clazz.type, name: foreign.name);
 
         // Skip [BelongTo]s with complementing [Relation]
         if (other != null) continue;

@@ -1,4 +1,3 @@
-import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'model.dart';
@@ -9,7 +8,15 @@ abstract class RelationSpec {
   String get linkByName;
 }
 
-class HasOneSpec implements RelationSpec {
+abstract class HasXSpec implements RelationSpec {
+  String get property;
+
+  String get linkByName;
+
+  DartType get bean;
+}
+
+class HasOneSpec implements HasXSpec {
   final String property;
 
   final String linkByName;
@@ -19,7 +26,7 @@ class HasOneSpec implements RelationSpec {
   HasOneSpec(this.property, this.bean, this.linkByName);
 }
 
-class HasManySpec implements RelationSpec {
+class HasManySpec implements HasXSpec {
   final String property;
 
   final String linkByName;
@@ -44,6 +51,8 @@ class ManyToManySpec implements RelationSpec {
 
 /// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships
 abstract class Preload {
+  RelationSpec get spec;
+
   DartType get bean;
 
   String get beanName => bean.name;
@@ -52,7 +61,9 @@ abstract class Preload {
 
   String get modelName => getModelForBean(bean).name;
 
-  String get property;
+  String get linkByName => spec.linkByName;
+
+  String get property => spec.property;
 
   List<ParsedField> get fields;
 
@@ -63,24 +74,26 @@ abstract class Preload {
 
 /// Contains information about `HasOne`, `HasMany` relationships
 class PreloadOneToX extends Preload {
-  final DartType bean;
+  final HasXSpec spec;
 
-  final String property;
+  DartType get bean => spec.bean;
 
   final List<ParsedField> fields = <ParsedField>[];
 
   final List<ParsedField> foreignFields;
 
   /// true for `HasMany`. false for `HasOne`
-  final bool hasMany;
+  bool get hasMany => spec is HasManySpec;
 
-  PreloadOneToX(this.bean, this.property, this.foreignFields, this.hasMany);
+  PreloadOneToX(this.spec, this.foreignFields);
 }
 
 class PreloadManyToMany extends Preload {
-  final DartType bean;
+  final ManyToManySpec spec;
 
-  final DartType targetBean;
+  DartType get bean => spec.pivotBean;
+
+  DartType get targetBean => spec.targetBean;
 
   String get targetBeanName => targetBean.name;
 
@@ -88,7 +101,7 @@ class PreloadManyToMany extends Preload {
 
   String get targetModelName => getModelForBean(targetBean).name;
 
-  final String property;
+  String get property => spec.property;
 
   final UnAssociatedBean targetInfo;
 
@@ -100,6 +113,6 @@ class PreloadManyToMany extends Preload {
 
   final bool hasMany = true;
 
-  PreloadManyToMany(this.bean, this.targetBean, this.property, this.targetInfo,
-      this.beanInfo, this.foreignFields);
+  PreloadManyToMany(
+      this.spec, this.targetInfo, this.beanInfo, this.foreignFields);
 }

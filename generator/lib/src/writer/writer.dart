@@ -912,8 +912,7 @@ class Writer {
     _write('await removeBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
-    final String beanName =
-        m.manyToManyInfo.targetBeanInstanceName;
+    final String beanName = m.manyToManyInfo.targetBeanInstanceName;
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');

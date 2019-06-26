@@ -190,8 +190,7 @@ class UnassociatedBeanParser {
           }
         }
 
-        preloads.add(
-            PreloadOneToX(spec.bean, spec.property, g?.fields ?? [], false));
+        preloads.add(PreloadOneToX(spec, g?.fields ?? []));
       } else if (spec is HasManySpec) {
         AssociationByRelation g;
         if (associatePreloads) {
@@ -205,8 +204,7 @@ class UnassociatedBeanParser {
           }
         }
 
-        preloads.add(
-            PreloadOneToX(spec.bean, spec.property, g?.fields ?? [], true));
+        preloads.add(PreloadOneToX(spec, g?.fields ?? []));
       } else if (spec is ManyToManySpec) {
         AssociationByRelation g;
         if (associatePreloads) {
@@ -221,13 +219,12 @@ class UnassociatedBeanParser {
                   spec.targetBean.element,
                   associatePreloads: false)
               .parse();
-          preloads.add(PreloadManyToMany(spec.pivotBean, spec.targetBean,
-              spec.property, targetInfo, beanInfo, g?.fields));
+          preloads
+              .add(PreloadManyToMany(spec, targetInfo, beanInfo, g?.fields));
           return;
         }
 
-        preloads.add(PreloadManyToMany(
-            spec.pivotBean, spec.targetBean, spec.property, null, null, null));
+        preloads.add(PreloadManyToMany(spec, null, null, null));
       } else {
         throw Exception("Unknown Relation type");
       }
