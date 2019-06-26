@@ -1,4 +1,4 @@
-part of 'parser.dart';
+part of 'unassociated_parser.dart';
 
 Column readColumn(ConstantReader reader) {
   return Column(

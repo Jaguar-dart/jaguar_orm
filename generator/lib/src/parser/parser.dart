@@ -1,6 +1,6 @@
 library jaguar_orm.generator.parser;
 
-import 'package:jaguar_orm_gen/src/parser/unassociated/parser.dart';
+import 'package:jaguar_orm_gen/src/parser/unassociated/unassociated_parser.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -28,11 +28,9 @@ class BeanParser {
 
   List<Preload> get preloads => _unassociated.preloads;
 
-  final associationsWithRelations =
-      <DartType, BelongsToAssociationByRelation>{};
+  final associationsWithRelations = <DartType, AssociationByRelation>{};
 
-  final associationsWithoutRelations =
-      <DartType, BelongToAssociationWithoutRelation>{};
+  final associationsWithoutRelations = <DartType, AssociationWithoutRelation>{};
 
   BeanParser(this.clazz, {this.doRelations: true});
 
@@ -42,7 +40,7 @@ class BeanParser {
     // Collect [BelongsToAssociation] from [BelongsToForeign]
     associate();
 
-    for (BelongsToAssociationByRelation m in associationsWithRelations.values) {
+    for (AssociationByRelation m in associationsWithRelations.values) {
       final UnAssociatedBean info =
           UnassociatedBeanParser(m.bean.element, associatePreloads: false)
               .parse();
@@ -61,8 +59,7 @@ class BeanParser {
       }
     }
 
-    for (BelongToAssociationWithoutRelation m
-        in associationsWithoutRelations.values) {
+    for (AssociationWithoutRelation m in associationsWithoutRelations.values) {
       final UnAssociatedBean info =
           UnassociatedBeanParser(m.bean.element, associatePreloads: false)
               .parse();
@@ -112,7 +109,7 @@ class BeanParser {
 
       final BelongsToSpec foreign = f.foreign;
       final DartType bean = foreign.bean;
-      BelongsToAssociationByRelation current = associationsWithRelations[bean];
+      AssociationByRelation current = associationsWithRelations[bean];
 
       final UnAssociatedBean info =
           UnassociatedBeanParser(bean.element, associatePreloads: false)
@@ -132,10 +129,9 @@ class BeanParser {
         } else {
           byHasMany = other.hasMany;
         }
-        current =
-            BelongsToAssociationByRelation(bean, [], [], other, byHasMany);
+        current = AssociationByRelation(bean, [], [], other, byHasMany);
         associationsWithRelations[bean] = current;
-      } else if (current is BelongsToAssociationByRelation) {
+      } else if (current is AssociationByRelation) {
         if (current.byHasMany != other.hasMany) {
           throw Exception('Mismatching association type!');
         }
@@ -171,14 +167,12 @@ class BeanParser {
         throw Exception(
             'For un-associated foreign keys, "byHasMany" must be specified!');
 
-      BelongToAssociationWithoutRelation current =
-          associationsWithoutRelations[bean];
+      AssociationWithoutRelation current = associationsWithoutRelations[bean];
 
       if (current == null) {
-        current =
-            BelongToAssociationWithoutRelation(bean, [], [], foreign.byHasMany);
+        current = AssociationWithoutRelation(bean, [], [], foreign.byHasMany);
         associationsWithoutRelations[bean] = current;
-      } else if (current is BelongToAssociationWithoutRelation) {
+      } else if (current is AssociationWithoutRelation) {
         if (current.byHasMany != foreign.byHasMany) {
           throw Exception('Mismatching association type!');
         }

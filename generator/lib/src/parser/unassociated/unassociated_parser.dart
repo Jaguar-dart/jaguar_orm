@@ -178,13 +178,13 @@ class UnassociatedBeanParser {
       RelationSpec spec = relations[fieldName];
 
       if (spec is HasOneSpec) {
-        BelongsToAssociationByRelation g;
+        AssociationByRelation g;
         if (associatePreloads) {
           if (spec.bean != curBean) {
             final ParsedBean info =
                 BeanParser(spec.bean.element, doRelations: false).parse();
             g = info.associationsWithRelations[curBean];
-            if (g == null || g is! BelongsToAssociationByRelation)
+            if (g == null || g is! AssociationByRelation)
               throw Exception(
                   'Association ${spec.bean} not found! Field ${spec.property}.');
           }
@@ -193,13 +193,13 @@ class UnassociatedBeanParser {
         preloads.add(
             PreloadOneToX(spec.bean, spec.property, g?.fields ?? [], false));
       } else if (spec is HasManySpec) {
-        BelongsToAssociationByRelation g;
+        AssociationByRelation g;
         if (associatePreloads) {
           if (spec.bean != curBean) {
             final ParsedBean info =
                 BeanParser(spec.bean.element, doRelations: false).parse();
             g = info.associationsWithRelations[curBean];
-            if (g == null || g is! BelongsToAssociationByRelation)
+            if (g == null || g is! AssociationByRelation)
               throw Exception(
                   'Association ${spec.bean} not found! Field ${spec.property}.');
           }
@@ -208,12 +208,12 @@ class UnassociatedBeanParser {
         preloads.add(
             PreloadOneToX(spec.bean, spec.property, g?.fields ?? [], true));
       } else if (spec is ManyToManySpec) {
-        BelongsToAssociationByRelation g;
+        AssociationByRelation g;
         if (associatePreloads) {
           final ParsedBean beanInfo =
               BeanParser(spec.pivotBean.element, doRelations: false).parse();
           g = beanInfo.associationsWithRelations[curBean];
-          if (g == null || g is! BelongsToAssociationByRelation) {
+          if (g == null || g is! AssociationByRelation) {
             throw Exception(
                 'Association $curBean not found! Field ${spec.property}.');
           }

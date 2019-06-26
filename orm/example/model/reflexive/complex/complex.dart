@@ -97,7 +97,7 @@ class Product {
   String name;
 
   @Column(notNull: true)
-  @BelongsTo(CategoryBean, references: 'id', byHasMany: true)
+  @BelongsTo.many(CategoryBean, references: 'id')
   int categoryId;
 
   @ManyToMany(ProductItemsPivotBean, ProductItemsBean)

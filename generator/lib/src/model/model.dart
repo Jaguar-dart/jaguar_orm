@@ -47,11 +47,11 @@ class ParsedField {
 }
 
 class ParsedBean extends UnAssociatedBean {
-  /// A map of bean to [BelongsToAssociationByRelation]
-  final Map<DartType, BelongsToAssociationByRelation> associationsWithRelations;
+  /// A map of bean to [AssociationByRelation]
+  final Map<DartType, AssociationByRelation> associationsWithRelations;
 
-  /// A map of association to [BelongToAssociationWithoutRelation]
-  final Map<DartType, BelongToAssociationWithoutRelation>
+  /// A map of association to [AssociationWithoutRelation]
+  final Map<DartType, AssociationWithoutRelation>
       associationsWithoutRelations;
 
   ParsedBean(
@@ -59,7 +59,6 @@ class ParsedBean extends UnAssociatedBean {
     @required String modelType,
     @required Map<String, ParsedField> fields,
     @required List<ParsedField> primary,
-    @required Map<String, ReferencesSpec> references,
     @required List<Preload> preloads,
     @required Map<String, RelationSpec> relations,
     @required this.associationsWithRelations,
@@ -67,31 +66,29 @@ class ParsedBean extends UnAssociatedBean {
   }) : super(name, modelType,
             fields: fields,
             primary: primary,
-            references: references,
             relations: relations,
             preloads: preloads);
 
   factory ParsedBean.fromPreAssociated(
     UnAssociatedBean bean, {
-    @required Map<DartType, BelongsToAssociationByRelation> belongTos,
+    @required Map<DartType, AssociationByRelation> belongTos,
     @required
-        Map<DartType, BelongToAssociationWithoutRelation>
+        Map<DartType, AssociationWithoutRelation>
             beanedForeignAssociations,
   }) {
     return ParsedBean(bean.name,
         modelType: bean.modelType,
         fields: bean.fields,
         primary: bean.primary,
-        references: bean.references,
         preloads: bean.preloads,
         relations: bean.relations,
         associationsWithRelations: belongTos,
         associationsWithoutRelations: beanedForeignAssociations);
   }
 
-  BelongsToAssociationByRelation getMatchingManyToMany(
-      BelongsToAssociationByRelation val) {
-    for (BelongsToAssociationByRelation f in associationsWithRelations.values) {
+  AssociationByRelation getMatchingManyToMany(
+      AssociationByRelation val) {
+    for (AssociationByRelation f in associationsWithRelations.values) {
       if (!f.belongsToMany) continue;
 
       if (f == val) continue;
@@ -113,8 +110,6 @@ class UnAssociatedBean {
 
   final List<Preload> preloads;
 
-  final Map<String, ReferencesSpec> references;
-
   /// Map of field name to relation.
   final Map<String, RelationSpec> relations;
 
@@ -122,7 +117,6 @@ class UnAssociatedBean {
       {@required this.fields,
       @required this.primary,
       @required this.relations,
-      @required this.references,
       @required this.preloads});
 
   Preload findHasXByAssociation(DartType association) {

@@ -1,3 +1,4 @@
+import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:meta/meta.dart';
 
 export 'relations.dart';
@@ -21,18 +22,17 @@ class BelongsTo implements ColumnDef {
   /// The field/column in the foreign bean
   final String references;
 
-  final bool byHasMany;
-
+  /// Specifies if the [Relation] is [HasOne] or [HasMany]
   final bool toMany;
 
   final String name;
 
   const BelongsTo(this.bean,
-      {@required this.references, this.byHasMany, this.name})
+      {@required this.references, this.name})
       : toMany = false;
 
   const BelongsTo.many(this.bean,
-      {@required this.references, this.byHasMany, this.name})
+      {@required this.references, this.name})
       : toMany = true;
 }
 

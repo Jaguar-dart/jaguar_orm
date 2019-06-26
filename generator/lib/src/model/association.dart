@@ -15,7 +15,7 @@ abstract class Association {
 }
 
 /// [BelongsTo] association has a complementing [Relation]
-class BelongsToAssociationByRelation implements Association {
+class AssociationByRelation implements Association {
   final DartType bean;
 
   final DartType model;
@@ -30,7 +30,7 @@ class BelongsToAssociationByRelation implements Association {
 
   final Preload other;
 
-  BelongsToAssociationByRelation(
+  AssociationByRelation(
       this.bean, this.fields, this.foreignFields, this.other, this.byHasMany)
       : model = getModelForBean(bean);
 
@@ -44,7 +44,7 @@ class BelongsToAssociationByRelation implements Association {
 abstract class ForeignAssociation {}
 
 /// [BelongsTo] association does not have a complementing [Relation].
-class BelongToAssociationWithoutRelation extends ForeignAssociation
+class AssociationWithoutRelation extends ForeignAssociation
     implements Association {
   final DartType bean;
 
@@ -56,7 +56,7 @@ class BelongToAssociationWithoutRelation extends ForeignAssociation
 
   final bool byHasMany;
 
-  BelongToAssociationWithoutRelation(
+  AssociationWithoutRelation(
       this.bean, this.fields, this.foreignFields, this.byHasMany)
       : model = getModelForBean(bean);
 

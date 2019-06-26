@@ -33,7 +33,7 @@ class Writer {
 
     // TODO remove by foreign for non-beaned
 
-    for (BelongsToAssociationByRelation ass
+    for (AssociationByRelation ass
         in _b.associationsWithRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
@@ -47,7 +47,7 @@ class Writer {
       }
     }
 
-    for (BelongToAssociationWithoutRelation ass
+    for (AssociationWithoutRelation ass
         in _b.associationsWithoutRelations.values) {
       _writeFindOneByBeanedAssociation(ass);
       _writeFindListByBeanedAssociationList(ass);
@@ -691,7 +691,7 @@ class Writer {
     return;
   }
 
-  void _removeByForeign(BelongsToAssociationByRelation m) {
+  void _removeByForeign(AssociationByRelation m) {
     _w.write('Future<int>');
     _w.write(' removeBy${_cap(m.modelName)}(');
     final String args =
@@ -863,7 +863,7 @@ class Writer {
       }
     }
 
-    for (BelongsToAssociationByRelation f
+    for (AssociationByRelation f
         in _b.associationsWithRelations.values) {
       if (f.belongsToMany) {
         if (written.contains(f.beanInstanceName)) continue;
@@ -890,7 +890,7 @@ class Writer {
     }
   }
 
-  void _writeAssociate(BelongsToAssociationByRelation m) {
+  void _writeAssociate(AssociationByRelation m) {
     _write('void associate${_cap(m.modelName)}(');
     _write('${_b.modelType} child, ');
     _write('${m.modelName} parent');
@@ -904,7 +904,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeDetach(BelongsToAssociationByRelation m) {
+  void _writeDetach(AssociationByRelation m) {
     _writeln(
         'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
@@ -919,7 +919,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
-    BelongsToAssociationByRelation o = _b.getMatchingManyToMany(m);
+    AssociationByRelation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -936,7 +936,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeFetchOther(BelongsToAssociationByRelation m) {
+  void _writeFetchOther(AssociationByRelation m) {
     final String beanName =
         (m.other as PreloadManyToMany).targetBeanInstanceName;
     final String targetModel = (m.other as PreloadManyToMany).targetModelName;
@@ -952,7 +952,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
-    BelongsToAssociationByRelation o = _b.getMatchingManyToMany(m);
+    AssociationByRelation o = _b.getMatchingManyToMany(m);
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -968,14 +968,14 @@ class Writer {
   }
 
   void _writeAttach() {
-    final BelongsToAssociationByRelation m = _b.associationsWithRelations.values
+    final AssociationByRelation m = _b.associationsWithRelations.values
         .firstWhere(
-            (BelongsToAssociationByRelation f) =>
-                f is BelongsToAssociationByRelation && f.belongsToMany,
+            (AssociationByRelation f) =>
+                f is AssociationByRelation && f.belongsToMany,
             orElse: () => null);
     if (m == null) return;
 
-    final BelongsToAssociationByRelation m1 = _b.getMatchingManyToMany(m);
+    final AssociationByRelation m1 = _b.getMatchingManyToMany(m);
 
     _writeln('Future<dynamic> attach(');
     if (m.modelName.compareTo(m1.modelName) > 0) {
