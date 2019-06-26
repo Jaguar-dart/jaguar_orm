@@ -19,7 +19,7 @@ class Directory {
   List<Directory> child;
 
   @Column(notNull: true)
-  @BelongsTo(DirectoryBean, references: 'id')
+  @BelongsTo.many(DirectoryBean, references: 'id')
   String parentId;
 
   Directory({this.id, this.name, this.parentId});

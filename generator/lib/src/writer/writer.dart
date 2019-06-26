@@ -109,15 +109,15 @@ class Writer {
         if (foreign is BelongsToSpec) {
           _write(
               'foreign: References(${foreign.beanInstanceName}.tableName, "${foreign.references}"');
-          if (foreign.name != null) {
-            _write(', name: "${foreign.name}"');
+          if (foreign.link != null) {
+            _write(', name: "${foreign.link}"');
           }
           _write('),');
         } else if (foreign is ReferencesSpec) {
           _write(
               'foreign: References("${foreign.table}", "${foreign.references}"');
-          if (foreign.name != null) {
-            _write(', name: "${foreign.name}"');
+          if (foreign.link != null) {
+            _write(', name: "${foreign.link}"');
           }
           _write('),');
         } else {
@@ -226,8 +226,9 @@ class Writer {
 
       if (!p.hasMany) {
         _write(_uncap(p.beanInstanceName));
-        _writeln(
-            '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+        _write('.associate${_b.modelType}');
+        if (p.linkBy != null) _write('_for${p.linkBy}');
+        _write('(model.' + p.property + ', newModel);');
         _write('await ' +
             _uncap(p.beanInstanceName) +
             '.upsert(model.' +
@@ -237,7 +238,9 @@ class Writer {
         if (p is PreloadOneToX) {
           _write('model.' + p.property + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
-          _writeln('.associate${_b.modelType}(x, newModel));');
+          _write('.associate${_b.modelType}');
+          if (p.linkBy != null) _write('_for${p.linkBy}');
+          _writeln('(x, newModel));');
           _writeln('for(final child in model.${p.property}) {');
           _writeln('await ' +
               _uncap(p.beanInstanceName) +
@@ -248,11 +251,13 @@ class Writer {
           _writeln(
               'await ${p.targetBeanInstanceName}.upsert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-            _writeln(
-                'await ${p.beanInstanceName}.attach(newModel, child, upsert: true);');
+            _write('await ${p.beanInstanceName}.attach');
+            if (p.linkBy != null) _write('_for${p.linkBy}');
+            _writeln('(newModel, child, upsert: true);');
           } else {
-            _writeln(
-                'await ${p.beanInstanceName}.attach(child, newModel, upsert: true);');
+            _write('await ${p.beanInstanceName}.attach');
+            if (p.linkBy != null) _write('_for${p.linkBy}');
+            _writeln('(child, newModel, upsert: true);');
           }
           _writeln('}');
         }
@@ -337,8 +342,9 @@ class Writer {
 
       if (!p.hasMany) {
         _write(_uncap(p.beanInstanceName));
-        _writeln(
-            '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+        _write('.associate${_b.modelType}');
+        if (p.linkBy != null) _write('_for${p.linkBy}');
+        _write('(model.' + p.property + ', newModel);');
         _write('await ' +
             _uncap(p.beanInstanceName) +
             '.insert(model.' +
@@ -348,7 +354,9 @@ class Writer {
         if (p is PreloadOneToX) {
           _write('model.' + p.property + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
-          _writeln('.associate${_b.modelType}(x, newModel));');
+          _write('.associate${_b.modelType}');
+          if (p.linkBy != null) _write('_for${p.linkBy}');
+          _write('(x, newModel));');
           _writeln('for(final child in model.${p.property}) {');
           _writeln('await ' +
               _uncap(p.beanInstanceName) +
@@ -359,9 +367,13 @@ class Writer {
           _writeln(
               'await ${p.targetBeanInstanceName}.insert(child, cascade: cascade);');
           if (_b.modelType.compareTo(p.targetInfo.modelType) > 0) {
-            _writeln('await ${p.beanInstanceName}.attach(newModel, child);');
+            _write('await ${p.beanInstanceName}.attach');
+            if (p.linkBy != null) _write('_for${p.linkBy}');
+            _writeln('(newModel, child);');
           } else {
-            _writeln('await ${p.beanInstanceName}.attach(child, newModel);');
+            _write('await ${p.beanInstanceName}.attach');
+            if (p.linkBy != null) _write('_for${p.linkBy}');
+            _writeln('(child, newModel);');
           }
           _writeln('}');
         }
@@ -448,12 +460,15 @@ class Writer {
 
         if (!p.hasMany) {
           _write(_uncap(p.beanInstanceName));
-          _writeln(
-              '.associate${_b.modelType}(model.' + p.property + ', newModel);');
+          _write('.associate${_b.modelType}');
+          if (p.linkBy != null) _write('_for${p.linkBy}');
+          _writeln('(model.' + p.property + ', newModel);');
         } else {
           _write('model.' + p.property + '.forEach((x) => ');
           _write(_uncap(p.beanInstanceName));
-          _writeln('.associate${_b.modelType}(x, newModel));');
+          _write('.associate${_b.modelType}');
+          if (p.linkBy != null) _write('_for${p.linkBy}');
+          _writeln('(x, newModel));');
         }
         _writeln('}');
       }
@@ -595,8 +610,9 @@ class Writer {
     _w.writeln('if(newModel != null) {');
     for (Preload p in _b.preloads) {
       if (p is PreloadOneToX) {
-        _write(
-            'await ' + p.beanInstanceName + '.removeBy' + _b.modelType + '(');
+        _write('await ' + p.beanInstanceName + '.removeBy' + _b.modelType);
+        if (p.linkBy != null) _write('_for${p.linkBy}');
+        _write('(');
         _write(p.fields.map((f) => 'newModel.' + f.field).join(', '));
         _writeln(');');
       } else if (p is PreloadManyToMany) {
@@ -622,7 +638,11 @@ class Writer {
     } else {
       _w.write('Future<List<${_b.modelType}>>');
     }
-    _w.write(' findBy${_cap(m.modelName)}(');
+    _w.write(' findBy${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(');
     final String args =
         m.fields.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
@@ -692,7 +712,11 @@ class Writer {
 
   void _removeByForeign(AssociationByRelation m) {
     _w.write('Future<int>');
-    _w.write(' removeBy${_cap(m.modelName)}(');
+    _w.write(' removeBy${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(');
     final String args =
         m.fields.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
@@ -710,7 +734,11 @@ class Writer {
   }
 
   void _writeFindListByBeanedAssociationList(Association m) {
-    _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}List(');
+    _write('Future<List<${_b.modelType}>> findBy${_cap(m.modelName)}List');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(');
     _write('List<${m.modelName}> models');
     _write(', {bool preload = false, bool cascade = false}');
     _writeln(') async {');
@@ -757,6 +785,7 @@ class Writer {
         _write(_uncap(p.beanInstanceName));
         _write('.findBy');
         _write(_b.modelType);
+        if (p.linkBy != null) _write('_for${p.linkBy}');
         _write('(');
         final String args = p.foreignFields
             .map((ParsedField f) => f.foreign.references)
@@ -803,8 +832,9 @@ class Writer {
         //Arg3: function
         _write(_uncap(p.beanInstanceName));
         _write('.findBy');
-        _write(_b.modelType);
-        _write('List, ');
+        _write(_b.modelType + 'List');
+        if (p.linkBy != null) _write('_for${p.linkBy}');
+        _write(', ');
         //Arg4: ChildGetter
         _write('(${p.modelName} model) => [');
         {
@@ -889,7 +919,11 @@ class Writer {
   }
 
   void _writeAssociate(AssociationByRelation m) {
-    _write('void associate${_cap(m.modelName)}(');
+    _write('void associate${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(');
     _write('${_b.modelType} child, ');
     _write('${m.modelName} parent');
     _writeln(') {');
@@ -903,8 +937,11 @@ class Writer {
   }
 
   void _writeManyToManyDetach(AssociationByRelation m) {
-    _writeln(
-        'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
+    _writeln('Future<int> detach${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
@@ -936,8 +973,11 @@ class Writer {
   void _writeManyToManyFetchOther(AssociationByRelation m) {
     final String beanName = m.manyToManyInfo.targetBeanInstanceName;
     final String targetModel = m.manyToManyInfo.targetModelName;
-    _writeln(
-        'Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
+    _writeln('Future<List<$targetModel>> fetchBy${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _w.write('(${_cap(m.modelName)} model) async {');
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');

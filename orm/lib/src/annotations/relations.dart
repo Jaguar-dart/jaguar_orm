@@ -7,28 +7,28 @@ abstract class Relation {
   /// between two table.
   ///
   /// If there are multiple foreign relations between two tables, disambiguate
-  /// them by matching [Relation.linkByName] and [References.name] or
-  /// [BelongsTo.name].
+  /// them by matching [Relation.linkBy] and [References.link] or
+  /// [BelongsTo.link].
   ///
   /// TODO example
-  String get linkByName;
+  String get linkBy;
 }
 
 /// TODO example
 class HasOne implements Relation {
   final Type bean;
 
-  final String linkByName;
+  final String linkBy;
 
-  const HasOne(this.bean, {this.linkByName});
+  const HasOne(this.bean, {this.linkBy});
 }
 
 class HasMany implements Relation {
   final Type bean;
 
-  final String linkByName;
+  final String linkBy;
 
-  const HasMany(this.bean, {this.linkByName});
+  const HasMany(this.bean, {this.linkBy});
 }
 
 class ManyToMany implements Relation {
@@ -36,7 +36,7 @@ class ManyToMany implements Relation {
 
   final Type targetBean;
 
-  final String linkByName;
+  final String linkBy;
 
-  const ManyToMany(this.pivotBean, this.targetBean, {this.linkByName});
+  const ManyToMany(this.pivotBean, this.targetBean, {this.linkBy});
 }

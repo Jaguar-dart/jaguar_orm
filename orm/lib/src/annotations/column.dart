@@ -25,12 +25,12 @@ class BelongsTo implements ColumnDef {
   /// Specifies if the [Relation] is [HasOne] or [HasMany]
   final bool toMany;
 
-  final String name;
+  final String link;
 
-  const BelongsTo(this.bean, {@required this.references, this.name})
+  const BelongsTo(this.bean, {@required this.references, this.link})
       : toMany = false;
 
-  const BelongsTo.many(this.bean, {@required this.references, this.name})
+  const BelongsTo.many(this.bean, {@required this.references, this.link})
       : toMany = true;
 }
 

@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
 import 'package:jaguar_orm/src/annotations/column.dart';
+import 'package:tuple/tuple.dart';
 import 'preloads.dart';
 
 export 'preloads.dart';
@@ -48,7 +49,8 @@ class ParsedField {
 
 class ParsedBean extends UnAssociatedBean {
   /// A map of bean to [AssociationByRelation]
-  final Map<DartType, AssociationByRelation> associationsWithRelations;
+  final Map<Tuple2<DartType, String>, AssociationByRelation>
+      associationsWithRelations;
 
   /// A map of association to [AssociationWithoutRelation]
   final Map<DartType, AssociationWithoutRelation> associationsWithoutRelations;
@@ -70,7 +72,7 @@ class ParsedBean extends UnAssociatedBean {
 
   factory ParsedBean.fromPreAssociated(
     UnAssociatedBean bean, {
-    @required Map<DartType, AssociationByRelation> belongTos,
+    @required Map<Tuple2<DartType, String>, AssociationByRelation> belongTos,
     @required
         Map<DartType, AssociationWithoutRelation> beanedForeignAssociations,
   }) {
@@ -118,7 +120,7 @@ class UnAssociatedBean {
 
   Preload findHasXByAssociation(DartType association, {@required String name}) {
     return preloads.firstWhere(
-        (p) => p.bean == association && p.linkByName == name,
+        (p) => p.bean == association && p.linkBy == name,
         orElse: () => null);
   }
 

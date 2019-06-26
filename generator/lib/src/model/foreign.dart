@@ -15,10 +15,10 @@ class BelongsToSpec implements ForeignSpec {
 
   /// Name of the foreign key.
   ///
-  /// Is also used to connect to [Relation]. Same as [BelongsTo.name].
-  final String name;
+  /// Is also used to connect to [Relation]. Same as [BelongsTo.link].
+  final String link;
 
-  BelongsToSpec(this.bean, this.references, this.belongsToMany, {this.name})
+  BelongsToSpec(this.bean, this.references, this.belongsToMany, {this.link})
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;
@@ -33,11 +33,11 @@ class ReferencesSpec implements ForeignSpec {
 
   final String references;
 
-  final String name;
+  final String link;
 
   // TODO association
 
-  ReferencesSpec(this.table, this.references, {this.name});
+  ReferencesSpec(this.table, this.references, {this.link});
 }
 
 /* TODO

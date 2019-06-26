@@ -135,7 +135,7 @@ class UnassociatedBeanParser {
     DartObject rel = isRelation.firstAnnotationOf(f);
     if (rel == null) return false;
 
-    String linkByName = getString(rel, 'linkByName');
+    String linkBy = getString(rel, 'linkBy');
 
     if (isHasOne.isExactlyType(rel.type) || isHasMany.isExactlyType(rel.type)) {
       final DartType bean = rel.getField('bean').toTypeValue();
@@ -147,9 +147,9 @@ class UnassociatedBeanParser {
       final bool hasMany = isHasMany.isExactlyType(rel.type);
 
       if (!hasMany) {
-        relations[f.displayName] = HasOneSpec(f.displayName, bean, linkByName);
+        relations[f.displayName] = HasOneSpec(f.displayName, bean, linkBy);
       } else {
-        relations[f.displayName] = HasManySpec(f.displayName, bean, linkByName);
+        relations[f.displayName] = HasManySpec(f.displayName, bean, linkBy);
       }
     } else if (isManyToMany.isExactlyType(rel.type)) {
       final DartType pivot = rel.getField('pivotBean').toTypeValue();
@@ -164,7 +164,7 @@ class UnassociatedBeanParser {
       }
 
       relations[f.displayName] =
-          ManyToManySpec(f.displayName, pivot, target, linkByName);
+          ManyToManySpec(f.displayName, pivot, target, linkBy);
     } else {
       throw Exception('Invalid Relation type!');
     }
@@ -177,13 +177,15 @@ class UnassociatedBeanParser {
     for (String fieldName in relations.keys) {
       RelationSpec spec = relations[fieldName];
 
+      final id = Tuple2(curBean, spec.linkBy);
+
       if (spec is HasOneSpec) {
         AssociationByRelation g;
         if (associatePreloads) {
           if (spec.bean != curBean) {
             final ParsedBean info =
                 BeanParser(spec.bean.element, doRelations: false).parse();
-            g = info.associationsWithRelations[curBean];
+            g = info.associationsWithRelations[id];
             if (g == null || g is! AssociationByRelation)
               throw Exception(
                   'Association ${spec.bean} not found! Field ${spec.property}.');
@@ -197,7 +199,7 @@ class UnassociatedBeanParser {
           if (spec.bean != curBean) {
             final ParsedBean info =
                 BeanParser(spec.bean.element, doRelations: false).parse();
-            g = info.associationsWithRelations[curBean];
+            g = info.associationsWithRelations[id];
             if (g == null || g is! AssociationByRelation)
               throw Exception(
                   'Association ${spec.bean} not found! Field ${spec.property}.');
@@ -210,7 +212,7 @@ class UnassociatedBeanParser {
         if (associatePreloads) {
           final ParsedBean beanInfo =
               BeanParser(spec.pivotBean.element, doRelations: false).parse();
-          g = beanInfo.associationsWithRelations[curBean];
+          g = beanInfo.associationsWithRelations[id];
           if (g == null || g is! AssociationByRelation) {
             throw Exception(
                 'Association $curBean not found! Field ${spec.property}.');

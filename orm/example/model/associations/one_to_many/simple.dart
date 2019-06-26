@@ -25,7 +25,7 @@ class Post {
   @Str(length: 150)
   String message;
 
-  @BelongsTo(AuthorBean, references: 'id')
+  @BelongsTo.many(AuthorBean, references: 'id')
   @Str(length: 50)
   String authorId;
 

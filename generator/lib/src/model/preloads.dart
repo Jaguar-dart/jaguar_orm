@@ -5,13 +5,13 @@ import 'model.dart';
 abstract class RelationSpec {
   String get property;
 
-  String get linkByName;
+  String get linkBy;
 }
 
 abstract class HasXSpec implements RelationSpec {
   String get property;
 
-  String get linkByName;
+  String get linkBy;
 
   DartType get bean;
 }
@@ -19,34 +19,34 @@ abstract class HasXSpec implements RelationSpec {
 class HasOneSpec implements HasXSpec {
   final String property;
 
-  final String linkByName;
+  final String linkBy;
 
   final DartType bean;
 
-  HasOneSpec(this.property, this.bean, this.linkByName);
+  HasOneSpec(this.property, this.bean, this.linkBy);
 }
 
 class HasManySpec implements HasXSpec {
   final String property;
 
-  final String linkByName;
+  final String linkBy;
 
   final DartType bean;
 
-  HasManySpec(this.property, this.bean, this.linkByName);
+  HasManySpec(this.property, this.bean, this.linkBy);
 }
 
 class ManyToManySpec implements RelationSpec {
   final String property;
 
-  final String linkByName;
+  final String linkBy;
 
   final DartType pivotBean;
 
   final DartType targetBean;
 
   ManyToManySpec(
-      this.property, this.pivotBean, this.targetBean, this.linkByName);
+      this.property, this.pivotBean, this.targetBean, this.linkBy);
 }
 
 /// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships
@@ -61,7 +61,7 @@ abstract class Preload {
 
   String get modelName => getModelForBean(bean).name;
 
-  String get linkByName => spec.linkByName;
+  String get linkBy => spec.linkBy;
 
   String get property => spec.property;
 

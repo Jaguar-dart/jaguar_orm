@@ -6,6 +6,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import 'package:jaguar_orm_gen/src/model/model.dart';
 import 'package:jaguar_orm/jaguar_orm.dart' hide Field;
+import 'package:tuple/tuple.dart';
 
 /// Parses the `@GenBean()` into `WriterModel` so that `Model` can be used
 /// to generate the code by `Writer`.
@@ -28,7 +29,8 @@ class BeanParser {
 
   List<Preload> get preloads => _unassociated.preloads;
 
-  final associationsWithRelations = <DartType, AssociationByRelation>{};
+  final associationsWithRelations =
+      <Tuple2<DartType, String>, AssociationByRelation>{};
 
   final associationsWithoutRelations = <DartType, AssociationWithoutRelation>{};
 
@@ -46,8 +48,6 @@ class BeanParser {
               .parse();
 
       for (ParsedField f in m.fields) {
-        // TODO linkByName
-
         ParsedField ff = info.fieldByColName(f.foreign.references);
 
         if (ff == null) {
@@ -81,7 +81,8 @@ class BeanParser {
     if (doRelations) {
       for (Preload p in preloads) {
         if (p.bean == clazz.type) {
-          p.foreignFields.addAll(associationsWithRelations[p.bean].fields);
+          final id = Tuple2(p.bean, p.linkBy);
+          p.foreignFields.addAll(associationsWithRelations[id].fields);
         }
         for (ParsedField f in p.foreignFields) {
           ParsedField ff = ret.fieldByColName(f.foreign.references);
@@ -109,26 +110,23 @@ class BeanParser {
 
       final BelongsToSpec foreign = f.foreign;
       final DartType bean = foreign.bean;
-      AssociationByRelation current = associationsWithRelations[bean];
+      final id = Tuple2(bean, foreign.link);
+      AssociationByRelation current = associationsWithRelations[id];
 
       final UnAssociatedBean info =
           UnassociatedBeanParser(bean.element, associatePreloads: false)
               .parse();
 
       final Preload otherPreload =
-          info.findHasXByAssociation(clazz.type, name: foreign.name);
+          info.findHasXByAssociation(clazz.type, name: foreign.link);
 
       // Skip [BelongTo]s without complementing [Relation]
       if (otherPreload == null) continue;
 
       if (current == null) {
-        bool byHasMany = otherPreload.hasMany;
-        if (byHasMany != null) {
-          if (byHasMany != otherPreload.hasMany) {
-            throw Exception('Mismatching association type!');
-          }
-        } else {
-          byHasMany = otherPreload.hasMany;
+        bool byHasMany = foreign.belongsToMany;
+        if (byHasMany != otherPreload.hasMany) {
+          throw Exception('Mismatching association type!');
         }
         AssociationManyToManyInfo other;
 
@@ -137,8 +135,9 @@ class BeanParser {
               targetBeanInstanceName: otherPreload.targetBeanInstanceName,
               targetModelName: otherPreload.targetModelName);
         }
-        current = AssociationByRelation(bean, [], [], other, byHasMany);
-        associationsWithRelations[bean] = current;
+        current = AssociationByRelation(bean, [], [], other, byHasMany,
+            name: foreign.link);
+        associationsWithRelations[id] = current;
       } else if (current is AssociationByRelation) {
         if (current.toMany != otherPreload.hasMany) {
           throw Exception('Mismatching association type!');
@@ -149,7 +148,7 @@ class BeanParser {
       } else {
         throw Exception('Table and bean associations mixed!');
       }
-      associationsWithRelations[bean].fields.add(f);
+      associationsWithRelations[id].fields.add(f);
     }
   }
 
@@ -166,7 +165,7 @@ class BeanParser {
             UnassociatedBeanParser(bean.element, associatePreloads: false)
                 .parse();
         final Preload other =
-            info.findHasXByAssociation(clazz.type, name: foreign.name);
+            info.findHasXByAssociation(clazz.type, name: foreign.link);
 
         // Skip [BelongTo]s with complementing [Relation]
         if (other != null) continue;

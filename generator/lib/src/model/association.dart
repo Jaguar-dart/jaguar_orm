@@ -31,6 +31,8 @@ class AssociationByRelation implements Association {
 
   final DartType model;
 
+  final String name;
+
   final List<ParsedField> fields;
 
   final List<ParsedField> foreignFields;
@@ -42,7 +44,7 @@ class AssociationByRelation implements Association {
   final AssociationManyToManyInfo manyToManyInfo;
 
   AssociationByRelation(this.bean, this.fields, this.foreignFields,
-      this.manyToManyInfo, this.toMany)
+      this.manyToManyInfo, this.toMany, {@required this.name})
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;

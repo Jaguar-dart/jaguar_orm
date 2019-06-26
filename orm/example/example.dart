@@ -15,7 +15,7 @@ class CartItem {
 
   int quantity;
 
-  @BelongsTo(CartBean, references: 'id')
+  @BelongsTo.many(CartBean, references: 'id')
   int cartId;
 
   CartItem({this.amount, this.product, this.quantity, this.id});

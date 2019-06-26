@@ -10,7 +10,7 @@ Column readColumn(ConstantReader reader) {
 ReferencesSpec readReferences(ConstantReader reader) {
   final String table = getString(reader, 'table');
   final String col = getString(reader, 'col');
-  final String name = getString(reader, 'name');
+  final String link = getString(reader, 'link');
 
   if (table == null) {
     throw Exception("table of a Reference is mandatory!");
@@ -20,14 +20,14 @@ ReferencesSpec readReferences(ConstantReader reader) {
     throw Exception("col of a Reference is mandatory!");
   }
 
-  return ReferencesSpec(table, col, name: name);
+  return ReferencesSpec(table, col, link: link);
 }
 
 BelongsToSpec readBelongsTo(ConstantReader reader) {
   final DartType bean = getType(reader, 'bean');
   final String references = getString(reader, 'references');
   final bool toMany = getBool(reader, 'toMany');
-  final String name = getString(reader, 'name');
+  final String link = getString(reader, 'link');
 
   if (references == null) {
     throw Exception("references cannot be null on BelongsTo!");
@@ -37,7 +37,7 @@ BelongsToSpec readBelongsTo(ConstantReader reader) {
     throw Exception("bean cannot be null on BelongsTo!");
   }
 
-  return BelongsToSpec(bean, references, toMany, name: name);
+  return BelongsToSpec(bean, references, toMany, link: link);
 }
 
 List<ColumnDef> _filterColumnDef(FieldElement f) {

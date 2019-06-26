@@ -28,9 +28,9 @@ class References {
   final String col;
 
   /// Name of the constraint
-  final String name;
+  final String link;
 
-  const References(this.table, this.col, {this.name});
+  const References(this.table, this.col, {this.link});
 }
 
 abstract class Constraint {}
