@@ -40,9 +40,9 @@ class Writer {
 
       _writeAssociate(ass);
 
-      if (ass.belongsToMany) {
-        _writeDetach(ass);
-        _writeFetchOther(ass);
+      if (ass.isManyToMany) {
+        _writeManyToManyDetach(ass);
+        _writeManyToManyFetchOther(ass);
       }
     }
 
@@ -863,7 +863,7 @@ class Writer {
     }
 
     for (AssociationByRelation f in _b.associationsWithRelations.values) {
-      if (f.belongsToMany) {
+      if (f.isManyToMany) {
         if (written.contains(f.beanInstanceName)) continue;
         written.add(f.beanInstanceName);
 
@@ -902,7 +902,7 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeDetach(AssociationByRelation m) {
+  void _writeManyToManyDetach(AssociationByRelation m) {
     _writeln(
         'Future<int> detach${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final dels = await findBy${_cap(m.modelName)}(');
@@ -913,7 +913,7 @@ class Writer {
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
     final String beanName =
-        (m.other as PreloadManyToMany).targetBeanInstanceName;
+        m.manyToManyInfo.targetBeanInstanceName;
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
@@ -934,10 +934,9 @@ class Writer {
     _writeln('}');
   }
 
-  void _writeFetchOther(AssociationByRelation m) {
-    final String beanName =
-        (m.other as PreloadManyToMany).targetBeanInstanceName;
-    final String targetModel = (m.other as PreloadManyToMany).targetModelName;
+  void _writeManyToManyFetchOther(AssociationByRelation m) {
+    final String beanName = m.manyToManyInfo.targetBeanInstanceName;
+    final String targetModel = m.manyToManyInfo.targetModelName;
     _writeln(
         'Future<List<$targetModel>> fetchBy${_cap(m.modelName)}(${_cap(m.modelName)} model) async {');
     _write('final pivots = await findBy${_cap(m.modelName)}(');
@@ -969,7 +968,7 @@ class Writer {
     final AssociationByRelation m = _b.associationsWithRelations.values
         .firstWhere(
             (AssociationByRelation f) =>
-                f is AssociationByRelation && f.belongsToMany,
+                f is AssociationByRelation && f.isManyToMany,
             orElse: () => null);
     if (m == null) return;
 

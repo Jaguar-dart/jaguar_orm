@@ -86,7 +86,7 @@ class ParsedBean extends UnAssociatedBean {
 
   AssociationByRelation getMatchingManyToMany(AssociationByRelation val) {
     for (AssociationByRelation f in associationsWithRelations.values) {
-      if (!f.belongsToMany) continue;
+      if (!f.isManyToMany) continue;
 
       if (f == val) continue;
 

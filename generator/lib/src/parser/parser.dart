@@ -115,27 +115,34 @@ class BeanParser {
           UnassociatedBeanParser(bean.element, associatePreloads: false)
               .parse();
 
-      final Preload other = info.findHasXByAssociation(clazz.type);
+      final Preload otherPreload = info.findHasXByAssociation(clazz.type);
 
       // Skip [BelongTo]s without complementing [Relation]
-      if (other == null) continue;
+      if (otherPreload == null) continue;
 
       if (current == null) {
-        bool byHasMany = other.hasMany;
+        bool byHasMany = otherPreload.hasMany;
         if (byHasMany != null) {
-          if (byHasMany != other.hasMany) {
+          if (byHasMany != otherPreload.hasMany) {
             throw Exception('Mismatching association type!');
           }
         } else {
-          byHasMany = other.hasMany;
+          byHasMany = otherPreload.hasMany;
+        }
+        AssociationManyToManyInfo other;
+
+        if (otherPreload is PreloadManyToMany) {
+          other = AssociationManyToManyInfo(
+              targetBeanInstanceName: otherPreload.targetBeanInstanceName,
+              targetModelName: otherPreload.targetModelName);
         }
         current = AssociationByRelation(bean, [], [], other, byHasMany);
         associationsWithRelations[bean] = current;
       } else if (current is AssociationByRelation) {
-        if (current.toMany != other.hasMany) {
+        if (current.toMany != otherPreload.hasMany) {
           throw Exception('Mismatching association type!');
         }
-        if (current.belongsToMany != other is PreloadManyToMany) {
+        if (current.isManyToMany != otherPreload is PreloadManyToMany) {
           throw Exception('Mismatching association type!');
         }
       } else {
@@ -162,10 +169,6 @@ class BeanParser {
         // Skip [BelongTo]s with complementing [Relation]
         if (other != null) continue;
       }
-
-      if (foreign.belongsToMany == null)
-        throw Exception(
-            'For un-associated foreign keys, "byHasMany" must be specified!');
 
       AssociationWithoutRelation current = associationsWithoutRelations[bean];
 

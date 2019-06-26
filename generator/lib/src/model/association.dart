@@ -1,5 +1,16 @@
 part of jaguar_orm.generator.model;
 
+class AssociationManyToManyInfo {
+  // TODO bean?
+
+  final String targetBeanInstanceName;
+
+  final String targetModelName;
+
+  const AssociationManyToManyInfo(
+      {@required this.targetBeanInstanceName, @required this.targetModelName});
+}
+
 abstract class Association {
   DartType get bean;
 
@@ -26,12 +37,12 @@ class AssociationByRelation implements Association {
 
   final bool toMany;
 
-  bool get belongsToMany => other is PreloadManyToMany;
+  bool get isManyToMany => manyToManyInfo != null;
 
-  final Preload other;
+  final AssociationManyToManyInfo manyToManyInfo;
 
   AssociationByRelation(
-      this.bean, this.fields, this.foreignFields, this.other, this.toMany)
+      this.bean, this.fields, this.foreignFields, this.manyToManyInfo, this.toMany)
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;
