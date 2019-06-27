@@ -1,6 +1,8 @@
 import 'package:jaguar_query/jaguar_query.dart';
 
 abstract class Connection<ConnType> {
+  Logger get logger;
+
   ConnType get connection;
 
   Future<void> release();

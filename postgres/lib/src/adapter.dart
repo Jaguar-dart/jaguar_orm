@@ -21,13 +21,23 @@ class PgAdapter extends Adapter<pg.PostgreSQLConnection> {
   final String username;
   final String password;
 
+  Logger logger;
+
   PgAdapter(this.databaseName,
-      {this.username, this.password, this.host: 'localhost', this.port: 5432});
+      {this.username,
+      this.password,
+      this.host: 'localhost',
+      this.port: 5432,
+      this.logger});
 
   /// Connects to the database
   Future<Connection> open() async {
     return PgConn.open(databaseName,
-        host: host, port: port, username: username, password: password);
+        host: host,
+        port: port,
+        username: username,
+        password: password,
+        logger: logger);
   }
 
   @override

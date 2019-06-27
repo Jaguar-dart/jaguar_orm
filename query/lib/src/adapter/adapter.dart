@@ -8,8 +8,12 @@ import 'connection.dart';
 export 'connection.dart';
 export 'to_dialect.dart';
 
+typedef Logger = void Function(String statement);
+
 /// Adapter interface that must be implemented to support new databases
 abstract class Adapter<ConnType> {
+  Logger get logger;
+
   /// Opens a new connection to database
   Future<Connection> open();
 
