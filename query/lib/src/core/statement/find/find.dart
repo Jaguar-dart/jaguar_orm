@@ -191,12 +191,12 @@ class Find implements Statement, Whereable, RowSource {
   Find between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
-  Find orderBy(String column, {bool desc = false}) {
+  Find orderBy(String column, {bool desc}) {
     _orderBy.add(OrderBy(column, desc: desc));
     return this;
   }
 
-  Find orderByMany(List<String> columns, {bool desc = false}) {
+  Find orderByMany(List<String> columns, {bool desc}) {
     columns.forEach((String column) {
       _orderBy.add(OrderBy(column, desc: desc));
     });
@@ -268,5 +268,5 @@ class OrderBy {
 
   final bool desc;
 
-  const OrderBy(this.columnName, {this.desc = false});
+  const OrderBy(this.columnName, {this.desc});
 }

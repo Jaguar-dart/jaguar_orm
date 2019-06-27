@@ -75,8 +75,13 @@ String composeJoinedTable(final JoinedTable join) {
   return sb.toString();
 }
 
-String composeOrderBy(final OrderBy orderBy) =>
-    '${orderBy.columnName} ' + (orderBy.desc ? 'ASC' : 'DESC');
+String composeOrderBy(final OrderBy orderBy) {
+  var sb = StringBuffer('${orderBy.columnName}');
+  if(orderBy.desc != null) {
+    if(orderBy.desc) sb.write(' DESC');
+  }
+  return sb.toString();
+}
 
 String composeSelExpr(SelExpr exp) {
   if (exp is Sel) {
