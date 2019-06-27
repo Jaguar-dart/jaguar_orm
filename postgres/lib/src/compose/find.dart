@@ -76,7 +76,7 @@ String composeJoinedTable(final JoinedTable join) {
 }
 
 String composeOrderBy(final OrderBy orderBy) =>
-    '${orderBy.columnName} ' + (orderBy.ascending ? 'ASC' : 'DESC');
+    '${orderBy.columnName} ' + (orderBy.desc ? 'ASC' : 'DESC');
 
 String composeSelExpr(SelExpr exp) {
   if (exp is Sel) {

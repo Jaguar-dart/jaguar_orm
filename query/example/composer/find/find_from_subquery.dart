@@ -8,7 +8,7 @@ main() {
   Find find = Sql.find(Find('post').sel('message'))
       .where(IntField('likes').eq(10) & IntField('replies').eq(5))
       .where(eq('author', 'teja') | like('author', 'kleak*'))
-      .orderBy('author', true)
+      .orderBy('author', desc: false)
       .limit(10)
       .groupByMany(['message', 'likes']);
   print(composeFind(find));
