@@ -44,7 +44,8 @@ class AssociationByRelation implements Association {
   final AssociationManyToManyInfo manyToManyInfo;
 
   AssociationByRelation(this.bean, this.fields, this.foreignFields,
-      this.manyToManyInfo, this.toMany, {@required this.name})
+      this.manyToManyInfo, this.toMany,
+      {@required this.name})
       : model = getModelForBean(bean);
 
   String get beanName => bean.name;

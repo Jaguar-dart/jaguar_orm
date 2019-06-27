@@ -25,42 +25,41 @@ class Post {
 }
 
 main() async {
-  final PgAdapter adapter =
-      PgAdapter('example', username: 'dart_jaguar', password: 'dart_jaguar');
-  await adapter.connect();
+  final connection = await PgConn.open('example',
+      username: 'dart_jaguar', password: 'dart_jaguar');
 
-  await Sql.drop(Post.tableName).exec(adapter);
-  await Sql.drop(Author.tableName).exec(adapter);
+  await Sql.drop(Post.tableName).exec(connection);
+  await Sql.drop(Author.tableName).exec(connection);
 
   await Sql.create(Author.tableName)
       .addInt('id', isPrimary: true)
       .addStr('name', length: 50)
-      .exec(adapter);
+      .exec(connection);
 
   await Sql.create(Post.tableName)
       .addInt('id', isPrimary: true)
       .addInt('authorId', foreign: References('author', 'id'))
       .addStr('message', length: 150)
       .addInt('likes')
-      .exec(adapter);
+      .exec(connection);
 
   await Sql.insert(Author.tableName).setValues(<String, dynamic>{
     "id": '1',
     "name": "Ho",
-  }).exec(adapter);
+  }).exec(connection);
 
   await Sql.insert(Post.tableName).setValues(<String, dynamic>{
     "id": 9,
     "authorid": 1,
     "message": "Message 9 from 3!",
     "likes": 13,
-  }).exec(adapter);
+  }).exec(connection);
 
   final data = await Sql.find(Post.tableName)
       .innerJoin(Author.tableName)
       .joinOn(Field.inTable('post', 'authorid').eqF('id', table: 'author'))
       .where(eq('author.id', 1))
-      .exec(adapter)
+      .exec(connection)
       .one();
   print(data);
 

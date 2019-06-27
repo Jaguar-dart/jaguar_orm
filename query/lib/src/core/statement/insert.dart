@@ -6,7 +6,7 @@ part of query.core;
 /// Use `set`, `setMany`, `setValue`, `setInt`, `setString`, `setBool`,
 /// `setDateTime` and `setValues` to set column values.
 ///
-/// Use `exec` statement or `Adapter` to execute the statement against a
+/// Use `exec` statement or `Connection` to execute the statement against a
 /// database.
 class Insert implements Statement, Settable {
   final String name;
@@ -19,7 +19,7 @@ class Insert implements Statement, Settable {
     _immutable = ImmutableInsertStatement(this);
   }
 
-  /// Id is the auto-generated primary key that is set by the database. [Adapter]
+  /// Id is the auto-generated primary key that is set by the database. [Connection]
   /// will request the database to return this column on inserts.
   Insert id(String id) {
     _id = id;
@@ -76,8 +76,8 @@ class Insert implements Statement, Settable {
     return this;
   }
 
-  /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.insert<T>(this);
+  /// Executes the statement with the given connection.
+  Future<T> exec<T>(Connection connection) => connection.insert<T>(this);
 
   ImmutableInsertStatement _immutable;
 

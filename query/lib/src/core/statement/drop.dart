@@ -22,5 +22,5 @@ class Drop implements Statement {
     return this;
   }
 
-  Future<void> exec(Adapter adapter) => adapter.dropTable(this);
+  Future<void> exec(Connection connection) => connection.dropTable(this);
 }

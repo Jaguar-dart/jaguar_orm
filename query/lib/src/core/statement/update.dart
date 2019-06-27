@@ -106,7 +106,7 @@ class Update implements Statement, Settable, Whereable {
   Update between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
-  Future<int> exec(Adapter adapter) => adapter.update(this);
+  Future<int> exec(Connection connection) => connection.update(this);
 
   ImmutableUpdateStatement _immutable;
 

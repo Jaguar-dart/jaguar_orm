@@ -24,7 +24,7 @@ class Create implements Statement {
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, type,
-         notNull: notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -38,7 +38,7 @@ class Create implements Statement {
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Int(auto: autoIncrement),
-         notNull: notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -46,12 +46,12 @@ class Create implements Statement {
   }
 
   Create addDouble(String name,
-      {bool  notNull = false,
+      {bool notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Double(),
-         notNull:  notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -59,19 +59,19 @@ class Create implements Statement {
   }
 
   Create addBool(String name,
-      {bool  notNull = false, List<Constraint> constraints = const []}) {
+      {bool notNull = false, List<Constraint> constraints = const []}) {
     _columns[name] =
-        CreateCol(name, Bool(),  notNull:  notNull, constraints: constraints);
+        CreateCol(name, Bool(), notNull: notNull, constraints: constraints);
     return this;
   }
 
   Create addTimestamp(String name,
-      {bool  notNull = false,
+      {bool notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Timestamp(),
-         notNull:  notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -79,13 +79,13 @@ class Create implements Statement {
   }
 
   Create addStr(String name,
-      {bool  notNull = false,
+      {bool notNull = false,
       int length,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     _columns[name] = CreateCol(name, Str(length: length),
-         notNull:  notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -104,7 +104,8 @@ class Create implements Statement {
     return this;
   }
 
-  Future<void> exec(Adapter adapter) => adapter.createTable(this);
+  Future<void> exec(/* Connection | Adapter */ connection) =>
+      connection.createTable(this);
 
   ImmutableCreateStatement _immutable;
 

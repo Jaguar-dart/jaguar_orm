@@ -34,11 +34,9 @@ class Post {
 
 @GenBean()
 class AuthorBean extends Bean<Author> with _AuthorBean {
-  final PostBean postBean;
+  final BeanRepo beanRepo;
 
-  AuthorBean(Adapter adapter)
-      : postBean = PostBean(adapter),
-        super(adapter);
+  AuthorBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)
@@ -52,10 +50,9 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 
 @GenBean()
 class PostBean extends Bean<Post> with _PostBean {
-  AuthorBean _authorBean;
-  AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);
+  final BeanRepo beanRepo;
 
-  PostBean(Adapter adapter) : super(adapter);
+  PostBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   Future createTable({bool ifNotExists = false}) {
     final st = Sql.create(tableName)

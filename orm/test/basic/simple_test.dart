@@ -9,13 +9,9 @@ void main() {
   group('Basic', () {
     final userBean = UserBean(adapter);
 
-    setUpAll(() async {
-      await adapter.connect();
-    });
+    setUpAll(() async {});
 
-    tearDownAll(() async {
-      await adapter.close();
-    });
+    tearDownAll(() async {});
 
     setUp(() async {
       await userBean.drop();

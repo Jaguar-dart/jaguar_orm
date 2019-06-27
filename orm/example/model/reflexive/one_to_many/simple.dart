@@ -30,8 +30,9 @@ class Directory {
 
 @GenBean()
 class DirectoryBean extends Bean<Directory> with _DirectoryBean {
-  DirectoryBean get directoryBean => this;
-  DirectoryBean(Adapter adapter) : super(adapter);
+  final BeanRepo beanRepo;
+
+  DirectoryBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'directory';
 }

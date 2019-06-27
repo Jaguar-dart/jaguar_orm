@@ -5,5 +5,5 @@ abstract class Property<T> {
 
   DataType<T> get type;
 
-  bool get  notNull;
+  bool get notNull;
 }

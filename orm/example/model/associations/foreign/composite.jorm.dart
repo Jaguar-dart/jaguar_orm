@@ -97,7 +97,7 @@ abstract class _UserBean implements Bean<User> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -140,7 +140,7 @@ abstract class _UserBean implements Bean<User> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -190,7 +190,7 @@ abstract class _UserBean implements Bean<User> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -245,7 +245,8 @@ abstract class _UserBean implements Bean<User> {
     return models;
   }
 
-  AddressBean get addressBean;
+  AddressBean get addressBean => beanRepo[AddressBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _AddressBean implements Bean<Address> {
@@ -350,7 +351,7 @@ abstract class _AddressBean implements Bean<Address> {
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
-    final InsertMany insert = inserters.addAll(data);
+    final InsertMany insert = insertser.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
@@ -377,7 +378,7 @@ abstract class _AddressBean implements Bean<Address> {
       data.add(
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
-    final UpsertMany upsert = upserters.addAll(data);
+    final UpsertMany upsert = upsertser.addAll(data);
     await adapter.upsertMany(upsert);
     return;
   }
@@ -404,7 +405,7 @@ abstract class _AddressBean implements Bean<Address> {
           .toList());
       where.add(this.id.eq(model.id));
     }
-    final UpdateMany update = updaters.addAll(data, where);
+    final UpdateMany update = updateser.addAll(data, where);
     await adapter.updateMany(update);
     return;
   }
@@ -459,5 +460,6 @@ abstract class _AddressBean implements Bean<Address> {
     child.userName = parent.name;
   }
 
-  UserBean get userBean;
+  UserBean get userBean => beanRepo[UserBean];
+  BeanRepo get beanRepo;
 }

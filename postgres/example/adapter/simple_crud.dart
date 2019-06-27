@@ -7,22 +7,21 @@ import 'model.dart';
 
 /// The adapter
 PgAdapter adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
-  // Connect
-  await adapter.connect();
-
   final bean = PostBean(adapter);
+
+  await bean.drop();
 
   await bean.createTable();
 
   // Insert some posts
-  await bean.insert(Post.make(id: 1, msg: 'Whatever 1', author: 'mark'));
-  await bean.insert(Post.make(id: 2, msg: 'Whatever 2', author: 'bob'));
+  final id1 = await bean.insert(Post.make(msg: 'Whatever 1', author: 'mark'));
+  final id2 = await bean.insert(Post.make(msg: 'Whatever 2', author: 'bob'));
 
   // Find one post
-  Post post = await bean.findById(1);
+  Post post = await bean.findById(id1);
   print(post);
 
   // Find all posts
@@ -30,22 +29,19 @@ main() async {
   print(posts);
 
   // Update a post
-  await bean.updateAuthor(1, 'rowling');
+  await bean.updateAuthor(id1, 'rowling');
 
   // Check that the post is updated
-  post = await bean.findById(1);
+  post = await bean.findById(id1);
   print(post);
 
   // Delete some posts
-  await bean.remove(1);
-  await bean.remove(2);
+  await bean.remove(id1);
+  await bean.remove(id2);
 
   // Find a post when none exists
-  post = await bean.findById(1);
+  post = await bean.findById(id1);
   print(post);
-
-  // Close connection
-  await adapter.close();
 
   exit(0);
 }

@@ -229,11 +229,11 @@ class IntField extends Field<int> {
   void create(Create statement,
       {bool autoIncrement = false,
       bool isPrimary = false,
-      bool  notNull = false,
+      bool notNull = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     statement.addInt(name,
-        notNull:  notNull,
+        notNull: notNull,
         autoIncrement: autoIncrement,
         isPrimary: isPrimary,
         foreign: foreign,
@@ -256,12 +256,12 @@ class DoubleField extends Field<double> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool  notNull = false,
+      {bool notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     statement.addDouble(name,
-         notNull:  notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -295,13 +295,13 @@ class StrField extends Field<String> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool  notNull = false,
+      {bool notNull = false,
       int length = 20,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     statement.addStr(name,
-         notNull:  notNull,
+        notNull: notNull,
         length: length,
         isPrimary: isPrimary,
         foreign: foreign,
@@ -316,12 +316,12 @@ class DateTimeField extends Field<DateTime> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool  notNull = false,
+      {bool notNull = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     statement.addTimestamp(name,
-         notNull:  notNull,
+        notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);
@@ -335,7 +335,7 @@ class BoolField extends Field<bool> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool  notNull = false, List<Constraint> constraints = const []}) {
+      {bool notNull = false, List<Constraint> constraints = const []}) {
     statement.addBool(name, constraints: constraints);
   }
 }

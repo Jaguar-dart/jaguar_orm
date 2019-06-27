@@ -28,19 +28,9 @@ class ProductItems {
 /// bean
 @GenBean()
 class ProductItemsBean extends Bean<ProductItems> with _ProductItemsBean {
-  ProductItemsPivotBean _productItemsPivotBean;
-  ProductItemsPivot productItemsPivot;
-  ProductBean productBean;
+  final BeanRepo beanRepo;
 
-  ProductItemsBean(Adapter adapter)
-      : productItemsPivot = ProductItemsPivot(),
-        productBean = ProductBean(adapter),
-        super(adapter);
-
-  ProductItemsPivotBean get productItemsPivotBean {
-    _productItemsPivotBean ??= ProductItemsPivotBean(adapter);
-    return _productItemsPivotBean;
-  }
+  ProductItemsBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => "product_list";
 }
@@ -62,21 +52,9 @@ class ProductItemsPivot {
 @GenBean()
 class ProductItemsPivotBean extends Bean<ProductItemsPivot>
     with _ProductItemsPivotBean {
-  ProductItemsBean _productItemsBean;
+  final BeanRepo beanRepo;
 
-  ProductBean _productBean;
-
-  ProductItemsPivotBean(Adapter adapter) : super(adapter);
-
-  ProductBean get productBean {
-    _productBean ??= ProductBean(adapter);
-    return _productBean;
-  }
-
-  ProductItemsBean get productItemsBean {
-    _productItemsBean ??= ProductItemsBean(adapter);
-    return _productItemsBean;
-  }
+  ProductItemsPivotBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => "product_list_pivot";
 }
@@ -111,25 +89,12 @@ class Product {
 /// bean
 @GenBean()
 class ProductBean extends Bean<Product> with _ProductBean {
-  ProductItemsBean _productItemsBean;
-  ProductItemsPivotBean _productPivotBean;
-  ProductBean(Adapter adapter) : super(adapter);
+  final BeanRepo beanRepo;
 
-  ProductItemsBean get productItemsBean {
-    _productItemsBean ??= ProductItemsBean(adapter);
-    return _productItemsBean;
-  }
-
-  ProductItemsPivotBean get productItemsPivotBean {
-    _productPivotBean ??= ProductItemsPivotBean(adapter);
-    return _productPivotBean;
-  }
+  ProductBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   /// Table name for the model this bean manages
   String get tableName => "product";
-
-  @override
-  CategoryBean get categoryBean => CategoryBean(adapter);
 }
 
 class Category {
@@ -145,9 +110,9 @@ class Category {
 /// bean
 @GenBean()
 class CategoryBean extends Bean<Category> with _CategoryBean {
-  ProductBean get productBean => ProductBean(adapter);
+  final BeanRepo beanRepo;
 
-  CategoryBean(Adapter adapter) : super(adapter);
+  CategoryBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   /// Table name for the model this bean manages
   String get tableName => "category";

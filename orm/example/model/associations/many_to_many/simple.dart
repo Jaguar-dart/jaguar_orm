@@ -43,56 +43,27 @@ class Pivot {
 
 @GenBean()
 class TodoListBean extends Bean<TodoList> with _TodoListBean {
-  PivotBean _pivotBean;
+  final BeanRepo beanRepo;
 
-  CategoryBean _categoryBean;
-
-  TodoListBean(Adapter adapter) : super(adapter);
-
-  PivotBean get pivotBean {
-    _pivotBean ??= new PivotBean(adapter);
-    return _pivotBean;
-  }
-
-  CategoryBean get categoryBean {
-    _categoryBean ??= new CategoryBean(adapter);
-    return _categoryBean;
-  }
+  TodoListBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'mtm_simple_todolist';
 }
 
 @GenBean()
 class CategoryBean extends Bean<Category> with _CategoryBean {
-  final PivotBean pivotBean;
+  final BeanRepo beanRepo;
 
-  final TodoListBean todoListBean;
-
-  CategoryBean(Adapter adapter)
-      : pivotBean = new PivotBean(adapter),
-        todoListBean = new TodoListBean(adapter),
-        super(adapter);
+  CategoryBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'mtm_simple_category';
 }
 
 @GenBean()
 class PivotBean extends Bean<Pivot> with _PivotBean {
-  CategoryBean _categoryBean;
+  final BeanRepo beanRepo;
 
-  TodoListBean _todoListBean;
-
-  PivotBean(Adapter adapter) : super(adapter);
-
-  CategoryBean get categoryBean {
-    _categoryBean ??= new CategoryBean(adapter);
-    return _categoryBean;
-  }
-
-  TodoListBean get todoListBean {
-    _todoListBean ??= new TodoListBean(adapter);
-    return _todoListBean;
-  }
+  PivotBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'mtm_simple_pivot';
 }

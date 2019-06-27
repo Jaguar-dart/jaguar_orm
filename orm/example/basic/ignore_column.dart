@@ -12,9 +12,6 @@ final _adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
 main() async {
-  // Connect to database
-  await _adapter.connect();
-
   // Create beans
   final userBean = UserBean(_adapter);
 

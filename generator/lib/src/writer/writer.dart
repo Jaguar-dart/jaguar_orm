@@ -295,7 +295,7 @@ class Writer {
         'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());');
 
     _w.write('}');
-    _w.write('final UpsertMany upsert = upserters.addAll(data);');
+    _w.write('final UpsertMany upsert = upsertser.addAll(data);');
     _w.writeln('await adapter.upsertMany(upsert);');
     _w.writeln('return;');
 
@@ -406,7 +406,7 @@ class Writer {
 
     _w.write(
         'final List<List<SetColumn>> data = models.map((model) => toSetColumns(model, only: only, onlyNonNull: onlyNonNull)).toList();');
-    _w.writeln('final InsertMany insert = inserters.addAll(data);');
+    _w.writeln('final InsertMany insert = insertser.addAll(data);');
     _w.writeln('await adapter.insertMany(insert);');
     _w.writeln('return;');
 
@@ -535,7 +535,7 @@ class Writer {
     }
     _w.write('where.add($wheres);');
     _w.write('}');
-    _w.write('final UpdateMany update = updaters.addAll(data, where);');
+    _w.write('final UpdateMany update = updateser.addAll(data, where);');
     _w.writeln('await adapter.updateMany(update);');
     _w.writeln('return;');
 
@@ -879,6 +879,7 @@ class Writer {
       _write(p.beanName);
       _write(' get ');
       _write(p.beanInstanceName);
+      _write(' => beanRepo[${p.beanName}]');
       _writeln(';');
       if (p is PreloadManyToMany) {
         if (written.contains(p.targetBeanInstanceName)) continue;
@@ -888,6 +889,7 @@ class Writer {
         _write(p.targetBeanName);
         _write(' get ');
         _write(p.targetBeanInstanceName);
+        _write(' => beanRepo[${p.targetBeanName}]');
         _writeln(';');
       }
     }
@@ -900,6 +902,7 @@ class Writer {
         _write(f.beanName);
         _write(' get ');
         _write(f.beanInstanceName);
+        _write(' => beanRepo[${f.beanName}]');
         _writeln(';');
       }
     }
@@ -913,9 +916,12 @@ class Writer {
         _write(fb.beanName);
         _write(' get ');
         _write(fb.beanInstanceName);
+        _write(' => beanRepo[${fb.beanName}]');
         _writeln(';');
       }
     }
+
+    if (written.isNotEmpty) _writeln("BeanRepo get beanRepo;");
   }
 
   void _writeAssociate(AssociationByRelation m) {

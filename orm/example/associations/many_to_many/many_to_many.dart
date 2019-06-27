@@ -8,14 +8,15 @@ import '../../model/associations/many_to_many/simple.dart';
 final PgAdapter _adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
-main() async {
-  // Connect to database
-  await _adapter.connect();
+final beanRepo = BeanRepo();
 
+main() async {
   // Create beans
-  final todolistBean = TodoListBean(_adapter);
-  final categoryBean = CategoryBean(_adapter);
-  final pivotBean = PivotBean(_adapter);
+  final todolistBean = TodoListBean(_adapter, beanRepo);
+  final categoryBean = CategoryBean(_adapter, beanRepo);
+  final pivotBean = PivotBean(_adapter, beanRepo);
+
+  beanRepo.addAll([todolistBean, categoryBean, pivotBean]);
 
   // Drop old tables
   await pivotBean.drop();

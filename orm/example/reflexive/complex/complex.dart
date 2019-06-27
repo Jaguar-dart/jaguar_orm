@@ -11,15 +11,16 @@ import '../../model/reflexive/complex/complex.dart';
 final adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
-main() async {
-  // Connect to database
-  await adapter.connect();
+final beanRepo = BeanRepo();
 
+main() async {
   // Create beans
-  final cBean = CategoryBean(adapter);
-  final piBean = ProductItemsBean(adapter);
-  final ppBean = ProductItemsPivotBean(adapter);
-  final pBean = ProductBean(adapter);
+  final cBean = CategoryBean(adapter, beanRepo);
+  final piBean = ProductItemsBean(adapter, beanRepo);
+  final ppBean = ProductItemsPivotBean(adapter, beanRepo);
+  final pBean = ProductBean(adapter, beanRepo);
+
+  beanRepo.addAll([cBean, piBean, ppBean, pBean]);
 
   // Drop old tables
   await ppBean.drop();

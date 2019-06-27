@@ -62,21 +62,18 @@ class Address {
 
 @GenBean()
 class UserBean extends Bean<User> with _UserBean {
-  UserBean(Adapter adapter)
-      : addressBean = AddressBean(adapter),
-        super(adapter);
+  final BeanRepo beanRepo;
 
-  final AddressBean addressBean;
+  UserBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'oto_simple_user';
 }
 
 @GenBean()
 class AddressBean extends Bean<Address> with _AddressBean {
-  UserBean _userBean;
-  UserBean get userBean => _userBean ??= UserBean(adapter);
+  final BeanRepo beanRepo;
 
-  AddressBean(Adapter adapter) : super(adapter);
+  AddressBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   String get tableName => 'oto_simple_address';
 }

@@ -96,7 +96,4 @@ class PostBean extends Bean<Post> {
     Remove st = remover.where(this.id.eq(id));
     return adapter.remove(st);
   }
-
-  /// Deletes all posts
-  Future<int> removeAll() => adapter.remove(remover);
 }

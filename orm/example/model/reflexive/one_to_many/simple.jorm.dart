@@ -109,7 +109,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -154,7 +154,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -207,7 +207,7 @@ abstract class _DirectoryBean implements Bean<Directory> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -298,5 +298,6 @@ abstract class _DirectoryBean implements Bean<Directory> {
     return models;
   }
 
-  DirectoryBean get directoryBean;
+  DirectoryBean get directoryBean => beanRepo[DirectoryBean];
+  BeanRepo get beanRepo;
 }

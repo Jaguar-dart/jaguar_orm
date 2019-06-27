@@ -41,12 +41,9 @@ class PostBean1 extends PostBean {
 }
 
 main() async {
-  // Connect
-  await adapter.connect();
-
   final bean = PostBean1(adapter);
 
-  await adapter.dropTable(Sql.drop(bean.tableName, onlyIfExists: true));
+  await bean.drop();
 
   await bean.createTable();
 
@@ -79,7 +76,4 @@ main() async {
   // Find a post when none exists
   post = await bean.findById(1);
   print(post);
-
-  // Close connection
-  await adapter.close();
 }

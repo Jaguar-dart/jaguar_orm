@@ -11,13 +11,14 @@ import '../../model/associations/one_to_many/simple.dart';
 final _adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
-main() async {
-  // Connect to database
-  await _adapter.connect();
+final beanRepo = BeanRepo();
 
+main() async {
   // Create beans
-  final authorBean = AuthorBean(_adapter);
-  final postBean = PostBean(_adapter);
+  final authorBean = AuthorBean(_adapter, beanRepo);
+  final postBean = PostBean(_adapter, beanRepo);
+
+  beanRepo.addAll([authorBean, postBean]);
 
   // Drop old tables
   await postBean.drop();

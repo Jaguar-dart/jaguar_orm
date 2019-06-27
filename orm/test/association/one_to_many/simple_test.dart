@@ -5,18 +5,18 @@ import '../../../example/model/associations/one_to_one/simple.dart';
 final adapter =
     PgAdapter('postgres', username: 'postgres', password: 'dart_jaguar');
 
+final beanRepo = BeanRepo();
+
 void main() {
   group('OneToMany', () {
-    final userBean = UserBean(adapter);
-    final addressBean = AddressBean(adapter);
+    final userBean = UserBean(adapter, beanRepo);
+    final addressBean = AddressBean(adapter, beanRepo);
 
-    setUpAll(() async {
-      await adapter.connect();
-    });
+    beanRepo.addAll([userBean, addressBean]);
 
-    tearDownAll(() async {
-      await adapter.close();
-    });
+    setUpAll(() async {});
+
+    tearDownAll(() async {});
 
     setUp(() async {
       await addressBean.drop();

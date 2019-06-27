@@ -5,6 +5,8 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
+import '../../../associations/one_to_one/simple.dart' as prefix0;
+
 part 'simple.jorm.dart';
 
 class User {
@@ -59,21 +61,18 @@ class Address {
 
 @GenBean()
 class UserBean extends Bean<User> with _UserBean {
-  UserBean(Adapter adapter)
-      : addressBean = AddressBean(adapter),
-        super(adapter);
+  UserBean(Adapter adapter, this.beanRepo) : super(adapter);
 
-  final AddressBean addressBean;
+  final BeanRepo beanRepo;
 
   String get tableName => 'oto_simple_user';
 }
 
 @GenBean()
 class AddressBean extends Bean<Address> with _AddressBean {
-  UserBean _userBean;
-  UserBean get userBean => _userBean ??= UserBean(adapter);
+  AddressBean(Adapter adapter, this.beanRepo) : super(adapter);
 
-  AddressBean(Adapter adapter) : super(adapter);
+  final BeanRepo beanRepo;
 
   String get tableName => 'oto_simple_address';
 }

@@ -5,7 +5,7 @@ part of query.core;
 /// Use `into` method to set the table to insert into.
 /// Use `add`, `addAll`, `addMap` and `addAllMap` to set column values.
 ///
-/// Use `exec` statement or `Adapter` to execute the statement against a
+/// Use `exec` statement or `Connection` to execute the statement against a
 /// database.
 class InsertMany implements Statement {
   final String name;
@@ -47,8 +47,8 @@ class InsertMany implements Statement {
     return this;
   }
 
-  /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
+  /// Executes the statement with the given connection.
+  Future<T> exec<T>(Connection connection) => connection.insertMany<T>(this);
 
   ImmutableInsertManyStatement _immutable;
 

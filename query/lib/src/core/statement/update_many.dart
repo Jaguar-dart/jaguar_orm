@@ -23,7 +23,7 @@ class UpdateMany implements Statement /*, Whereable */ {
     return this;
   }
 
-  Future<T> exec<T>(Adapter adapter) => adapter.updateMany(this);
+  Future<T> exec<T>(Connection connection) => connection.updateMany(this);
 
   ImmutableUpdateManyStatement _immutable;
 

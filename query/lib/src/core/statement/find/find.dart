@@ -227,8 +227,8 @@ class Find implements Statement, Whereable, RowSource {
     return this;
   }
 
-  FindExecutor<ConnType> exec<ConnType>(Adapter<ConnType> adapter) =>
-      FindExecutor<ConnType>(adapter, this);
+  FindExecutor<ConnType> exec<ConnType>(Connection<ConnType> connection) =>
+      FindExecutor<ConnType>(connection, this);
 
   ImmutableFindStatement _immutable;
 

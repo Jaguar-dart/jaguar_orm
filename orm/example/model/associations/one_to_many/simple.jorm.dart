@@ -94,7 +94,7 @@ abstract class _AuthorBean implements Bean<Author> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -138,7 +138,7 @@ abstract class _AuthorBean implements Bean<Author> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -189,7 +189,7 @@ abstract class _AuthorBean implements Bean<Author> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -246,7 +246,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return models;
   }
 
-  PostBean get postBean;
+  PostBean get postBean => beanRepo[PostBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _PostBean implements Bean<Post> {
@@ -329,7 +330,7 @@ abstract class _PostBean implements Bean<Post> {
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
-    final InsertMany insert = inserters.addAll(data);
+    final InsertMany insert = insertser.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
@@ -351,7 +352,7 @@ abstract class _PostBean implements Bean<Post> {
       data.add(
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
-    final UpsertMany upsert = upserters.addAll(data);
+    final UpsertMany upsert = upsertser.addAll(data);
     await adapter.upsertMany(upsert);
     return;
   }
@@ -378,7 +379,7 @@ abstract class _PostBean implements Bean<Post> {
           .toList());
       where.add(this.id.eq(model.id));
     }
-    final UpdateMany update = updaters.addAll(data, where);
+    final UpdateMany update = updateser.addAll(data, where);
     await adapter.updateMany(update);
     return;
   }
@@ -430,5 +431,6 @@ abstract class _PostBean implements Bean<Post> {
     child.authorId = parent.id;
   }
 
-  AuthorBean get authorBean;
+  AuthorBean get authorBean => beanRepo[AuthorBean];
+  BeanRepo get beanRepo;
 }

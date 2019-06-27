@@ -43,13 +43,12 @@ class Post {
     ..likes = map['likes'];
 }
 
-final PgAdapter adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+PgConn conn;
 
 Future<void> dropTables() async {
   final st = Drop(['post', 'author'], onlyIfExists: true);
   print(composeDrop(st));
-  await adapter.dropTable(st);
+  await conn.dropTable(st);
 }
 
 Future<void> createTables() async {
@@ -57,7 +56,7 @@ Future<void> createTables() async {
     await Sql.create('author', ifNotExists: true)
         .addInt('_id', isPrimary: true, autoIncrement: true)
         .addStr('name', length: 100)
-        .exec(adapter);
+        .exec(conn);
   }
 
   {
@@ -66,15 +65,15 @@ Future<void> createTables() async {
         .addInt('authorId', foreign: References('author', '_id'))
         .addStr('message', length: 100)
         .addInt('likes')
-        .exec(adapter);
+        .exec(conn);
   }
 }
 
 Future<int> insertAuthor(String name) =>
-    Sql.insert('author').id('_id').setString('name', 'teja').exec<int>(adapter);
+    Sql.insert('author').id('_id').setString('name', 'teja').exec<int>(conn);
 
 Future<List<Author>> getAuthors() async =>
-    (await Sql.find('author').exec(adapter).many())
+    (await Sql.find('author').exec(conn).many())
         .map((Map map) => Author()
           ..id = map['_id']
           ..name = map['name'])
@@ -82,7 +81,7 @@ Future<List<Author>> getAuthors() async =>
 
 Future<Author> getAuthorId(int id) async {
   Find st = Sql.find('author').where(Field('_id').eq(id));
-  Map map = await adapter.findOne(st);
+  Map map = await conn.findOne(st);
   return Author()
     ..id = map['_id']
     ..name = map['name'];
@@ -100,7 +99,7 @@ Future<Author> getAuthorIdWithRelated(int id) async {
 
 Future<void> removeAuthors() async {
   Remove st = Sql.remove('author');
-  await adapter.remove(st);
+  await conn.remove(st);
 }
 
 Future<int> insertPost(int authorId, String message, int likes) =>
@@ -109,15 +108,13 @@ Future<int> insertPost(int authorId, String message, int likes) =>
         .setInt('authorId', authorId)
         .setString('message', message)
         .setInt('likes', likes)
-        .exec(adapter);
+        .exec(conn);
 
 Future<List<Post>> getPosts() =>
-    Sql.find('post').exec(adapter).manyTo(Post.fromMap);
+    Sql.find('post').exec(conn).manyTo(Post.fromMap);
 
-Future<Post> getPostById(int id) => Sql.find('post')
-    .where(Field('_id').eq(id))
-    .exec(adapter)
-    .oneTo(Post.fromMap);
+Future<Post> getPostById(int id) =>
+    Sql.find('post').where(Field('_id').eq(id)).exec(conn).oneTo(Post.fromMap);
 
 Future<Post> getPostByIdRelated(int id) async {
   Find st = Sql.find('post')
@@ -127,7 +124,7 @@ Future<Post> getPostByIdRelated(int id) async {
       .joinOn(Field.inTable('post', 'authorId')
           .eqField(Field.inTable('author', '_id')))
       .where(Field.inTable('post', '_id').eq(id));
-  Map map = await adapter.findOne(st);
+  Map map = await conn.findOne(st);
 
   final post = Post()
     ..id = map['_id']
@@ -142,12 +139,12 @@ Future<Post> getPostByIdRelated(int id) async {
 
 Future<List<Post>> getPostsByAuthorId(int authorId) => Sql.find('post')
     .where(Field('authorId').eq(authorId))
-    .exec(adapter)
+    .exec(conn)
     .manyTo(Post.fromMap);
 
 Future<void> removePosts() async {
   Remove st = Sql.remove('post');
-  await adapter.remove(st);
+  await conn.remove(st);
 }
 
 Future<void> getRelatedPost(Post post) async {
@@ -155,7 +152,9 @@ Future<void> getRelatedPost(Post post) async {
 }
 
 main() async {
-  await adapter.connect();
+  conn = await PgConn.open('example',
+      username: 'postgres', password: 'dart_jaguar');
+  ;
 
   await dropTables();
 

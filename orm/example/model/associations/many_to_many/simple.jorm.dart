@@ -95,7 +95,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -139,7 +139,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -187,7 +187,7 @@ abstract class _TodoListBean implements Bean<TodoList> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -243,9 +243,10 @@ abstract class _TodoListBean implements Bean<TodoList> {
     return models;
   }
 
-  PivotBean get pivotBean;
+  PivotBean get pivotBean => beanRepo[PivotBean];
 
-  CategoryBean get categoryBean;
+  CategoryBean get categoryBean => beanRepo[CategoryBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _CategoryBean implements Bean<Category> {
@@ -336,7 +337,7 @@ abstract class _CategoryBean implements Bean<Category> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -380,7 +381,7 @@ abstract class _CategoryBean implements Bean<Category> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -428,7 +429,7 @@ abstract class _CategoryBean implements Bean<Category> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -484,9 +485,10 @@ abstract class _CategoryBean implements Bean<Category> {
     return models;
   }
 
-  PivotBean get pivotBean;
+  PivotBean get pivotBean => beanRepo[PivotBean];
 
-  TodoListBean get todoListBean;
+  TodoListBean get todoListBean => beanRepo[TodoListBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _PivotBean implements Bean<Pivot> {
@@ -559,7 +561,7 @@ abstract class _PivotBean implements Bean<Pivot> {
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
-    final InsertMany insert = inserters.addAll(data);
+    final InsertMany insert = insertser.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
@@ -581,7 +583,7 @@ abstract class _PivotBean implements Bean<Pivot> {
       data.add(
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
-    final UpsertMany upsert = upserters.addAll(data);
+    final UpsertMany upsert = upsertser.addAll(data);
     await adapter.upsertMany(upsert);
     return;
   }
@@ -597,7 +599,7 @@ abstract class _PivotBean implements Bean<Pivot> {
           .toList());
       where.add(null);
     }
-    final UpdateMany update = updaters.addAll(data, where);
+    final UpdateMany update = updateser.addAll(data, where);
     await adapter.updateMany(update);
     return;
   }
@@ -714,6 +716,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     }
   }
 
-  TodoListBean get todoListBean;
-  CategoryBean get categoryBean;
+  TodoListBean get todoListBean => beanRepo[TodoListBean];
+  CategoryBean get categoryBean => beanRepo[CategoryBean];
+  BeanRepo get beanRepo;
 }

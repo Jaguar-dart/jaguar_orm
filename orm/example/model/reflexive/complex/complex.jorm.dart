@@ -95,7 +95,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -139,7 +139,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -187,7 +187,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -244,9 +244,11 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
     return models;
   }
 
-  ProductItemsPivotBean get productItemsPivotBean;
+  ProductItemsPivotBean get productItemsPivotBean =>
+      beanRepo[ProductItemsPivotBean];
 
-  ProductBean get productBean;
+  ProductBean get productBean => beanRepo[ProductBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
@@ -319,7 +321,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
-    final InsertMany insert = inserters.addAll(data);
+    final InsertMany insert = insertser.addAll(data);
     await adapter.insertMany(insert);
     return;
   }
@@ -341,7 +343,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
       data.add(
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
-    final UpsertMany upsert = upserters.addAll(data);
+    final UpsertMany upsert = upsertser.addAll(data);
     await adapter.upsertMany(upsert);
     return;
   }
@@ -357,7 +359,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
           .toList());
       where.add(null);
     }
-    final UpdateMany update = updaters.addAll(data, where);
+    final UpdateMany update = updateser.addAll(data, where);
     await adapter.updateMany(update);
     return;
   }
@@ -476,8 +478,9 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     }
   }
 
-  ProductBean get productBean;
-  ProductItemsBean get productItemsBean;
+  ProductBean get productBean => beanRepo[ProductBean];
+  ProductItemsBean get productItemsBean => beanRepo[ProductItemsBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _ProductBean implements Bean<Product> {
@@ -596,7 +599,7 @@ abstract class _ProductBean implements Bean<Product> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -640,7 +643,7 @@ abstract class _ProductBean implements Bean<Product> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -688,7 +691,7 @@ abstract class _ProductBean implements Bean<Product> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -778,10 +781,12 @@ abstract class _ProductBean implements Bean<Product> {
     return models;
   }
 
-  ProductItemsPivotBean get productItemsPivotBean;
+  ProductItemsPivotBean get productItemsPivotBean =>
+      beanRepo[ProductItemsPivotBean];
 
-  ProductItemsBean get productItemsBean;
-  CategoryBean get categoryBean;
+  ProductItemsBean get productItemsBean => beanRepo[ProductItemsBean];
+  CategoryBean get categoryBean => beanRepo[CategoryBean];
+  BeanRepo get beanRepo;
 }
 
 abstract class _CategoryBean implements Bean<Category> {
@@ -861,7 +866,7 @@ abstract class _CategoryBean implements Bean<Category> {
           .map((model) =>
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
-      final InsertMany insert = inserters.addAll(data);
+      final InsertMany insert = insertser.addAll(data);
       await adapter.insertMany(insert);
       return;
     }
@@ -906,7 +911,7 @@ abstract class _CategoryBean implements Bean<Category> {
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
-      final UpsertMany upsert = upserters.addAll(data);
+      final UpsertMany upsert = upsertser.addAll(data);
       await adapter.upsertMany(upsert);
       return;
     }
@@ -959,7 +964,7 @@ abstract class _CategoryBean implements Bean<Category> {
             .toList());
         where.add(this.id.eq(model.id));
       }
-      final UpdateMany update = updaters.addAll(data, where);
+      final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update);
       return;
     }
@@ -1016,5 +1021,6 @@ abstract class _CategoryBean implements Bean<Category> {
     return models;
   }
 
-  ProductBean get productBean;
+  ProductBean get productBean => beanRepo[ProductBean];
+  BeanRepo get beanRepo;
 }

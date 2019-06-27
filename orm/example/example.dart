@@ -49,15 +49,12 @@ class CartItem {
 
 @GenBean()
 class CartItemBean extends Bean<CartItem> with _CartItemBean {
-  CartItemBean(Adapter adapter) : super(adapter);
+  final BeanRepo beanRepo;
 
-  CartBean _cartBean;
+  CartItemBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   @override
   String get tableName => 'cartItem';
-
-  @override
-  CartBean get cartBean => _cartBean ??= CartBean(adapter);
 }
 
 class Cart {
@@ -96,12 +93,9 @@ class Cart {
 
 @GenBean()
 class CartBean extends Bean<Cart> with _CartBean {
-  CartBean(Adapter adapter)
-      : cartItemBean = CartItemBean(adapter),
-        super(adapter);
+  final BeanRepo beanRepo;
 
-  @override
-  final CartItemBean cartItemBean;
+  CartBean(Adapter adapter, this.beanRepo) : super(adapter);
 
   @override
   String get tableName => 'cart';

@@ -119,8 +119,7 @@ class UnAssociatedBean {
       @required this.preloads});
 
   Preload findHasXByAssociation(DartType association, {@required String name}) {
-    return preloads.firstWhere(
-        (p) => p.bean == association && p.linkBy == name,
+    return preloads.firstWhere((p) => p.bean == association && p.linkBy == name,
         orElse: () => null);
   }
 
