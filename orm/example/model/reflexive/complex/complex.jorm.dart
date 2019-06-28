@@ -44,7 +44,8 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
@@ -56,22 +57,23 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       Str(),
       notNull: true,
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(ProductItems model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.insert(insert);
+    var retId = await adapter.insert(insert, withConn: withConn);
     if (cascade) {
       ProductItems newModel;
       if (model.items != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         for (final child in model.items) {
-          await productBean.insert(child, cascade: cascade);
+          await productBean.insert(child, cascade: cascade, withConn: withConn);
           await productItemsPivotBean.attach(newModel, child);
         }
       }
@@ -82,11 +84,12 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   Future<void> insertMany(List<ProductItems> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(insert(model, cascade: cascade));
+        futures.add(insert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -96,7 +99,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
       final InsertMany insert = insertser.addAll(data);
-      await adapter.insertMany(insert);
+      await adapter.insertMany(insert, withConn: withConn);
       return;
     }
   }
@@ -104,17 +107,19 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   Future<dynamic> upsert(ProductItems model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.upsert(upsert);
+    var retId = await adapter.upsert(upsert, withConn: withConn);
     if (cascade) {
       ProductItems newModel;
       if (model.items != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         for (final child in model.items) {
-          await productBean.upsert(child, cascade: cascade);
-          await productItemsPivotBean.attach(newModel, child, upsert: true);
+          await productBean.upsert(child, cascade: cascade, withConn: withConn);
+          await productItemsPivotBean.attach(newModel, child,
+              upsert: true, withConn: withConn);
         }
       }
     }
@@ -124,11 +129,12 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   Future<void> upsertMany(List<ProductItems> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(upsert(model, cascade: cascade));
+        futures.add(upsert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -140,7 +146,7 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upsertser.addAll(data);
-      await adapter.upsertMany(upsert);
+      await adapter.upsertMany(upsert, withConn: withConn);
       return;
     }
   }
@@ -149,17 +155,18 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    final ret = adapter.update(update);
+    final ret = adapter.update(update, withConn: withConn);
     if (cascade) {
       ProductItems newModel;
       if (model.items != null) {
         for (final child in model.items) {
           await productBean.update(child,
-              cascade: cascade, associate: associate);
+              cascade: cascade, associate: associate, withConn: withConn);
         }
       }
     }
@@ -169,11 +176,12 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   Future<void> updateMany(List<ProductItems> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(update(model, cascade: cascade));
+        futures.add(update(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -188,52 +196,57 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updateser.addAll(data, where);
-      await adapter.updateMany(update);
+      await adapter.updateMany(update, withConn: withConn);
       return;
     }
   }
 
   Future<ProductItems> find(String id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    final ProductItems model = await findOne(find);
+    final ProductItems model = await findOne(find, withConn: withConn);
     if (preload && model != null) {
-      await this.preload(model, cascade: cascade);
+      await this.preload(model, cascade: cascade, withConn: withConn);
     }
     return model;
   }
 
-  Future<int> remove(String id, {bool cascade = false}) async {
+  Future<int> remove(String id,
+      {bool cascade = false, Connection withConn}) async {
     if (cascade) {
-      final ProductItems newModel = await find(id);
+      final ProductItems newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await productItemsPivotBean.detachProductItems(newModel);
+        await productItemsPivotBean.detachProductItems(newModel,
+            withConn: withConn);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<ProductItems> models) async {
+  Future<int> removeMany(List<ProductItems> models,
+      {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
   Future<ProductItems> preload(ProductItems model,
-      {bool cascade = false}) async {
-    model.items = await productItemsPivotBean.fetchByProductItems(model);
+      {bool cascade = false, Connection withConn}) async {
+    model.items = await productItemsPivotBean.fetchByProductItems(model,
+        withConn: withConn);
     return model;
   }
 
   Future<List<ProductItems>> preloadAll(List<ProductItems> models,
-      {bool cascade = false}) async {
+      {bool cascade = false, Connection withConn}) async {
     for (ProductItems model in models) {
-      var temp = await productItemsPivotBean.fetchByProductItems(model);
+      var temp = await productItemsPivotBean.fetchByProductItems(model,
+          withConn: withConn);
       if (model.items == null)
         model.items = temp;
       else {
@@ -291,7 +304,8 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       productId.name,
@@ -303,40 +317,42 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
       Str(),
       foreign: References(productItemsBean.tableName, "id"),
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(ProductItemsPivot model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    return adapter.insert(insert);
+    return adapter.insert(insert, withConn: withConn);
   }
 
   Future<void> insertMany(List<ProductItemsPivot> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
     final InsertMany insert = insertser.addAll(data);
-    await adapter.insertMany(insert);
+    await adapter.insertMany(insert, withConn: withConn);
     return;
   }
 
   Future<dynamic> upsert(ProductItemsPivot model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    return adapter.upsert(upsert);
+    return adapter.upsert(upsert, withConn: withConn);
   }
 
   Future<void> upsertMany(List<ProductItemsPivot> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -344,12 +360,12 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upsertser.addAll(data);
-    await adapter.upsertMany(upsert);
+    await adapter.upsertMany(upsert, withConn: withConn);
     return;
   }
 
   Future<void> updateMany(List<ProductItemsPivot> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -360,50 +376,51 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
       where.add(null);
     }
     final UpdateMany update = updateser.addAll(data, where);
-    await adapter.updateMany(update);
+    await adapter.updateMany(update, withConn: withConn);
     return;
   }
 
   Future<List<ProductItemsPivot>> findByProduct(String productId,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.productId.eq(productId));
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
   Future<List<ProductItemsPivot>> findByProductList(List<Product> models,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Product model in models) {
       find.or(this.productId.eq(model.id));
     }
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
-  Future<int> removeByProduct(String productId) async {
+  Future<int> removeByProduct(String productId, {Connection withConn}) async {
     final Remove rm = remover.where(this.productId.eq(productId));
-    return await adapter.remove(rm);
+    return await adapter.remove(rm, withConn: withConn);
   }
 
   void associateProduct(ProductItemsPivot child, Product parent) {
     child.productId = parent.id;
   }
 
-  Future<int> detachProduct(Product model) async {
-    final dels = await findByProduct(model.id);
+  Future<int> detachProduct(Product model, {Connection withConn}) async {
+    final dels = await findByProduct(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
-      await removeByProduct(model.id);
+      await removeByProduct(model.id, withConn: withConn);
       final exp = Or();
       for (final t in dels) {
         exp.or(productItemsBean.id.eq(t.productListId));
       }
-      return await productItemsBean.removeWhere(exp);
+      return await productItemsBean.removeWhere(exp, withConn: withConn);
     }
     return 0;
   }
 
-  Future<List<ProductItems>> fetchByProduct(Product model) async {
+  Future<List<ProductItems>> fetchByProduct(Product model,
+      {Connection withConn}) async {
     final pivots = await findByProduct(model.id);
 // Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
@@ -411,51 +428,55 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     for (final t in pivots) {
       exp.or(productItemsBean.id.eq(t.productListId));
     }
-    return await productItemsBean.findWhere(exp);
+    return await productItemsBean.findWhere(exp, withConn: withConn);
   }
 
   Future<List<ProductItemsPivot>> findByProductItems(String productListId,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.productListId.eq(productListId));
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
   Future<List<ProductItemsPivot>> findByProductItemsList(
       List<ProductItems> models,
       {bool preload = false,
-      bool cascade = false}) async {
+      bool cascade = false,
+      Connection withConn}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (ProductItems model in models) {
       find.or(this.productListId.eq(model.id));
     }
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
-  Future<int> removeByProductItems(String productListId) async {
+  Future<int> removeByProductItems(String productListId,
+      {Connection withConn}) async {
     final Remove rm = remover.where(this.productListId.eq(productListId));
-    return await adapter.remove(rm);
+    return await adapter.remove(rm, withConn: withConn);
   }
 
   void associateProductItems(ProductItemsPivot child, ProductItems parent) {
     child.productListId = parent.id;
   }
 
-  Future<int> detachProductItems(ProductItems model) async {
-    final dels = await findByProductItems(model.id);
+  Future<int> detachProductItems(ProductItems model,
+      {Connection withConn}) async {
+    final dels = await findByProductItems(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
-      await removeByProductItems(model.id);
+      await removeByProductItems(model.id, withConn: withConn);
       final exp = Or();
       for (final t in dels) {
         exp.or(productBean.id.eq(t.productId));
       }
-      return await productBean.removeWhere(exp);
+      return await productBean.removeWhere(exp, withConn: withConn);
     }
     return 0;
   }
 
-  Future<List<Product>> fetchByProductItems(ProductItems model) async {
+  Future<List<Product>> fetchByProductItems(ProductItems model,
+      {Connection withConn}) async {
     final pivots = await findByProductItems(model.id);
 // Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
@@ -463,18 +484,18 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     for (final t in pivots) {
       exp.or(productBean.id.eq(t.productId));
     }
-    return await productBean.findWhere(exp);
+    return await productBean.findWhere(exp, withConn: withConn);
   }
 
   Future<dynamic> attach(ProductItems one, Product two,
-      {bool upsert = false}) async {
+      {bool upsert = false, Connection withConn}) async {
     final ret = ProductItemsPivot();
     ret.productListId = one.id;
     ret.productId = two.id;
     if (!upsert) {
-      return insert(ret);
+      return insert(ret, withConn: withConn);
     } else {
-      return this.upsert(ret);
+      return this.upsert(ret, withConn: withConn);
     }
   }
 
@@ -538,7 +559,8 @@ abstract class _ProductBean implements Bean<Product> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
@@ -560,23 +582,26 @@ abstract class _ProductBean implements Bean<Product> {
       notNull: true,
       foreign: References(categoryBean.tableName, "id"),
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(Product model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.insert(insert);
+    var retId = await adapter.insert(insert, withConn: withConn);
     if (cascade) {
       Product newModel;
       if (model.lists != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         for (final child in model.lists) {
-          await productItemsBean.insert(child, cascade: cascade);
-          await productItemsPivotBean.attach(child, newModel);
+          await productItemsBean.insert(child,
+              cascade: cascade, withConn: withConn);
+          await productItemsPivotBean.attach(child, newModel,
+              withConn: withConn);
         }
       }
     }
@@ -586,11 +611,12 @@ abstract class _ProductBean implements Bean<Product> {
   Future<void> insertMany(List<Product> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(insert(model, cascade: cascade));
+        futures.add(insert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -600,7 +626,7 @@ abstract class _ProductBean implements Bean<Product> {
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
       final InsertMany insert = insertser.addAll(data);
-      await adapter.insertMany(insert);
+      await adapter.insertMany(insert, withConn: withConn);
       return;
     }
   }
@@ -608,17 +634,20 @@ abstract class _ProductBean implements Bean<Product> {
   Future<dynamic> upsert(Product model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.upsert(upsert);
+    var retId = await adapter.upsert(upsert, withConn: withConn);
     if (cascade) {
       Product newModel;
       if (model.lists != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         for (final child in model.lists) {
-          await productItemsBean.upsert(child, cascade: cascade);
-          await productItemsPivotBean.attach(child, newModel, upsert: true);
+          await productItemsBean.upsert(child,
+              cascade: cascade, withConn: withConn);
+          await productItemsPivotBean.attach(child, newModel,
+              upsert: true, withConn: withConn);
         }
       }
     }
@@ -628,11 +657,12 @@ abstract class _ProductBean implements Bean<Product> {
   Future<void> upsertMany(List<Product> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(upsert(model, cascade: cascade));
+        futures.add(upsert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -644,7 +674,7 @@ abstract class _ProductBean implements Bean<Product> {
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upsertser.addAll(data);
-      await adapter.upsertMany(upsert);
+      await adapter.upsertMany(upsert, withConn: withConn);
       return;
     }
   }
@@ -653,17 +683,18 @@ abstract class _ProductBean implements Bean<Product> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    final ret = adapter.update(update);
+    final ret = adapter.update(update, withConn: withConn);
     if (cascade) {
       Product newModel;
       if (model.lists != null) {
         for (final child in model.lists) {
           await productItemsBean.update(child,
-              cascade: cascade, associate: associate);
+              cascade: cascade, associate: associate, withConn: withConn);
         }
       }
     }
@@ -673,11 +704,12 @@ abstract class _ProductBean implements Bean<Product> {
   Future<void> updateMany(List<Product> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(update(model, cascade: cascade));
+        futures.add(update(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -692,54 +724,55 @@ abstract class _ProductBean implements Bean<Product> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updateser.addAll(data, where);
-      await adapter.updateMany(update);
+      await adapter.updateMany(update, withConn: withConn);
       return;
     }
   }
 
   Future<Product> find(String id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Product model = await findOne(find);
+    final Product model = await findOne(find, withConn: withConn);
     if (preload && model != null) {
-      await this.preload(model, cascade: cascade);
+      await this.preload(model, cascade: cascade, withConn: withConn);
     }
     return model;
   }
 
-  Future<int> remove(String id, {bool cascade = false}) async {
+  Future<int> remove(String id,
+      {bool cascade = false, Connection withConn}) async {
     if (cascade) {
-      final Product newModel = await find(id);
+      final Product newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await productItemsPivotBean.detachProduct(newModel);
+        await productItemsPivotBean.detachProduct(newModel, withConn: withConn);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<Product> models) async {
+  Future<int> removeMany(List<Product> models, {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
   Future<List<Product>> findByCategory(int categoryId,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.categoryId.eq(categoryId));
-    final List<Product> models = await findMany(find);
+    final List<Product> models = await findMany(find, withConn: withConn);
     if (preload) {
-      await this.preloadAll(models, cascade: cascade);
+      await this.preloadAll(models, cascade: cascade, withConn: withConn);
     }
     return models;
   }
 
   Future<List<Product>> findByCategoryList(List<Category> models,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
@@ -748,29 +781,32 @@ abstract class _ProductBean implements Bean<Product> {
     }
     final List<Product> retModels = await findMany(find);
     if (preload) {
-      await this.preloadAll(retModels, cascade: cascade);
+      await this.preloadAll(retModels, cascade: cascade, withConn: withConn);
     }
     return retModels;
   }
 
-  Future<int> removeByCategory(int categoryId) async {
+  Future<int> removeByCategory(int categoryId, {Connection withConn}) async {
     final Remove rm = remover.where(this.categoryId.eq(categoryId));
-    return await adapter.remove(rm);
+    return await adapter.remove(rm, withConn: withConn);
   }
 
   void associateCategory(Product child, Category parent) {
     child.categoryId = parent.id;
   }
 
-  Future<Product> preload(Product model, {bool cascade = false}) async {
-    model.lists = await productItemsPivotBean.fetchByProduct(model);
+  Future<Product> preload(Product model,
+      {bool cascade = false, Connection withConn}) async {
+    model.lists =
+        await productItemsPivotBean.fetchByProduct(model, withConn: withConn);
     return model;
   }
 
   Future<List<Product>> preloadAll(List<Product> models,
-      {bool cascade = false}) async {
+      {bool cascade = false, Connection withConn}) async {
     for (Product model in models) {
-      var temp = await productItemsPivotBean.fetchByProduct(model);
+      var temp =
+          await productItemsPivotBean.fetchByProduct(model, withConn: withConn);
       if (model.lists == null)
         model.lists = temp;
       else {
@@ -819,27 +855,29 @@ abstract class _CategoryBean implements Bean<Category> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
       Int(),
       isPrimary: true,
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(Category model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.insert(insert);
+    var retId = await adapter.insert(insert, withConn: withConn);
     if (cascade) {
       Category newModel;
       if (model.products != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         model.products
             .forEach((x) => productBean.associateCategory(x, newModel));
         for (final child in model.products) {
@@ -853,11 +891,12 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<void> insertMany(List<Category> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(insert(model, cascade: cascade));
+        futures.add(insert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -867,7 +906,7 @@ abstract class _CategoryBean implements Bean<Category> {
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
       final InsertMany insert = insertser.addAll(data);
-      await adapter.insertMany(insert);
+      await adapter.insertMany(insert, withConn: withConn);
       return;
     }
   }
@@ -875,18 +914,19 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<dynamic> upsert(Category model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.upsert(upsert);
+    var retId = await adapter.upsert(upsert, withConn: withConn);
     if (cascade) {
       Category newModel;
       if (model.products != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         model.products
             .forEach((x) => productBean.associateCategory(x, newModel));
         for (final child in model.products) {
-          await productBean.upsert(child, cascade: cascade);
+          await productBean.upsert(child, cascade: cascade, withConn: withConn);
         }
       }
     }
@@ -896,11 +936,12 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<void> upsertMany(List<Category> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(upsert(model, cascade: cascade));
+        futures.add(upsert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -912,7 +953,7 @@ abstract class _CategoryBean implements Bean<Category> {
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upsertser.addAll(data);
-      await adapter.upsertMany(upsert);
+      await adapter.upsertMany(upsert, withConn: withConn);
       return;
     }
   }
@@ -921,22 +962,23 @@ abstract class _CategoryBean implements Bean<Category> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    final ret = adapter.update(update);
+    final ret = adapter.update(update, withConn: withConn);
     if (cascade) {
       Category newModel;
       if (model.products != null) {
         if (associate) {
-          newModel ??= await find(model.id);
+          newModel ??= await find(model.id, withConn: withConn);
           model.products
               .forEach((x) => productBean.associateCategory(x, newModel));
         }
         for (final child in model.products) {
           await productBean.update(child,
-              cascade: cascade, associate: associate);
+              cascade: cascade, associate: associate, withConn: withConn);
         }
       }
     }
@@ -946,11 +988,12 @@ abstract class _CategoryBean implements Bean<Category> {
   Future<void> updateMany(List<Category> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(update(model, cascade: cascade));
+        futures.add(update(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -965,50 +1008,52 @@ abstract class _CategoryBean implements Bean<Category> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updateser.addAll(data, where);
-      await adapter.updateMany(update);
+      await adapter.updateMany(update, withConn: withConn);
       return;
     }
   }
 
   Future<Category> find(int id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Category model = await findOne(find);
+    final Category model = await findOne(find, withConn: withConn);
     if (preload && model != null) {
-      await this.preload(model, cascade: cascade);
+      await this.preload(model, cascade: cascade, withConn: withConn);
     }
     return model;
   }
 
-  Future<int> remove(int id, {bool cascade = false}) async {
+  Future<int> remove(int id,
+      {bool cascade = false, Connection withConn}) async {
     if (cascade) {
-      final Category newModel = await find(id);
+      final Category newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await productBean.removeByCategory(newModel.id);
+        await productBean.removeByCategory(newModel.id, withConn: withConn);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<Category> models) async {
+  Future<int> removeMany(List<Category> models, {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<Category> preload(Category model, {bool cascade = false}) async {
+  Future<Category> preload(Category model,
+      {bool cascade = false, Connection withConn}) async {
     model.products = await productBean.findByCategory(model.id,
-        preload: cascade, cascade: cascade);
+        preload: cascade, cascade: cascade, withConn: withConn);
     return model;
   }
 
   Future<List<Category>> preloadAll(List<Category> models,
-      {bool cascade = false}) async {
+      {bool cascade = false, Connection withConn}) async {
     models.forEach((Category model) => model.products ??= []);
     await OneToXHelper.preloadAll<Category, Product>(
         models,
@@ -1017,7 +1062,8 @@ abstract class _CategoryBean implements Bean<Category> {
         (Product model) => [model.categoryId],
         (Category model, Product child) =>
             model.products = List.from(model.products)..add(child),
-        cascade: cascade);
+        cascade: cascade,
+        withConn: withConn);
     return models;
   }
 

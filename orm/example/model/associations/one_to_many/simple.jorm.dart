@@ -44,7 +44,8 @@ abstract class _AuthorBean implements Bean<Author> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
@@ -55,20 +56,21 @@ abstract class _AuthorBean implements Bean<Author> {
       name.name,
       Str(length: 50),
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(Author model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.insert(insert);
+    var retId = await adapter.insert(insert, withConn: withConn);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         for (final child in model.posts) {
           await postBean.insert(child, cascade: cascade);
@@ -81,11 +83,12 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<void> insertMany(List<Author> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(insert(model, cascade: cascade));
+        futures.add(insert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -95,7 +98,7 @@ abstract class _AuthorBean implements Bean<Author> {
               toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
           .toList();
       final InsertMany insert = insertser.addAll(data);
-      await adapter.insertMany(insert);
+      await adapter.insertMany(insert, withConn: withConn);
       return;
     }
   }
@@ -103,17 +106,18 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<dynamic> upsert(Author model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    var retId = await adapter.upsert(upsert);
+    var retId = await adapter.upsert(upsert, withConn: withConn);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(model.id, withConn: withConn);
         model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         for (final child in model.posts) {
-          await postBean.upsert(child, cascade: cascade);
+          await postBean.upsert(child, cascade: cascade, withConn: withConn);
         }
       }
     }
@@ -123,11 +127,12 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<void> upsertMany(List<Author> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(upsert(model, cascade: cascade));
+        futures.add(upsert(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -139,7 +144,7 @@ abstract class _AuthorBean implements Bean<Author> {
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
       }
       final UpsertMany upsert = upsertser.addAll(data);
-      await adapter.upsertMany(upsert);
+      await adapter.upsertMany(upsert, withConn: withConn);
       return;
     }
   }
@@ -148,20 +153,22 @@ abstract class _AuthorBean implements Bean<Author> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    final ret = adapter.update(update);
+    final ret = adapter.update(update, withConn: withConn);
     if (cascade) {
       Author newModel;
       if (model.posts != null) {
         if (associate) {
-          newModel ??= await find(model.id);
+          newModel ??= await find(model.id, withConn: withConn);
           model.posts.forEach((x) => postBean.associateAuthor(x, newModel));
         }
         for (final child in model.posts) {
-          await postBean.update(child, cascade: cascade, associate: associate);
+          await postBean.update(child,
+              cascade: cascade, associate: associate, withConn: withConn);
         }
       }
     }
@@ -171,11 +178,12 @@ abstract class _AuthorBean implements Bean<Author> {
   Future<void> updateMany(List<Author> models,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     if (cascade) {
       final List<Future> futures = [];
       for (var model in models) {
-        futures.add(update(model, cascade: cascade));
+        futures.add(update(model, cascade: cascade, withConn: withConn));
       }
       await Future.wait(futures);
       return;
@@ -190,50 +198,52 @@ abstract class _AuthorBean implements Bean<Author> {
         where.add(this.id.eq(model.id));
       }
       final UpdateMany update = updateser.addAll(data, where);
-      await adapter.updateMany(update);
+      await adapter.updateMany(update, withConn: withConn);
       return;
     }
   }
 
   Future<Author> find(String id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    final Author model = await findOne(find);
+    final Author model = await findOne(find, withConn: withConn);
     if (preload && model != null) {
-      await this.preload(model, cascade: cascade);
+      await this.preload(model, cascade: cascade, withConn: withConn);
     }
     return model;
   }
 
-  Future<int> remove(String id, {bool cascade = false}) async {
+  Future<int> remove(String id,
+      {bool cascade = false, Connection withConn}) async {
     if (cascade) {
-      final Author newModel = await find(id);
+      final Author newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await postBean.removeByAuthor(newModel.id);
+        await postBean.removeByAuthor(newModel.id, withConn: withConn);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<Author> models) async {
+  Future<int> removeMany(List<Author> models, {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<Author> preload(Author model, {bool cascade = false}) async {
+  Future<Author> preload(Author model,
+      {bool cascade = false, Connection withConn}) async {
     model.posts = await postBean.findByAuthor(model.id,
-        preload: cascade, cascade: cascade);
+        preload: cascade, cascade: cascade, withConn: withConn);
     return model;
   }
 
   Future<List<Author>> preloadAll(List<Author> models,
-      {bool cascade = false}) async {
+      {bool cascade = false, Connection withConn}) async {
     models.forEach((Author model) => model.posts ??= []);
     await OneToXHelper.preloadAll<Author, Post>(
         models,
@@ -242,7 +252,8 @@ abstract class _AuthorBean implements Bean<Author> {
         (Post model) => [model.authorId],
         (Author model, Post child) =>
             model.posts = List.from(model.posts)..add(child),
-        cascade: cascade);
+        cascade: cascade,
+        withConn: withConn);
     return models;
   }
 
@@ -296,7 +307,8 @@ abstract class _PostBean implements Bean<Post> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
@@ -312,40 +324,42 @@ abstract class _PostBean implements Bean<Post> {
       Str(length: 50),
       foreign: References(authorBean.tableName, "id"),
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(Post model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    return adapter.insert(insert);
+    return adapter.insert(insert, withConn: withConn);
   }
 
   Future<void> insertMany(List<Post> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
     final InsertMany insert = insertser.addAll(data);
-    await adapter.insertMany(insert);
+    await adapter.insertMany(insert, withConn: withConn);
     return;
   }
 
   Future<dynamic> upsert(Post model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    return adapter.upsert(upsert);
+    return adapter.upsert(upsert, withConn: withConn);
   }
 
   Future<void> upsertMany(List<Post> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -353,7 +367,7 @@ abstract class _PostBean implements Bean<Post> {
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upsertser.addAll(data);
-    await adapter.upsertMany(upsert);
+    await adapter.upsertMany(upsert, withConn: withConn);
     return;
   }
 
@@ -361,15 +375,16 @@ abstract class _PostBean implements Bean<Post> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    return adapter.update(update);
+    return adapter.update(update, withConn: withConn);
   }
 
   Future<void> updateMany(List<Post> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -380,51 +395,51 @@ abstract class _PostBean implements Bean<Post> {
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updateser.addAll(data, where);
-    await adapter.updateMany(update);
+    await adapter.updateMany(update, withConn: withConn);
     return;
   }
 
   Future<Post> find(String id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await findOne(find);
+    return await findOne(find, withConn: withConn);
   }
 
-  Future<int> remove(String id) async {
+  Future<int> remove(String id, {Connection withConn}) async {
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<Post> models) async {
+  Future<int> removeMany(List<Post> models, {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
   Future<List<Post>> findByAuthor(String authorId,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.authorId.eq(authorId));
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
   Future<List<Post>> findByAuthorList(List<Author> models,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
 // Return if models is empty. If this is not done, all the records will be returned!
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Author model in models) {
       find.or(this.authorId.eq(model.id));
     }
-    return findMany(find);
+    return findMany(find, withConn: withConn);
   }
 
-  Future<int> removeByAuthor(String authorId) async {
+  Future<int> removeByAuthor(String authorId, {Connection withConn}) async {
     final Remove rm = remover.where(this.authorId.eq(authorId));
-    return await adapter.remove(rm);
+    return await adapter.remove(rm, withConn: withConn);
   }
 
   void associateAuthor(Post child, Author parent) {

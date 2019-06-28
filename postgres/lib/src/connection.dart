@@ -17,12 +17,12 @@ class PgConn extends Connection<pg.PostgreSQLConnection> {
   pg.PostgreSQLConnection get connection => _connection;
 
   Future<List<Map<String, Map<String, dynamic>>>> query(String sql) async {
-    if(logger != null) logger(sql);
+    if (logger != null) logger(sql);
     return await _connection.mappedResultsQuery(sql);
   }
 
   Future<dynamic> exec(String sql) async {
-    if(logger != null) logger(sql);
+    if (logger != null) logger(sql);
     return await _connection.execute(sql);
   }
 
@@ -122,7 +122,8 @@ class PgConn extends Connection<pg.PostgreSQLConnection> {
       {String username,
       String password,
       String host: 'localhost',
-      int port: 5432, Logger logger}) async {
+      int port: 5432,
+      Logger logger}) async {
     final connection = pg.PostgreSQLConnection(host, port, databaseName,
         username: username, password: password);
     await connection.open();

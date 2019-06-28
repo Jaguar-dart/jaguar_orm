@@ -56,7 +56,8 @@ abstract class _UserBean implements Bean<User> {
     return ret;
   }
 
-  Future<void> createTable({bool ifNotExists = false}) async {
+  Future<void> createTable(
+      {bool ifNotExists = false, Connection withConn}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
@@ -72,17 +73,18 @@ abstract class _UserBean implements Bean<User> {
       age.name,
       Int(),
     );
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   Future<dynamic> insert(User model,
       {bool cascade = false,
       bool onlyNonNull = false,
-      Set<String> only}) async {
+      Set<String> only,
+      Connection withConn}) async {
     final Insert insert = inserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
-    var retId = await adapter.insert(insert);
+    var retId = await adapter.insert(insert, withConn: withConn);
     if (cascade) {
       User newModel;
     }
@@ -90,24 +92,25 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<void> insertMany(List<User> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = models
         .map((model) =>
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .toList();
     final InsertMany insert = insertser.addAll(data);
-    await adapter.insertMany(insert);
+    await adapter.insertMany(insert, withConn: withConn);
     return;
   }
 
   Future<dynamic> upsert(User model,
       {bool cascade = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Upsert upsert = upserter
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
         .id(id.name);
-    var retId = await adapter.upsert(upsert);
+    var retId = await adapter.upsert(upsert, withConn: withConn);
     if (cascade) {
       User newModel;
     }
@@ -115,7 +118,7 @@ abstract class _UserBean implements Bean<User> {
   }
 
   Future<void> upsertMany(List<User> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     for (var i = 0; i < models.length; ++i) {
       var model = models[i];
@@ -123,7 +126,7 @@ abstract class _UserBean implements Bean<User> {
           toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
     }
     final UpsertMany upsert = upsertser.addAll(data);
-    await adapter.upsertMany(upsert);
+    await adapter.upsertMany(upsert, withConn: withConn);
     return;
   }
 
@@ -131,15 +134,16 @@ abstract class _UserBean implements Bean<User> {
       {bool cascade = false,
       bool associate = false,
       Set<String> only,
-      bool onlyNonNull = false}) async {
+      bool onlyNonNull = false,
+      Connection withConn}) async {
     final Update update = updater.where(this.id.eq(model.id)).setMany(
         toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
-    return adapter.update(update);
+    return adapter.update(update, withConn: withConn);
   }
 
   Future<void> updateMany(List<User> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
+      {bool onlyNonNull = false, Set<String> only, Connection withConn}) async {
     final List<List<SetColumn>> data = [];
     final List<Expression> where = [];
     for (var i = 0; i < models.length; ++i) {
@@ -150,28 +154,28 @@ abstract class _UserBean implements Bean<User> {
       where.add(this.id.eq(model.id));
     }
     final UpdateMany update = updateser.addAll(data, where);
-    await adapter.updateMany(update);
+    await adapter.updateMany(update, withConn: withConn);
     return;
   }
 
   Future<User> find(int id,
-      {bool preload = false, bool cascade = false}) async {
+      {bool preload = false, bool cascade = false, Connection withConn}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await findOne(find);
+    return await findOne(find, withConn: withConn);
   }
 
-  Future<int> remove(int id) async {
+  Future<int> remove(int id, {Connection withConn}) async {
     final Remove remove = remover.where(this.id.eq(id));
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 
-  Future<int> removeMany(List<User> models) async {
+  Future<int> removeMany(List<User> models, {Connection withConn}) async {
 // Return if models is empty. If this is not done, all records will be removed!
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
       remove.or(this.id.eq(model.id));
     }
-    return adapter.remove(remove);
+    return adapter.remove(remove, withConn: withConn);
   }
 }

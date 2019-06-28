@@ -38,11 +38,11 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
 
   AuthorBean(Adapter adapter, this.beanRepo) : super(adapter);
 
-  Future createTable({bool ifNotExists = false}) {
+  Future createTable({bool ifNotExists = false, Connection withConn}) {
     final st = Sql.create(tableName)
         .addStr('id', isPrimary: true, length: 50)
         .addStr('name', length: 50);
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   String get tableName => 'otm_simple_author';
@@ -54,13 +54,13 @@ class PostBean extends Bean<Post> with _PostBean {
 
   PostBean(Adapter adapter, this.beanRepo) : super(adapter);
 
-  Future createTable({bool ifNotExists = false}) {
+  Future createTable({bool ifNotExists = false, Connection withConn}) {
     final st = Sql.create(tableName)
         .addStr('id', isPrimary: true, length: 50)
         .addStr('message', length: 150)
         .addStr('author_id',
             length: 50, foreign: References(authorBean.tableName, 'id'));
-    return adapter.createTable(st);
+    return adapter.createTable(st, withConn: withConn);
   }
 
   String get tableName => 'otm_simple_post';

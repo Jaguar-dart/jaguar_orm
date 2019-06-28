@@ -77,8 +77,8 @@ String composeJoinedTable(final JoinedTable join) {
 
 String composeOrderBy(final OrderBy orderBy) {
   var sb = StringBuffer('${orderBy.columnName}');
-  if(orderBy.desc != null) {
-    if(orderBy.desc) sb.write(' DESC');
+  if (orderBy.desc != null) {
+    if (orderBy.desc) sb.write(' DESC');
   }
   return sb.toString();
 }
