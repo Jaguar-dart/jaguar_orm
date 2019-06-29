@@ -10,28 +10,27 @@ class Find implements Statement, Whereable, RowSource {
 
   JoinedTable _curJoin;
 
-  Expression _where = And();
+  Expression _where;
 
   final List<OrderBy> _orderBy = [];
 
-  final List<String> _groupBy = [];
+  final List<Expression> _groupBy = [];
 
-  int _limit;
+  Expression _limit;
 
-  int _offset;
+  Expression _offset;
 
   Find(/* String | RowSource */ from, {String alias, Expression where}) {
-    if (from is String) {
-      from = Table(from);
-    }
-    if (from is RowSource) {
-      _from = AliasedRowSource(from, alias: alias);
-    } else {
-      throw UnsupportedError("");
+    if (from is String) from = Table(from);
+
+    if (from is! RowSource) {
+      throw UnsupportedError('Unsupported from expression!');
     }
 
-    if (where != null) this.where(where);
-    _immutable = ImmutableFindStatement(this);
+    _from = AliasedRowSource(from, alias: alias);
+
+    _where = where;
+    _immutable = ImFind(this);
   }
 
   AliasedRowSource get from => _from;
@@ -84,22 +83,21 @@ class Find implements Statement, Whereable, RowSource {
   Find joinOn(Expression exp) {
     if (_curJoin == null) throw Exception('No joins in the join stack!');
 
-    _curJoin.joinOn(exp);
+    _curJoin.on(exp);
     return this;
   }
 
   /// Selects a [column] to be fetched from the [table]. Use [alias] to alias
   /// the column name.
-  Find sel(String column, {String alias, String table}) {
-    String col = (table == null ? '' : table + '.') + column;
-    _column.add(SelClause(Sel(col), alias: alias));
+  Find sel(/* String | Expression */ column, {String alias}) {
+    if (column is String) column = I(column);
+    _column.add(SelClause(column, alias: alias));
     return this;
   }
 
   /// Selects a [column] to be fetched. Use [alias] to alias the column name.
-  Find selAll([String table]) {
-    String col = (table == null ? '' : table + '.') + '*';
-    _column.add(SelClause(Sel(col)));
+  Find selAll() {
+    _column.add(SelClause(I('*')));
     return this;
   }
 
@@ -109,140 +107,177 @@ class Find implements Statement, Whereable, RowSource {
     if (table == null) {
       for (String columnName in columns) {
         final String name = columnName;
-        _column.add(SelClause(Sel(name)));
+        _column.add(SelClause(I(name)));
       }
     } else {
       for (String columnName in columns) {
         final String name = table + '.' + columnName;
-        _column.add(SelClause(Sel(name)));
+        _column.add(SelClause(I(name)));
       }
     }
     return this;
   }
 
-  @Deprecated("Use count function instead!")
-  Find count(SelExpr expr, {String alias, bool isDistinct = false}) {
-    if (isDistinct) expr = Funcs.distinct(expr);
-    _column.add(SelClause(Funcs.count(expr), alias: alias));
-    return this;
-  }
-
-  Find selExpr(SelExpr expr, {String alias}) {
-    _column.add(SelClause(expr, alias: alias));
-    return this;
-  }
-
-  /// Adds an 'or' [expression] to 'where' clause.
-  Find or(Expression expression) {
-    _where = _where.or(expression);
-    return this;
-  }
-
-  /// Adds an 'and' [expression] to 'where' clause.
-  Find and(Expression exp) {
-    _where = _where.and(exp);
-    return this;
-  }
-
-  Find orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
-    iterable.forEach((T v) {
-      final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
-    });
-    return this;
-  }
-
-  Find andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
-    iterable.forEach((T v) {
-      final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
-    });
-    return this;
-  }
-
   /// Adds an to 'where' [expression] clause.
   Find where(Expression expression) {
-    _where = _where.and(expression);
+    _where = expression;
+    return this;
+  }
+
+  /// Adds an 'AND' [expression] to 'where' clause.
+  Find and(Expression exp) {
+    if (_where == null) {
+      _where = exp;
+    } else {
+      _where = _where.and(exp);
+    }
+    return this;
+  }
+
+  /// Adds an 'OR' [expression] to 'where' clause.
+  Find or(Expression exp) {
+    if (_where == null) {
+      _where = exp;
+    } else {
+      _where = _where.or(exp);
+    }
     return this;
   }
 
   /// Adds an '=' [expression] to 'where' clause.
-  Find eq<T>(String column, T val) => and(q.eq<T>(column, val));
+  Find eq(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).eq(rhs));
 
   /// Adds an '<>' [expression] to 'where' clause.
-  Find ne<T>(String column, T val) => and(q.ne<T>(column, val));
+  Find ne(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).ne(rhs));
+
+  /// Adds an 'IS' [expression] to 'where' clause.
+  Find iss(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).iss(rhs));
+
+  /// Adds an 'IS NOT' [expression] to 'where' clause.
+  Find isNot(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).isNot(rhs));
 
   /// Adds an '>' [expression] to 'where' clause.
-  Find gt<T>(String column, T val) => and(q.gt<T>(column, val));
+  Find gt(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).gt(rhs));
 
   /// Adds an '>=' [expression] to 'where' clause.
-  Find gtEq<T>(String column, T val) => and(q.gtEq<T>(column, val));
+  Find gtEq(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).gtEq(rhs));
 
   /// Adds an '<=' [expression] to 'where' clause.
-  Find ltEq<T>(String column, T val) => and(q.ltEq<T>(column, val));
+  Find ltEq(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).ltEq(rhs));
 
   /// Adds an '<' [expression] to 'where' clause.
-  Find lt<T>(String column, T val) => and(q.lt<T>(column, val));
+  Find lt(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).lt(rhs));
 
   /// Adds an '%' [expression] to 'where' clause.
-  Find like(String column, String val) => and(q.like(column, val));
+  Find like(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).like(rhs));
 
   /// Adds an 'between' [expression] to 'where' clause.
-  Find between<T>(String column, T low, T high) =>
-      and(q.between<T>(column, low, high));
+  Find between(
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ low,
+          /* Literal | Expression */ high) =>
+      and(I.make(lhs).between(low, high));
 
-  Find orderBy(String column, {bool desc}) {
-    _orderBy.add(OrderBy(column, desc: desc));
+  Find orderBy(/* String | int | Expression */ expr, {bool desc}) {
+    if (expr is String) expr = col(expr);
+    if (expr is int) expr = IntLiteral(expr);
+    if (expr is! Expression) {
+      throw ArgumentError.value(
+          expr, 'val', 'Must be String | int | Expression');
+    }
+
+    _orderBy.add(OrderBy(expr, desc: desc));
     return this;
   }
 
-  Find orderByMany(List<String> columns, {bool desc}) {
-    columns.forEach((String column) {
+  Find orderByMany(List< /* String | int | Expression */ dynamic> columns,
+      {bool desc}) {
+    columns.forEach((column) {
       _orderBy.add(OrderBy(column, desc: desc));
     });
     return this;
   }
 
-  Find limit(int val) {
-    if (_limit != null) throw Exception('Already limited!');
+  Find limit(/* int | Expression */ val) {
+    if (val is int) val = IntLiteral(val);
+    if (val is! Expression) {
+      throw ArgumentError.value(val, 'val', 'Must be int | Expression');
+    }
 
     _limit = val;
     return this;
   }
 
-  Find offset(int val) {
-    if (_offset != null) throw Exception('Cant use more than one offset!');
+  Find offset(/* int | Expression */ val) {
+    if (val is int) val = IntLiteral(val);
+    if (val is! Expression) {
+      throw ArgumentError.value(val, 'val', 'Must be int | Expression');
+    }
 
     _offset = val;
     return this;
   }
 
-  Find groupBy(String val) {
-    _groupBy.add(val);
+  Find groupBy(/* String | int | Expression */ expr) {
+    if (expr is String) expr = col(expr);
+    if (expr is int) expr = IntLiteral(expr);
+    if (expr is! Expression) {
+      throw ArgumentError.value(
+          expr, 'val', 'Must be String | int | Expression');
+    }
+
+    _groupBy.add(expr);
     return this;
   }
 
-  Find groupByMany(List<String> columns) {
-    _groupBy.addAll(columns);
+  Find groupByMany(List< /* String | int | Expression */ dynamic> expr) {
+    expr.forEach(groupBy);
     return this;
   }
 
   FindExecutor<ConnType> exec<ConnType>(Connection<ConnType> connection) =>
       FindExecutor<ConnType>(connection, this);
 
-  ImmutableFindStatement _immutable;
+  ImFind _immutable;
 
-  ImmutableFindStatement get asImmutable => _immutable;
+  ImFind get asImmutable => _immutable;
 }
 
-class ImmutableFindStatement {
+class ImFind {
   Find _find;
 
-  ImmutableFindStatement(this._find)
+  ImFind(this._find)
       : selects = UnmodifiableListView<SelClause>(_find._column),
         joins = UnmodifiableListView<JoinedTable>(_find._joins),
         orderBy = UnmodifiableListView<OrderBy>(_find._orderBy),
-        groupBy = UnmodifiableListView<String>(_find._groupBy);
+        groupBy = UnmodifiableListView<Expression>(_find._groupBy);
 
   AliasedRowSource get from => _find.from;
 
@@ -254,19 +289,19 @@ class ImmutableFindStatement {
 
   final UnmodifiableListView<OrderBy> orderBy;
 
-  final UnmodifiableListView<String> groupBy;
+  final UnmodifiableListView<Expression> groupBy;
 
-  int get limit => _find._limit;
+  Expression get limit => _find._limit;
 
-  int get offset => _find._offset;
+  Expression get offset => _find._offset;
 }
 
 typedef MappedExpression<T> = Expression Function(T value);
 
 class OrderBy {
-  final String columnName;
+  final /* String | int | Expression */ expr;
 
   final bool desc;
 
-  const OrderBy(this.columnName, {this.desc});
+  const OrderBy(this.expr, {this.desc});
 }

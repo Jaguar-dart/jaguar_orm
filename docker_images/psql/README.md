@@ -12,8 +12,8 @@ docker-compose up
 
 postgresql server should be up now.
 
-# Testing
+# Connecting to the database
 
 ```
-psql postgresql://postgres:dart-jaguar@localhost:5432/postgres
+psql postgresql://postgres:dart_jaguar@localhost:5432/postgres
 ```

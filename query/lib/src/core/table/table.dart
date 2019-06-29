@@ -61,9 +61,9 @@ class JoinedTable {
 
   AliasedRowSource _to;
 
-  final _on = And();
+  Expression _on;
 
-  JoinedTable(this._type, /* String | RowSource */ source, [String alias]) {
+  JoinedTable(this._type, /* String | RowSource */ source, {String alias, Expression on}) {
     _info = QueryJoinedTableInfo(this);
 
     if (source is String) {
@@ -77,41 +77,38 @@ class JoinedTable {
   }
 
   factory JoinedTable.innerJoin(String tableName, [String alias]) =>
-      JoinedTable(JoinType.InnerJoin, tableName, alias);
+      JoinedTable(JoinType.InnerJoin, tableName, alias: alias);
 
   factory JoinedTable.leftJoin(String tableName, [String alias]) =>
-      JoinedTable(JoinType.LeftJoin, tableName, alias);
+      JoinedTable(JoinType.LeftJoin, tableName, alias: alias);
 
   factory JoinedTable.rightJoin(String tableName, [String alias]) =>
-      JoinedTable(JoinType.RightJoin, tableName, alias);
+      JoinedTable(JoinType.RightJoin, tableName, alias: alias);
 
   factory JoinedTable.fullJoin(String tableName, [String alias]) =>
-      JoinedTable(JoinType.FullJoin, tableName, alias);
+      JoinedTable(JoinType.FullJoin, tableName, alias: alias);
 
   factory JoinedTable.crossJoin(String tableName, [String alias]) =>
-      JoinedTable(JoinType.CrossJoin, tableName, alias);
+      JoinedTable(JoinType.CrossJoin, tableName, alias: alias);
 
-  JoinedTable joinOn(Expression onExp) {
-    if (_type == null || _to == null) {
-      throw Exception('Query has no join on it!');
-    }
-
-    _on.and(onExp);
-
+  JoinedTable on(Expression expr) {
+    _on = expr;
     return this;
   }
 
   void validate() {
     if (_to == null) {
-      if (_type != null || _on.length != 0) {
+      if (_type != null || _on != null) {
         throw Exception('Join not initialized properly!');
       }
     } else {
-      if (_type == null || _on.length == 0) {
+      if (_type == null || _on == null) {
         throw Exception('Join not initialized properly!');
       }
     }
   }
+
+  // TODO add relations ops
 
   QueryJoinedTableInfo _info;
 
@@ -128,5 +125,5 @@ class QueryJoinedTableInfo {
   AliasedRowSource get to => _inner._to;
 
   // TODO immutable
-  And get on => _inner._on;
+  Expression get on => _inner._on;
 }

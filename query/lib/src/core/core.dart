@@ -13,17 +13,12 @@ import 'package:jaguar_query/src/operators/operators.dart' as q;
 
 import 'datatype/datatype.dart';
 import 'statement/create/create.dart';
+import 'expression/expression.dart';
 
 export 'statement/create/create.dart';
 export 'datatype/datatype.dart';
+export 'expression/expression.dart';
 
-part 'expression/and.dart';
-part 'expression/condition.dart';
-part 'expression/expressions.dart';
-part 'expression/field.dart';
-part 'expression/in_between.dart';
-part 'expression/or.dart';
-part 'operators/comparision.dart';
 part 'statement/alter.dart';
 part 'statement/create_db.dart';
 part 'statement/drop.dart';
@@ -41,8 +36,9 @@ part 'table/table.dart';
 /// Main DSL class to create SQL statements
 class Sql {
   /// Creates a new [Find] statement
-  static Find find(/* String | RowSource */ table, {String alias}) =>
-      Find(table, alias: alias);
+  static Find find(/* String | RowSource */ table,
+          {String alias, Expression where}) =>
+      Find(table, alias: alias, where: where);
 
   /// Creates a new [Upsert] statement
   static Upsert upsert(String table) => Upsert(table);
@@ -64,7 +60,8 @@ class Sql {
   static UpdateMany updateMany(String table) => UpdateMany(table);
 
   /// Creates a new [Delete] statement
-  static Remove remove(String table) => Remove(table);
+  static Remove remove(String table, {Expression where}) =>
+      Remove(table, where: where);
 
   /// Returns a new [Create] statement
   static Create create(String table, {bool ifNotExists = false}) =>

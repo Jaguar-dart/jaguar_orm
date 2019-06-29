@@ -1,14 +1,14 @@
 part of query.compose;
 
 String composeFind(final Find find) {
-  final ImmutableFindStatement info = find.asImmutable;
+  final ImFind info = find.asImmutable;
   final sb = StringBuffer();
   sb.write('SELECT ');
 
   if (info.selects.length == 0) {
     sb.write('* ');
   } else {
-    sb.write(info.selects.map(composeSelColumn).toList().join(', '));
+    sb.write(info.selects.map(composeSelClause).toList().join(', '));
   }
 
   sb.write(' FROM ');
@@ -19,7 +19,7 @@ String composeFind(final Find find) {
     sb.write(composeJoinedTable(tab));
   }
 
-  if (info.where.length != 0) {
+  if (info.where != null) {
     sb.write(' WHERE ');
     sb.write(composeExpression(info.where));
   }
@@ -31,24 +31,24 @@ String composeFind(final Find find) {
 
   if (info.limit is int) {
     sb.write(' LIMIT ');
-    sb.write(info.limit);
+    sb.write(composeExpression(info.limit));
   }
 
   if (info.offset is int) {
     sb.write(' OFFSET ');
-    sb.write(info.offset);
+    sb.write(composeExpression(info.offset));
   }
 
   if (info.groupBy.length != 0) {
     sb.write(' GROUP BY ');
-    sb.write(info.groupBy.join(', '));
+    sb.write(info.groupBy.map(composeExpression).join(', '));
   }
 
   return sb.toString();
 }
 
-String composeSelColumn(final SelClause column) {
-  String ret = composeSelExpr(column.expr);
+String composeSelClause(final SelClause column) {
+  String ret = composeExpression(column.expr);
 
   if (column.alias is String) {
     ret += ' AS "${column.alias}"';
@@ -67,46 +67,22 @@ String composeJoinedTable(final JoinedTable join) {
   sb.write(info.type.string);
   sb.write(' ' + composeAliasedRowSource(info.to));
 
-  if (info.on.length != 0) {
+  if (info.on != null) {
     sb.write(' ON ');
-    sb.write(composeAnd(info.on));
+    sb.write(composeExpression(info.on));
   }
 
   return sb.toString();
 }
 
 String composeOrderBy(final OrderBy orderBy) {
-  var sb = StringBuffer('${orderBy.columnName}');
+  var sb = StringBuffer();
+
+  sb.write(composeExpression(orderBy.expr));
+
   if (orderBy.desc != null) {
     if (orderBy.desc) sb.write(' DESC');
   }
-  return sb.toString();
-}
-
-String composeSelExpr(SelExpr exp) {
-  if (exp is Sel) {
-    return exp.name;
-  } else if (exp is Func) {
-    return composeFunc(exp);
-  } else if (exp is ToDialectAble) {
-    final ret = (exp as ToDialectAble).toDialect("postgres");
-    if (ret is String) return ret;
-    if (ret is SelExpr) return composeSelExpr(ret);
-    throw UnsupportedError("Unsupported select expression $ret");
-  }
-  throw UnsupportedError("Unsupported select expression $exp");
-}
-
-String composeFunc(Func func) {
-  var sb = StringBuffer();
-
-  sb.write(func.name);
-
-  sb.write('(');
-
-  sb.write(func.args.map((s) => composeSelExpr(s)).join(', '));
-
-  sb.write(')');
 
   return sb.toString();
 }

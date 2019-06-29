@@ -15,7 +15,7 @@ main() {
   print(composeFind(find));
 
   Find colCompare = Sql.find('posts')
-      .where(Field('author').eq(Field.inTable('authors', 'id')))
+      .where(Field('author').eq(col('authors.id')))
       .orderBy('author', desc: false)
       .limit(10)
       .groupByMany(['message', 'likes']);

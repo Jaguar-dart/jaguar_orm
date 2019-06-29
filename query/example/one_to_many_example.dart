@@ -121,9 +121,8 @@ Future<Post> getPostByIdRelated(int id) async {
       .sel('post.*')
       .selMany(['_id', 'name'], table: 'author')
       .innerJoin('author', 'author')
-      .joinOn(Field.inTable('post', 'authorId')
-          .eqField(Field.inTable('author', '_id')))
-      .where(Field.inTable('post', '_id').eq(id));
+      .joinOn(col('post.authorId').eq(col('author._id')))
+      .where(col('post._id').eq(id));
   Map map = await conn.findOne(st);
 
   final post = Post()

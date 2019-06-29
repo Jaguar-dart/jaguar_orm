@@ -57,7 +57,7 @@ main() async {
 
   final data = await Sql.find(Post.tableName)
       .innerJoin(Author.tableName)
-      .joinOn(Field.inTable('post', 'authorid').eqF('id', table: 'author'))
+      .joinOn(col('post.authorid').eq(col('author.id')))
       .where(eq('author.id', 1))
       .exec(connection)
       .one();

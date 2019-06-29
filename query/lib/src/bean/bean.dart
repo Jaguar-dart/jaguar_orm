@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:jaguar_query/jaguar_query.dart';
 
-typedef Expression ExpressionMaker<MT>(Bean<MT> bean);
+typedef ExpressionMaker<MT> = Expression Function(Bean<MT> bean);
 
 /// Interface for bean class for a model
 abstract class Bean<ModelType> {

@@ -7,7 +7,7 @@ String composeRemove(final Remove st) {
   sb.write('DELETE FROM ');
   sb.write(st.info.tableName);
 
-  if (info.where.length != 0) {
+  if (info.where != null) {
     sb.write(' WHERE ');
     sb.write(composeExpression(info.where));
   }

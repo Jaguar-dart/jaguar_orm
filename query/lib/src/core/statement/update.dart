@@ -5,10 +5,10 @@ class Update implements Statement, Settable, Whereable {
 
   final Map<String, dynamic> _values = {};
 
-  Expression _where = And();
+  Expression _where;
 
   Update(this.name, {Expression where}) {
-    if (where != null) this.where(where);
+    _where = where;
     _immutable = ImmutableUpdateStatement(this);
   }
 
@@ -58,53 +58,92 @@ class Update implements Statement, Settable, Whereable {
     return this;
   }
 
-  Update or(Expression exp) {
-    _where = _where.or(exp);
+  /// Adds an to 'where' [expression] clause.
+  Update where(Expression expression) {
+    _where = expression;
     return this;
   }
 
+  /// Adds an 'AND' [expression] to 'where' clause.
   Update and(Expression exp) {
-    _where = _where.and(exp);
+    if (_where == null) {
+      _where = exp;
+    } else {
+      _where = _where.and(exp);
+    }
     return this;
   }
 
-  Update orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
-    iterable.forEach((T v) {
-      final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
-    });
+  /// Adds an 'OR' [expression] to 'where' clause.
+  Update or(Expression exp) {
+    if (_where == null) {
+      _where = exp;
+    } else {
+      _where = _where.or(exp);
+    }
     return this;
   }
 
-  Update andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
-    iterable.forEach((T v) {
-      final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
-    });
-    return this;
-  }
+  /// Adds an '=' [expression] to 'where' clause.
+  Update eq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).eq(rhs));
 
-  Update where(Expression exp) {
-    _where = _where.and(exp);
-    return this;
-  }
+  /// Adds an '<>' [expression] to 'where' clause.
+  Update ne(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).ne(rhs));
 
-  Update eq<T>(String column, T val) => and(q.eq<T>(column, val));
+  /// Adds an 'IS' [expression] to 'where' clause.
+  Update iss(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).iss(rhs));
 
-  Update ne<T>(String column, T val) => and(q.ne<T>(column, val));
+  /// Adds an 'IS NOT' [expression] to 'where' clause.
+  Update isNot(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).isNot(rhs));
 
-  Update gt<T>(String column, T val) => and(q.gt<T>(column, val));
+  /// Adds an '>' [expression] to 'where' clause.
+  Update gt(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).gt(rhs));
 
-  Update gtEq<T>(String column, T val) => and(q.gtEq<T>(column, val));
+  /// Adds an '>=' [expression] to 'where' clause.
+  Update gtEq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).gtEq(rhs));
 
-  Update ltEq<T>(String column, T val) => and(q.ltEq<T>(column, val));
+  /// Adds an '<=' [expression] to 'where' clause.
+  Update ltEq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).ltEq(rhs));
 
-  Update lt<T>(String column, T val) => and(q.lt<T>(column, val));
+  /// Adds an '<' [expression] to 'where' clause.
+  Update lt(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).lt(rhs));
 
-  Update like(String column, String val) => and(q.like(column, val));
+  /// Adds an '%' [expression] to 'where' clause.
+  Update like(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs) =>
+      and(I.make(lhs).like(rhs));
 
-  Update between<T>(String column, T low, T high) =>
-      and(q.between<T>(column, low, high));
+  /// Adds an 'between' [expression] to 'where' clause.
+  Update between(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ low,
+      /* Literal | Expression */ high) =>
+      and(I.make(lhs).between(low, high));
 
   Future<int> exec(Connection connection) => connection.update(this);
 

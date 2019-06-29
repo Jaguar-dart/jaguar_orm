@@ -1,58 +1,73 @@
 part of query.compose;
 
-String composeAnd(final And and) => and.expressions.map((Expression exp) {
-      final sb = StringBuffer();
-
-      if (exp.length != 1) {
-        sb.write('(');
-      }
-
-      sb.write(composeExpression(exp));
-
-      if (exp.length != 1) {
-        sb.write(')');
-      }
-
-      return sb.toString();
-    }).join(' AND ');
-
-String composeOr(final Or or) => or.expressions.map((Expression exp) {
-      final sb = StringBuffer();
-
-      if (exp.length != 1) {
-        sb.write('(');
-      }
-
-      sb.write(composeExpression(exp));
-
-      if (exp.length != 1) {
-        sb.write(')');
-      }
-
-      return sb.toString();
-    }).join(' OR ');
-
 String composeExpression(final Expression exp) {
-  if (exp is Or) {
-    return composeOr(exp);
-  } else if (exp is And) {
-    return composeAnd(exp);
-  } else if (exp is Cond) {
-    return '${composeField(exp.lhs)} ${exp.op.string} ${composeValue(exp.rhs)}';
-  } else if (exp is CondCol) {
-    return '${composeField(exp.lhs)} ${exp.op.string} ${composeField(exp.rhs)}';
-  } else if (exp is Between) {
-    return '(${composeField(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
-  } else if (exp is InBetweenCol) {
-    return '(${composeField(exp.field)} BETWEEN ${composeField(exp.low)} AND ${composeField(exp.high)})';
-  } else {
-    throw Exception('Unknown expression ${exp.runtimeType}!');
+  if (exp is ToDialect) {
+    final ret = (exp as ToDialect).toDialect("postgres");
+    if (ret is String) return ret;
+    if (ret is Expression) return composeExpression(ret);
+    throw UnsupportedError(
+        "${exp.runtimeType}.toDialect returned invalid literal: $ret");
   }
+
+  if (exp is I) return exp.name;
+  if (exp is Literal) return composeLiteral(exp);
+  if (exp is Func) return composeFunc(exp);
+
+  if (exp is Or) {
+    final sb = StringBuffer();
+    if (exp.length != 1) sb.write('(');
+    sb.write(exp.expressions
+        .map((Expression exp) => composeExpression(exp))
+        .join(' OR '));
+    if (exp.length != 1) sb.write(')');
+    return sb.toString();
+  }
+
+  if (exp is And) {
+    final sb = StringBuffer();
+    if (exp.length != 1) sb.write('(');
+    sb.write(exp.expressions
+        .map((Expression exp) => composeExpression(exp))
+        .join(' AND '));
+    if (exp.length != 1) sb.write(')');
+    return sb.toString();
+  }
+
+  if (exp is Cond) {
+    return '${composeExpression(exp.lhs)} ${exp.op.string} ${composeExpression(exp.rhs)}';
+  }
+
+  if (exp is Between) {
+    return '(${composeExpression(exp.lhs)} BETWEEN ${composeExpression(exp.low)} AND ${composeExpression(exp.high)})';
+  }
+
+  throw Exception('Unknown expression ${exp.runtimeType}!');
 }
 
-String composeField(final Field col) =>
-    (col.tableName != null ? col.tableName + '.' : '') + col.name;
+String composeField(final Field field) => field.name;
 
+String composeLiteral(Literal literal) {
+  if (literal is ToDialect) {
+    final val = (literal as ToDialect).toDialect(postgresDialect);
+    if (val is String) return val;
+    if (val is Expression) return composeExpression(val);
+    throw UnsupportedError(
+        "${literal.runtimeType}.toDialect returned invalid literal: $val");
+  }
+
+  final val = literal.value;
+
+  if (val is num) return "$val";
+  if (val is String) return "'${sqlStringEscape(val)}'";
+  if (val is DateTime) return "$val"; //TODO
+  if (val is bool) return val ? 'TRUE' : 'FALSE';
+  if (val is Duration) return "$val"; //TODO
+  if (val is NilLiteral) return "NULL";
+
+  throw Exception("Invalid type ${val.runtimeType}!");
+}
+
+/*
 String composeValue(dynamic val) {
   if (val == null) return null;
   if (val is int) {
@@ -71,5 +86,20 @@ String composeValue(dynamic val) {
     throw Exception("Invalid type ${val.runtimeType}!");
   }
 }
+ */
 
 String sqlStringEscape(String input) => input.replaceAll("'", "''");
+
+String composeFunc(Func func) {
+  var sb = StringBuffer();
+
+  sb.write(func.name);
+
+  sb.write('(');
+
+  sb.write(func.args.map((s) => composeExpression(s)).join(', '));
+
+  sb.write(')');
+
+  return sb.toString();
+}

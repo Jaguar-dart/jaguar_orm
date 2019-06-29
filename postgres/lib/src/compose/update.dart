@@ -12,7 +12,7 @@ String composeUpdate(final Update st) {
       .map((String key) => '$key=${composeValue(info.values[key])}')
       .join(', '));
 
-  if (info.where.length != 0) {
+  if (info.where != null) {
     sb.write(' WHERE ');
     sb.write(composeExpression(info.where));
   }

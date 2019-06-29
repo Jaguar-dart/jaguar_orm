@@ -1,52 +1,12 @@
 part of query.core;
 
-abstract class SelExpr {}
-
 class SelClause {
-  final SelExpr expr;
+  final Expression expr;
 
   final String alias;
 
   SelClause(this.expr, {this.alias});
 }
-
-/// Use [Sel] to either select a column or an expression.
-class Sel implements SelExpr {
-  final String name;
-
-  Sel(this.name);
-}
-
-class Func implements SelExpr {
-  final String name;
-
-  final List<SelExpr> args;
-
-  Func(this.name, {this.args = const []});
-}
-
-abstract class Funcs {
-  static Func count(SelExpr arg) => Func('COUNT', args: [arg]);
-
-  static Func max(SelExpr arg) => Func('MAX', args: [arg]);
-
-  static Func sum(SelExpr arg) => Func('SUM', args: [arg]);
-
-  static Func avg(SelExpr arg) => Func('AVG', args: [arg]);
-
-  static Func distinct(/* List<SelExpr> | SelExpr */ arg) {
-    if (arg is SelExpr) return Func('DISTINCT', args: [arg]);
-    if (arg is List<SelExpr>) Func('DISTINCT', args: arg);
-
-    throw UnsupportedError("$arg not supported!");
-  }
-}
-
-Func count(SelExpr arg) => Funcs.count(arg);
-
-Func max(SelExpr arg) => Funcs.max(arg);
-
-Func distinct(/* List<SelExpr> | SelExpr */ arg) => Funcs.distinct(arg);
 
 /// name:value pair used to set a column named [name] to [value]. Used during
 /// inserts and updates.
@@ -92,25 +52,38 @@ abstract class Whereable implements Statement {
 
   Whereable and(Expression exp);
 
-  Whereable orMap<T>(Iterable<T> iterable, MappedExpression<T> func);
-
-  Whereable andMap<T>(Iterable<T> iterable, MappedExpression<T> func);
-
   Whereable where(Expression exp);
 
-  Whereable eq<T>(String column, T val);
+  Whereable eq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable ne<T>(String column, T val);
+  Whereable ne(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable gt<T>(String column, T val);
+  Whereable gt(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable gtEq<T>(String column, T val);
+  Whereable gtEq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable ltEq<T>(String column, T val);
+  Whereable ltEq(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable lt<T>(String column, T val);
+  Whereable lt(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable like(String column, String val);
+  Whereable like(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ rhs);
 
-  Whereable between<T>(String column, T low, T high);
+  Whereable between(
+      /* String | Field | I */ lhs,
+      /* Literal | Expression */ low,
+      /* Literal | Expression */ high);
 }
