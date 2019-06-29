@@ -15,7 +15,7 @@ class PostBean1 extends PostBean {
 
   Future<void> createTable() async {
     await Create(tableName, ifNotExists: true)
-        .addInt('_id', isPrimary: true, autoIncrement: true)
+        .addInt('_id', isPrimary: true, auto: true)
         .addStr('msg')
         .addStr('author')
         .exec(adapter);

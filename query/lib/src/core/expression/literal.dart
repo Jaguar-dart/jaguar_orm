@@ -9,11 +9,12 @@ abstract class Literal extends Expression {
     if (value is Literal) return value;
 
     if (value is int) return IntLiteral(value);
-    if (value is double) return DoubleLiteral(value);
+    if (value is num) return DoubleLiteral(value);
     if (value is String) return StrLiteral(value);
     if (value is bool) return BoolLiteral(value);
     if (value is DateTime) return TimestampLiteral(value);
     if (value is Duration) return DurationLiteral(value);
+    if (value == null) return nil;
 
     return null;
   }

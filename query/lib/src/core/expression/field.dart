@@ -24,7 +24,8 @@ class Field<ValType> extends Expression implements I {
   ///     UpdateStatement update = UpdateStatement();
   ///     Field<int> age = Field<int>('age');
   ///     update.set(age.set(20));
-  SetColumn set(/* literal | Expression */ value) => SetColumn(name, value);
+  SetColumn set(/* literal | Expression */ value) =>
+      SetColumn(name, Expression.toExpression(value));
 }
 
 /// IntField is a convenience DSL used to construct queries in a concise and
@@ -42,14 +43,14 @@ class IntField extends Field<int> {
 
   /// Adds the field to create statement
   void create(Create statement,
-      {bool autoIncrement = false,
+      {bool auto = false,
       bool isPrimary = false,
       bool notNull = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     statement.addInt(name,
         notNull: notNull,
-        autoIncrement: autoIncrement,
+        auto: auto,
         isPrimary: isPrimary,
         foreign: foreign,
         constraints: constraints);

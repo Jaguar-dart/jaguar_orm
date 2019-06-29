@@ -55,6 +55,8 @@ String composeLiteral(Literal literal) {
         "${literal.runtimeType}.toDialect returned invalid literal: $val");
   }
 
+  if (literal is NilLiteral) return "NULL";
+
   final val = literal.value;
 
   if (val is num) return "$val";
@@ -62,7 +64,6 @@ String composeLiteral(Literal literal) {
   if (val is DateTime) return "$val"; //TODO
   if (val is bool) return val ? 'TRUE' : 'FALSE';
   if (val is Duration) return "$val"; //TODO
-  if (val is NilLiteral) return "NULL";
 
   throw Exception("Invalid type ${val.runtimeType}!");
 }

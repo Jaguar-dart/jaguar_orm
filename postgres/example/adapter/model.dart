@@ -41,8 +41,6 @@ class PostBean extends Bean<Post> {
       {bool update = false, Set<String> only}) {
     final ret = <SetColumn>[];
 
-    if (!update) ret.add(id.set(model.id));
-
     ret.add(msg.set(model.msg));
     ret.add(author.set(model.author));
 
@@ -64,7 +62,7 @@ class PostBean extends Bean<Post> {
 
   Future<void> createTable() async {
     await Create(tableName, ifNotExists: true)
-        .addInt('_id', isPrimary: true)
+        .addInt('_id', isPrimary: true, auto: true)
         .addStr('msg')
         .addStr('author')
         .exec(adapter);
@@ -72,7 +70,7 @@ class PostBean extends Bean<Post> {
 
   /// Inserts a new post into table
   Future<dynamic> insert(Post post) async {
-    Insert st = inserter.setMany(toSetColumns(post));
+    Insert st = inserter.setMany(toSetColumns(post)).id(id.name);
     return adapter.insert(st);
   }
 

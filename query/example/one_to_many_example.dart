@@ -54,14 +54,14 @@ Future<void> dropTables() async {
 Future<void> createTables() async {
   {
     await Sql.create('author', ifNotExists: true)
-        .addInt('_id', isPrimary: true, autoIncrement: true)
+        .addInt('_id', isPrimary: true, auto: true)
         .addStr('name', length: 100)
         .exec(conn);
   }
 
   {
     await Sql.create('post', ifNotExists: true)
-        .addInt('_id', isPrimary: true, autoIncrement: true)
+        .addInt('_id', isPrimary: true, auto: true)
         .addInt('authorId', foreign: References('author', '_id'))
         .addStr('message', length: 100)
         .addInt('likes')

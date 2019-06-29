@@ -33,11 +33,11 @@ class Create implements Statement {
 
   Create addInt(String name,
       {bool notNull = false,
-      bool autoIncrement = false,
+      bool auto = false,
       bool isPrimary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
-    _columns[name] = CreateCol(name, Int(auto: autoIncrement),
+    _columns[name] = CreateCol(name, Int(auto: auto),
         notNull: notNull,
         isPrimary: isPrimary,
         foreign: foreign,

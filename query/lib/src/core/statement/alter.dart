@@ -11,13 +11,13 @@ class AddColumn<T> implements AlterClause {
 
   static AddColumn<core.int> int(String name,
       {core.bool notNull = false,
-      core.bool autoIncrement = false,
+      core.bool auto = false,
       core.bool primary = false,
       References foreign,
       List<Constraint> constraints = const []}) {
     return AddColumn(CreateCol(
       name,
-      Int(auto: autoIncrement),
+      Int(auto: auto),
       notNull: notNull,
       isPrimary: primary,
       foreign: foreign,
