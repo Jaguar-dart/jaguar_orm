@@ -14,7 +14,7 @@ main() {
 
   final exp = ((age > 20) & (age < 35)) &
       ((likes.eq(0)) | (likes > 50)) &
-      (name % 'Ho' | name % 'Who') &
+      (name % 'Ho%' | name % '%Who') &
       ((likes >= 100) & (age <= 1000)) &
       (age.between(20, 35));
 

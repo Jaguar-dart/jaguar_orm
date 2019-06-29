@@ -12,7 +12,7 @@ class Post {
 
   int likes;
 
-  //TODO DateTime publishedOn;
+  DateTime publishedOn; // TODO
 
   bool public;
 }

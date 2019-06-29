@@ -25,11 +25,11 @@ class Post {
 }
 
 main() async {
-  final connection = await PgConn.open('example',
-      username: 'dart_jaguar', password: 'dart_jaguar');
+  final connection = await PgConn.open('postgres',
+      username: 'postgres', password: 'dart_jaguar');
 
-  await Sql.drop(Post.tableName).exec(connection);
-  await Sql.drop(Author.tableName).exec(connection);
+  await Sql.drop(Post.tableName, onlyIfExists: true).exec(connection);
+  await Sql.drop(Author.tableName, onlyIfExists: true).exec(connection);
 
   await Sql.create(Author.tableName)
       .addInt('id', isPrimary: true)
@@ -58,7 +58,7 @@ main() async {
   final data = await Sql.find(Post.tableName)
       .innerJoin(Author.tableName)
       .joinOn(col('post.authorid').eq(col('author.id')))
-      .where(eq('author.id', 1))
+      .where(col('author.id').eq(1))
       .exec(connection)
       .one();
   print(data);

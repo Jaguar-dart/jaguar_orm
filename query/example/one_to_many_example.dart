@@ -151,7 +151,7 @@ Future<void> getRelatedPost(Post post) async {
 }
 
 main() async {
-  conn = await PgConn.open('example',
+  conn = await PgConn.open('postgres',
       username: 'postgres', password: 'dart_jaguar');
   ;
 

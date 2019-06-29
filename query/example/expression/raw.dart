@@ -6,11 +6,11 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 
 main() {
-  final exp = (gt('age', 20) & lt('age', 35)) &
-      (eq('likes', 0) | gt('likes', 50)) &
-      (like('name', 'Ho') | like('name', 'Who')) &
-      (gtEq('likes', 100) & ltEq('likes', 1000)) &
-      (between('age', 20, 35));
+  final exp = (gt(col('age'), 20) & lt(col('age'), 35)) &
+      (eq(col('likes'), 0) | gt(col('likes'), 50)) &
+      (like(col('name'), 'Ho') | like(col('name'), 'Who%')) &
+      (gtEq(col('likes'), 100) & ltEq(col('likes'), 1000)) &
+      (between(col('age'), 20, 35));
 
   print(composeExpression(exp));
 }

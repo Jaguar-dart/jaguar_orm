@@ -24,24 +24,24 @@ String composeFind(final Find find) {
     sb.write(composeExpression(info.where));
   }
 
+  if (info.groupBy.length != 0) {
+    sb.write(' GROUP BY ');
+    sb.write(info.groupBy.map(composeExpression).join(', '));
+  }
+
   if (info.orderBy.length != 0) {
     sb.write(' ORDER BY ');
     sb.write(info.orderBy.map(composeOrderBy).join(', '));
   }
 
-  if (info.limit is int) {
+  if (info.limit != null) {
     sb.write(' LIMIT ');
     sb.write(composeExpression(info.limit));
   }
 
-  if (info.offset is int) {
+  if (info.offset != null) {
     sb.write(' OFFSET ');
     sb.write(composeExpression(info.offset));
-  }
-
-  if (info.groupBy.length != 0) {
-    sb.write(' GROUP BY ');
-    sb.write(info.groupBy.map(composeExpression).join(', '));
   }
 
   return sb.toString();

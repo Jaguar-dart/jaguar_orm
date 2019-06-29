@@ -23,7 +23,8 @@ class PgConn extends Connection<pg.PostgreSQLConnection> {
 
   Future<dynamic> exec(String sql) async {
     if (logger != null) logger(sql);
-    return await _connection.execute(sql);
+    var ret = await _connection.execute(sql);
+    return ret;
   }
 
   /// Finds one record in the table
@@ -77,10 +78,16 @@ class PgConn extends Connection<pg.PostgreSQLConnection> {
   }
 
   /// Updates a record in the table
-  Future<int> update(Update st) => exec(composeUpdate(st));
+  Future<int> update(Update st) async {
+    var ret = await exec(composeUpdate(st));
+    return ret as int;
+  }
 
   /// Deletes a record from the table
-  Future<int> remove(Remove st) => exec(composeRemove(st));
+  Future<int> remove(Remove st) async {
+    var ret = await exec(composeRemove(st));
+    return ret;
+  }
 
   @override
   Future<void> alter(Alter statement) async {

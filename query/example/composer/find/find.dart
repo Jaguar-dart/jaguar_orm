@@ -8,16 +8,15 @@ main() {
   Find find = Sql.find('posts')
       .sel('message')
       .where(IntField('likes').eq(10) & IntField('replies').eq(5))
-      .where(eq('author', 'teja') | like('author', 'kleak*'))
       .orderBy('author')
       .limit(10)
       .groupByMany(['message', 'likes']);
   print(composeFind(find));
 
   Find colCompare = Sql.find('posts')
-      .where(Field('author').eq(col('authors.id')))
-      .orderBy('author', desc: false)
-      .limit(10)
+      .where(col('authors.id').eq(col('author')))
+      .orderBy('author', desc: true)
+      .offset(10)
       .groupByMany(['message', 'likes']);
   print(composeFind(colCompare));
 }
