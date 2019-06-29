@@ -21,12 +21,16 @@ abstract class Adapter<ConnType> {
       {Connection<ConnType> withConn}) async {
     if (withConn == null) {
       withConn = await open();
+      T ret;
       try {
-        return task(withConn);
+        ret = await task(withConn);
       } catch (e) {
         await withConn.release();
         rethrow;
+      } finally {
+        await withConn.release();
       }
+      return ret;
     }
 
     return await task(withConn);
