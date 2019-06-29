@@ -19,7 +19,7 @@ class Table implements RowSource {
 }
 
 class Row {
-  final List<dynamic> columns;
+  final List<Expression> columns;
 
   Row(this.columns);
 }

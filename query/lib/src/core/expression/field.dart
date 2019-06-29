@@ -16,23 +16,15 @@ class Field<ValType> extends Expression implements I {
 
   const Field(this.name);
 
-  Expression _toExp(/* ValType | Expression */ value) {
-    value = Literal.toLiteral(value);
-    if (value is! Expression) {
-      throw ArgumentError.value(value, 'value',
-          'Must be Expression | bool | int | double | String | DateTime | Duration');
-    }
-    return value;
-  }
-
-  I aliasAs(String tableAlias) => I('$tableAlias.$name');
+  SelClause aliasAs(String alias, {String prefix}) =>
+      SelClause(I((prefix != null ? '$prefix.' : '') + name), alias: alias);
 
   /// Returns a "set column" clause
   ///
   ///     UpdateStatement update = UpdateStatement();
   ///     Field<int> age = Field<int>('age');
   ///     update.set(age.set(20));
-  SetColumn<ValType> set(ValType value) => SetColumn<ValType>(name, value); // TODO use Expression ins tead of ValType
+  SetColumn set(/* literal | Expression */ value) => SetColumn(name, value);
 }
 
 /// IntField is a convenience DSL used to construct queries in a concise and

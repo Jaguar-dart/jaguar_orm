@@ -7,8 +7,8 @@ import 'package:jaguar_query_postgres/composer.dart';
 main() {
   Insert insert = Sql.insert('posts')
       .setInt('id', 1)
-      .setValue('message', 'How are you?')
-      .setValue('author', 'teja')
+      .set('message', 'How are you?')
+      .set('author', 'teja')
       .setValues({'likes': 0, 'replies': 0});
   print(composeInsert(insert));
 }

@@ -9,7 +9,7 @@ String composeUpdate(final Update st) {
   sb.write(' SET ');
 
   sb.write(info.values.keys
-      .map((String key) => '$key=${composeValue(info.values[key])}')
+      .map((String key) => '$key=${composeExpression(info.values[key])}')
       .join(', '));
 
   if (info.where != null) {
