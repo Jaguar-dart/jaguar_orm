@@ -12,6 +12,7 @@ environment:
 
 dependencies:
   meta: ^1.1.5
+  quiver_hashcode: ^2.0.0
 
 dev_dependencies:
   test: ^1.3.0

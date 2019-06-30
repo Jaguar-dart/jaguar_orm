@@ -20,8 +20,8 @@ class Find implements Statement, Whereable, RowSource {
 
   Expression _offset;
 
-  Find(/* String | RowSource */ from, {String alias, Expression where}) {
-    if (from is String) from = Table(from);
+  Find(/* Symbol | RowSource */ from, {String alias, Expression where}) {
+    if (from is Symbol) from = Table(from);
 
     if (from is! RowSource) {
       throw UnsupportedError('Unsupported from expression!');
@@ -90,31 +90,21 @@ class Find implements Statement, Whereable, RowSource {
   /// Selects a [column] to be fetched from the [table]. Use [alias] to alias
   /// the column name.
   Find sel(/* String | Expression */ column, {String alias}) {
-    if (column is String) column = I(column);
+    if (column is String) column = col(column);
     _column.add(SelClause(column, alias: alias));
     return this;
   }
 
   /// Selects a [column] to be fetched. Use [alias] to alias the column name.
   Find selAll() {
-    _column.add(SelClause(I('*')));
+    _column.add(SelClause(col('*')));
     return this;
   }
 
   /// Selects many [columns] to be fetched in the given [table]. Use [alias] to
   /// alias the column name.
-  Find selMany(Iterable<String> columns, {String table}) {
-    if (table == null) {
-      for (String columnName in columns) {
-        final String name = columnName;
-        _column.add(SelClause(I(name)));
-      }
-    } else {
-      for (String columnName in columns) {
-        final String name = table + '.' + columnName;
-        _column.add(SelClause(I(name)));
-      }
-    }
+  Find selMany(Iterable< /* String | Expression */ dynamic> columns) {
+    columns.forEach(sel);
     return this;
   }
 

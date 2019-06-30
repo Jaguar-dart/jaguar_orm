@@ -407,16 +407,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   }
 
   Future<int> detachProduct(Product model, {Connection withConn}) async {
-    final dels = await findByProduct(model.id, withConn: withConn);
-    if (dels.isNotEmpty) {
-      await removeByProduct(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(productItemsBean.id.eq(t.productListId));
-      }
-      return await productItemsBean.removeWhere(exp, withConn: withConn);
-    }
-    return 0;
+    return removeByProduct(model.id, withConn: withConn);
   }
 
   Future<List<ProductItems>> fetchByProduct(Product model,
@@ -424,11 +415,33 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     final pivots = await findByProduct(model.id);
 // Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
+
+    final duplicates = <Tuple, int>{};
+
     final exp = Or();
     for (final t in pivots) {
-      exp.or(productItemsBean.id.eq(t.productListId));
+      final tup = Tuple([t.productListId]);
+      if (duplicates[tup] == null) {
+        exp.or(productItemsBean.id.eq(t.productListId));
+        duplicates[tup] = 1;
+      } else {
+        duplicates[tup] += 1;
+      }
     }
-    return await productItemsBean.findWhere(exp, withConn: withConn);
+
+    final returnList =
+        await productItemsBean.findWhere(exp, withConn: withConn);
+    if (duplicates.length != pivots.length) {
+      for (Tuple tup in duplicates.keys) {
+        int n = duplicates[tup] - 1;
+        for (int i = 0; i < n; i++) {
+          returnList
+              .add(await productItemsBean.find(tup[0], withConn: withConn));
+        }
+      }
+    }
+
+    return returnList;
   }
 
   Future<List<ProductItemsPivot>> findByProductItems(String productListId,
@@ -463,16 +476,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<int> detachProductItems(ProductItems model,
       {Connection withConn}) async {
-    final dels = await findByProductItems(model.id, withConn: withConn);
-    if (dels.isNotEmpty) {
-      await removeByProductItems(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(productBean.id.eq(t.productId));
-      }
-      return await productBean.removeWhere(exp, withConn: withConn);
-    }
-    return 0;
+    return removeByProductItems(model.id, withConn: withConn);
   }
 
   Future<List<Product>> fetchByProductItems(ProductItems model,
@@ -480,11 +484,31 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     final pivots = await findByProductItems(model.id);
 // Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
+
+    final duplicates = <Tuple, int>{};
+
     final exp = Or();
     for (final t in pivots) {
-      exp.or(productBean.id.eq(t.productId));
+      final tup = Tuple([t.productId]);
+      if (duplicates[tup] == null) {
+        exp.or(productBean.id.eq(t.productId));
+        duplicates[tup] = 1;
+      } else {
+        duplicates[tup] += 1;
+      }
     }
-    return await productBean.findWhere(exp, withConn: withConn);
+
+    final returnList = await productBean.findWhere(exp, withConn: withConn);
+    if (duplicates.length != pivots.length) {
+      for (Tuple tup in duplicates.keys) {
+        int n = duplicates[tup] - 1;
+        for (int i = 0; i < n; i++) {
+          returnList.add(await productBean.find(tup[0], withConn: withConn));
+        }
+      }
+    }
+
+    return returnList;
   }
 
   Future<dynamic> attach(ProductItems one, Product two,

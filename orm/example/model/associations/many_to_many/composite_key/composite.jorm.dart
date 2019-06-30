@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'simple.dart';
+part of 'composite.dart';
 
 // **************************************************************************
 // BeanGenerator
@@ -50,12 +50,12 @@ abstract class _TodoListBean implements Bean<TodoList> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(length: 50),
+      Str(),
       isPrimary: true,
     );
     st.addByType(
       description.name,
-      Str(length: 50),
+      Str(),
     );
     return adapter.createTable(st, withConn: withConn);
   }
@@ -264,15 +264,18 @@ abstract class _TodoListBean implements Bean<TodoList> {
 
 abstract class _CategoryBean implements Bean<Category> {
   final id = StrField('id');
+  final id2 = StrField('id2');
   final name = StrField('name');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
+        id2.name: id2,
         name.name: name,
       };
   Category fromMap(Map map) {
     Category model = Category();
     model.id = adapter.parseValue(map['id']);
+    model.id2 = adapter.parseValue(map['id2']);
     model.name = adapter.parseValue(map['name']);
 
     return model;
@@ -284,13 +287,18 @@ abstract class _CategoryBean implements Bean<Category> {
 
     if (only == null && !onlyNonNull) {
       ret.add(id.set(model.id));
+      ret.add(id2.set(model.id2));
       ret.add(name.set(model.name));
     } else if (only != null) {
       if (only.contains(id.name)) ret.add(id.set(model.id));
+      if (only.contains(id2.name)) ret.add(id2.set(model.id2));
       if (only.contains(name.name)) ret.add(name.set(model.name));
     } else /* if (onlyNonNull) */ {
       if (model.id != null) {
         ret.add(id.set(model.id));
+      }
+      if (model.id2 != null) {
+        ret.add(id2.set(model.id2));
       }
       if (model.name != null) {
         ret.add(name.set(model.name));
@@ -305,12 +313,17 @@ abstract class _CategoryBean implements Bean<Category> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       id.name,
-      Str(length: 50),
+      Str(),
+      isPrimary: true,
+    );
+    st.addByType(
+      id2.name,
+      Str(),
       isPrimary: true,
     );
     st.addByType(
       name.name,
-      Str(length: 50),
+      Str(),
     );
     return adapter.createTable(st, withConn: withConn);
   }
@@ -326,7 +339,7 @@ abstract class _CategoryBean implements Bean<Category> {
     if (cascade) {
       Category newModel;
       if (model.todolists != null) {
-        newModel ??= await find(model.id, withConn: withConn);
+        newModel ??= await find(model.id, model.id2, withConn: withConn);
         for (final child in model.todolists) {
           await todoListBean.insert(child,
               cascade: cascade, withConn: withConn);
@@ -371,7 +384,7 @@ abstract class _CategoryBean implements Bean<Category> {
     if (cascade) {
       Category newModel;
       if (model.todolists != null) {
-        newModel ??= await find(model.id, withConn: withConn);
+        newModel ??= await find(model.id, model.id2, withConn: withConn);
         for (final child in model.todolists) {
           await todoListBean.upsert(child,
               cascade: cascade, withConn: withConn);
@@ -414,8 +427,10 @@ abstract class _CategoryBean implements Bean<Category> {
       Set<String> only,
       bool onlyNonNull = false,
       Connection withConn}) async {
-    final Update update = updater.where(this.id.eq(model.id)).setMany(
-        toSetColumns(model,
+    final Update update = updater
+        .where(this.id.eq(model.id))
+        .where(this.id2.eq(model.id2))
+        .setMany(toSetColumns(model,
             only: only, onlyNonNull: onlyNonNull, update: true));
     final ret = adapter.update(update, withConn: withConn);
     if (cascade) {
@@ -450,7 +465,7 @@ abstract class _CategoryBean implements Bean<Category> {
         data.add(toSetColumns(model,
                 only: only, onlyNonNull: onlyNonNull, update: true)
             .toList());
-        where.add(this.id.eq(model.id));
+        where.add(this.id.eq(model.id).and(this.id2.eq(model.id2)));
       }
       final UpdateMany update = updateser.addAll(data, where);
       await adapter.updateMany(update, withConn: withConn);
@@ -458,9 +473,9 @@ abstract class _CategoryBean implements Bean<Category> {
     }
   }
 
-  Future<Category> find(String id,
+  Future<Category> find(String id, String id2,
       {bool preload = false, bool cascade = false, Connection withConn}) async {
-    final Find find = finder.where(this.id.eq(id));
+    final Find find = finder.where(this.id.eq(id)).where(this.id2.eq(id2));
     final Category model = await findOne(find, withConn: withConn);
     if (preload && model != null) {
       await this.preload(model, cascade: cascade, withConn: withConn);
@@ -468,15 +483,15 @@ abstract class _CategoryBean implements Bean<Category> {
     return model;
   }
 
-  Future<int> remove(String id,
+  Future<int> remove(String id, String id2,
       {bool cascade = false, Connection withConn}) async {
     if (cascade) {
-      final Category newModel = await find(id, withConn: withConn);
+      final Category newModel = await find(id, id2, withConn: withConn);
       if (newModel != null) {
         await pivotBean.detachCategory(newModel, withConn: withConn);
       }
     }
-    final Remove remove = remover.where(this.id.eq(id));
+    final Remove remove = remover.where(this.id.eq(id)).where(this.id2.eq(id2));
     return adapter.remove(remove, withConn: withConn);
   }
 
@@ -485,7 +500,7 @@ abstract class _CategoryBean implements Bean<Category> {
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
-      remove.or(this.id.eq(model.id));
+      remove.or(this.id.eq(model.id) | this.id2.eq(model.id2));
     }
     return adapter.remove(remove, withConn: withConn);
   }
@@ -520,15 +535,18 @@ abstract class _CategoryBean implements Bean<Category> {
 abstract class _PivotBean implements Bean<Pivot> {
   final todolistId = StrField('todolist_id');
   final categoryId = StrField('category_id');
+  final categoryId2 = StrField('category_id2');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         todolistId.name: todolistId,
         categoryId.name: categoryId,
+        categoryId2.name: categoryId2,
       };
   Pivot fromMap(Map map) {
     Pivot model = Pivot();
     model.todolistId = adapter.parseValue(map['todolist_id']);
     model.categoryId = adapter.parseValue(map['category_id']);
+    model.categoryId2 = adapter.parseValue(map['category_id2']);
 
     return model;
   }
@@ -540,17 +558,23 @@ abstract class _PivotBean implements Bean<Pivot> {
     if (only == null && !onlyNonNull) {
       ret.add(todolistId.set(model.todolistId));
       ret.add(categoryId.set(model.categoryId));
+      ret.add(categoryId2.set(model.categoryId2));
     } else if (only != null) {
       if (only.contains(todolistId.name))
         ret.add(todolistId.set(model.todolistId));
       if (only.contains(categoryId.name))
         ret.add(categoryId.set(model.categoryId));
+      if (only.contains(categoryId2.name))
+        ret.add(categoryId2.set(model.categoryId2));
     } else /* if (onlyNonNull) */ {
       if (model.todolistId != null) {
         ret.add(todolistId.set(model.todolistId));
       }
       if (model.categoryId != null) {
         ret.add(categoryId.set(model.categoryId));
+      }
+      if (model.categoryId2 != null) {
+        ret.add(categoryId2.set(model.categoryId2));
       }
     }
 
@@ -562,13 +586,18 @@ abstract class _PivotBean implements Bean<Pivot> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addByType(
       todolistId.name,
-      Str(length: 50),
+      Str(),
       foreign: References(todoListBean.tableName, "id"),
     );
     st.addByType(
       categoryId.name,
-      Str(length: 50),
+      Str(),
       foreign: References(categoryBean.tableName, "id"),
+    );
+    st.addByType(
+      categoryId2.name,
+      Str(),
+      foreign: References(categoryBean.tableName, "id2"),
     );
     return adapter.createTable(st, withConn: withConn);
   }
@@ -673,9 +702,10 @@ abstract class _PivotBean implements Bean<Pivot> {
 
     final exp = Or();
     for (final t in pivots) {
-      final tup = Tuple([t.categoryId]);
+      final tup = Tuple([t.categoryId, t.categoryId2]);
       if (duplicates[tup] == null) {
-        exp.or(categoryBean.id.eq(t.categoryId));
+        exp.or(categoryBean.id.eq(t.categoryId) &
+            categoryBean.id2.eq(t.categoryId2));
         duplicates[tup] = 1;
       } else {
         duplicates[tup] += 1;
@@ -683,11 +713,13 @@ abstract class _PivotBean implements Bean<Pivot> {
     }
 
     final returnList = await categoryBean.findWhere(exp, withConn: withConn);
+
     if (duplicates.length != pivots.length) {
       for (Tuple tup in duplicates.keys) {
         int n = duplicates[tup] - 1;
         for (int i = 0; i < n; i++) {
-          returnList.add(await categoryBean.find(tup[0], withConn: withConn));
+          returnList
+              .add(await categoryBean.find(tup[0], tup[1], withConn: withConn));
         }
       }
     }
@@ -695,9 +727,11 @@ abstract class _PivotBean implements Bean<Pivot> {
     return returnList;
   }
 
-  Future<List<Pivot>> findByCategory(String categoryId,
+  Future<List<Pivot>> findByCategory(String categoryId, String categoryId2,
       {bool preload = false, bool cascade = false, Connection withConn}) async {
-    final Find find = finder.where(this.categoryId.eq(categoryId));
+    final Find find = finder
+        .where(this.categoryId.eq(categoryId))
+        .where(this.categoryId2.eq(categoryId2));
     return findMany(find, withConn: withConn);
   }
 
@@ -707,27 +741,31 @@ abstract class _PivotBean implements Bean<Pivot> {
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Category model in models) {
-      find.or(this.categoryId.eq(model.id));
+      find.or(this.categoryId.eq(model.id) & this.categoryId2.eq(model.id2));
     }
     return findMany(find, withConn: withConn);
   }
 
-  Future<int> removeByCategory(String categoryId, {Connection withConn}) async {
-    final Remove rm = remover.where(this.categoryId.eq(categoryId));
+  Future<int> removeByCategory(String categoryId, String categoryId2,
+      {Connection withConn}) async {
+    final Remove rm = remover
+        .where(this.categoryId.eq(categoryId))
+        .where(this.categoryId2.eq(categoryId2));
     return await adapter.remove(rm, withConn: withConn);
   }
 
   void associateCategory(Pivot child, Category parent) {
     child.categoryId = parent.id;
+    child.categoryId2 = parent.id2;
   }
 
   Future<int> detachCategory(Category model, {Connection withConn}) async {
-    return removeByCategory(model.id, withConn: withConn);
+    return removeByCategory(model.id, model.id2, withConn: withConn);
   }
 
   Future<List<TodoList>> fetchByCategory(Category model,
       {Connection withConn}) async {
-    final pivots = await findByCategory(model.id);
+    final pivots = await findByCategory(model.id, model.id2);
 // Return if model has no pivots. If this is not done, all records will be removed!
     if (pivots.isEmpty) return [];
 
@@ -762,6 +800,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     final ret = Pivot();
     ret.todolistId = one.id;
     ret.categoryId = two.id;
+    ret.categoryId2 = two.id2;
     if (!upsert) {
       return insert(ret, withConn: withConn);
     } else {

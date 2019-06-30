@@ -9,7 +9,6 @@ import 'dart:core';
 import 'dart:core' as core;
 
 import 'package:jaguar_query/src/adapter/adapter.dart';
-import 'package:jaguar_query/src/operators/operators.dart' as q;
 
 import 'datatype/datatype.dart';
 import 'statement/create/create.dart';
