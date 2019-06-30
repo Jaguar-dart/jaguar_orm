@@ -15,7 +15,7 @@ class Create implements Statement {
   final Map<String, CreateCol> _columns = {};
 
   Create(this.name, {this.ifNotExists = false}) {
-    _immutable = ImmutableCreateStatement(this);
+    _immutable = ImCreate(this);
   }
 
   Create addByType(String name, DataType type,
@@ -107,15 +107,15 @@ class Create implements Statement {
   Future<void> exec(/* Connection | Adapter */ connection) =>
       connection.createTable(this);
 
-  ImmutableCreateStatement _immutable;
+  ImCreate _immutable;
 
-  ImmutableCreateStatement get asImmutable => _immutable;
+  ImCreate get asImmutable => _immutable;
 }
 
-class ImmutableCreateStatement {
+class ImCreate {
   final Create _inner;
 
-  ImmutableCreateStatement(this._inner)
+  ImCreate(this._inner)
       : columns = UnmodifiableMapView<String, CreateCol>(_inner._columns);
 
   String get name => _inner.name;

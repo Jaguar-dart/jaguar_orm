@@ -37,7 +37,7 @@ String composeProperty(final Property col) {
 }
 
 String composeCreate(final Create create) {
-  final ImmutableCreateStatement info = create.asImmutable;
+  final ImCreate info = create.asImmutable;
   final sb = StringBuffer();
 
   sb.write('CREATE TABLE');

@@ -13,7 +13,7 @@ class InsertMany implements Statement {
   final List<Map<String, dynamic>> _bulkValues = [];
 
   InsertMany(this.name) {
-    _immutable = ImmutableInsertManyStatement(this);
+    _immutable = ImInsertMany(this);
   }
 
   /// Adds a single [row] to be inserted.
@@ -50,16 +50,16 @@ class InsertMany implements Statement {
   /// Executes the statement with the given connection.
   Future<T> exec<T>(Connection connection) => connection.insertMany<T>(this);
 
-  ImmutableInsertManyStatement _immutable;
+  ImInsertMany _immutable;
 
   /// Read-only representation of this statement.
-  ImmutableInsertManyStatement get asImmutable => _immutable;
+  ImInsertMany get asImmutable => _immutable;
 }
 
-class ImmutableInsertManyStatement {
+class ImInsertMany {
   final InsertMany _inner;
 
-  ImmutableInsertManyStatement(this._inner)
+  ImInsertMany(this._inner)
       : values = UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
             _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 

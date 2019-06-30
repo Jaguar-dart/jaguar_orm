@@ -6,7 +6,7 @@ class UpdateMany implements Statement /*, Whereable */ {
   final List<Update> _bulkValues = [];
 
   UpdateMany(this.name) {
-    _immutable = ImmutableUpdateManyStatement(this);
+    _immutable = ImUpdateMany(this);
   }
 
   UpdateMany addAll(List<List<SetColumn>> items, List<Expression> where) {
@@ -25,20 +25,20 @@ class UpdateMany implements Statement /*, Whereable */ {
 
   Future<T> exec<T>(Connection connection) => connection.updateMany(this);
 
-  ImmutableUpdateManyStatement _immutable;
+  ImUpdateMany _immutable;
 
   /// Read-only representation of this statement.
-  ImmutableUpdateManyStatement get asImmutable => _immutable;
+  ImUpdateMany get asImmutable => _immutable;
 }
 
-class ImmutableUpdateManyStatement {
+class ImUpdateMany {
   final UpdateMany _inner;
 
-  ImmutableUpdateManyStatement(this._inner)
-      : values = UnmodifiableListView<ImmutableUpdateStatement>(
+  ImUpdateMany(this._inner)
+      : values = UnmodifiableListView<ImUpdate>(
             _inner._bulkValues.map((values) => values.asImmutable));
 
   String get tableName => _inner.name;
 
-  final UnmodifiableListView<ImmutableUpdateStatement> values;
+  final UnmodifiableListView<ImUpdate> values;
 }

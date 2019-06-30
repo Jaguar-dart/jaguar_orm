@@ -9,7 +9,7 @@ class Update implements Statement, Settable, Whereable {
 
   Update(this.name, {Expression where}) {
     _where = where;
-    _immutable = ImmutableUpdateStatement(this);
+    _immutable = ImUpdate(this);
   }
 
   /// Set the the [value] of given column ([field]).
@@ -150,15 +150,15 @@ class Update implements Statement, Settable, Whereable {
 
   Future<int> exec(Connection connection) => connection.update(this);
 
-  ImmutableUpdateStatement _immutable;
+  ImUpdate _immutable;
 
-  ImmutableUpdateStatement get asImmutable => _immutable;
+  ImUpdate get asImmutable => _immutable;
 }
 
-class ImmutableUpdateStatement {
+class ImUpdate {
   final Update _inner;
 
-  ImmutableUpdateStatement(this._inner)
+  ImUpdate(this._inner)
       : values = UnmodifiableMapView<String, Expression>(_inner._values);
 
   String get tableName => _inner.name;

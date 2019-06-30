@@ -16,7 +16,7 @@ class Upsert implements Statement {
   String _id;
 
   Upsert(this.name) {
-    _immutable = ImmutableUpsertStatement(this);
+    _immutable = ImUpsert(this);
   }
 
   /// Id is the auto-generated primary key that is set by the database. [Connection]
@@ -79,16 +79,16 @@ class Upsert implements Statement {
   /// Executes the statement with the given connection.
   Future<T> exec<T>(Connection connection) => connection.upsert<T>(this);
 
-  ImmutableUpsertStatement _immutable;
+  ImUpsert _immutable;
 
   /// Read-only representation of this statement.
-  ImmutableUpsertStatement get asImmutable => _immutable;
+  ImUpsert get asImmutable => _immutable;
 }
 
-class ImmutableUpsertStatement {
+class ImUpsert {
   final Upsert _inner;
 
-  ImmutableUpsertStatement(this._inner)
+  ImUpsert(this._inner)
       : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get table => _inner.name;
