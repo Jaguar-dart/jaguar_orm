@@ -151,6 +151,12 @@ abstract class Expression {
   }
 }
 
+class E extends Expression {
+  final String expr;
+
+  E(this.expr);
+}
+
 /// [I] represents an identifier.
 class I extends Expression {
   final String name;

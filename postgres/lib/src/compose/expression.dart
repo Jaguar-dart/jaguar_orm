@@ -11,6 +11,7 @@ String composeExpression(final Expression exp) {
 
   if (exp is I) return exp.name;
   if (exp is Literal) return composeLiteral(exp);
+  if (exp is E) return exp.expr;
   if (exp is Func) return composeFunc(exp);
 
   if (exp is Or) {
