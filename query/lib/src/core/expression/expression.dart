@@ -157,6 +157,12 @@ class E extends Expression {
   E(this.expr);
 }
 
+class Not extends Expression {
+  final Expression expr;
+
+  Not(this.expr);
+}
+
 /// [I] represents an identifier.
 class I extends Expression {
   final String name;
