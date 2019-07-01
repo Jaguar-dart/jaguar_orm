@@ -683,6 +683,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     }
 
     final returnList = await categoryBean.findWhere(exp, withConn: withConn);
+
     if (duplicates.length != pivots.length) {
       for (Tuple tup in duplicates.keys) {
         int n = duplicates[tup] - 1;
@@ -745,6 +746,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     }
 
     final returnList = await todoListBean.findWhere(exp, withConn: withConn);
+
     if (duplicates.length != pivots.length) {
       for (Tuple tup in duplicates.keys) {
         int n = duplicates[tup] - 1;

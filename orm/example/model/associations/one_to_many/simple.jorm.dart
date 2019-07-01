@@ -446,6 +446,11 @@ abstract class _PostBean implements Bean<Post> {
     child.authorId = parent.id;
   }
 
+  Future<List<Author>> fetchAuthor(Post model, {Connection withConn}) async {
+    return authorBean.findWhere(authorBean.id.eq(model.authorId),
+        withConn: withConn);
+  }
+
   AuthorBean get authorBean => beanRepo[AuthorBean];
   BeanRepo get beanRepo;
 }

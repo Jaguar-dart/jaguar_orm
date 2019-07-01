@@ -216,6 +216,10 @@ abstract class _CartItemBean implements Bean<CartItem> {
     child.cartId = parent.id;
   }
 
+  Future<List<Cart>> fetchCart(CartItem model, {Connection withConn}) async {
+    return cartBean.findWhere(cartBean.id.eq(model.cartId), withConn: withConn);
+  }
+
   CartBean get cartBean => beanRepo[CartBean];
   BeanRepo get beanRepo;
 }

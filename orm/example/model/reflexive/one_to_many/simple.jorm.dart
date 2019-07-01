@@ -287,6 +287,12 @@ abstract class _DirectoryBean implements Bean<Directory> {
     child.parentId = parent.id;
   }
 
+  Future<List<Directory>> fetchDirectory(Directory model,
+      {Connection withConn}) async {
+    return directoryBean.findWhere(directoryBean.id.eq(model.parentId),
+        withConn: withConn);
+  }
+
   Future<Directory> preload(Directory model,
       {bool cascade = false, Connection withConn}) async {
     model.child = await directoryBean.findByDirectory(model.id,

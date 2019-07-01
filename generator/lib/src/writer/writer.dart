@@ -43,6 +43,12 @@ class Writer {
       if (ass.isManyToMany) {
         _writeManyToManyDetach(ass);
         _writeManyToManyFetchOther(ass);
+      } else {
+        if (!ass.toMany) {
+          _writeOneToOneFetch(ass);
+        } else {
+          _writeOneToManyFetch(ass);
+        }
       }
     }
 
@@ -959,6 +965,36 @@ class Writer {
     _writeln('}');
   }
 
+  void _writeOneToOneFetch(AssociationByRelation m) {
+    _write('Future<${m.modelName}> fetch${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _writeln('(${_b.modelType} model, {Connection withConn}) async {');
+    _write('return ${m.beanInstanceName}.findOneWhere(');
+    for (int i = 0; i < m.fields.length; i++) {
+      _writeln(
+          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field}),');
+    }
+    _writeln(' withConn: withConn);');
+    _writeln('}');
+  }
+
+  void _writeOneToManyFetch(AssociationByRelation m) {
+    _write('Future<List<${m.modelName}>> fetch${_cap(m.modelName)}');
+    if (m is AssociationByRelation && m.name != null) {
+      _write('_for${m.name}');
+    }
+    _writeln('(${_b.modelType} model, {Connection withConn}) async {');
+    _write('return ${m.beanInstanceName}.findWhere(');
+    for (int i = 0; i < m.fields.length; i++) {
+      _writeln(
+          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field}),');
+    }
+    _writeln(' withConn: withConn);');
+    _writeln('}');
+  }
+
   void _writeManyToManyDetach(AssociationByRelation m) {
     _writeln('Future<int> detach${_cap(m.modelName)}');
     if (m is AssociationByRelation && m.name != null) {
@@ -980,8 +1016,7 @@ class Writer {
     if (m is AssociationByRelation && m.name != null) {
       _write('_for${m.name}');
     }
-    _w.writeln(
-        '(${_cap(m.modelName)} model, {Connection withConn}) async {');
+    _w.writeln('(${_cap(m.modelName)} model, {Connection withConn}) async {');
     _write('final pivots = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(');');
@@ -1016,7 +1051,6 @@ class Writer {
     _writeln('duplicates[tup] += 1;');
     _writeln('}');
     _writeln();
-
 
     _writeln('}');
     _writeln();

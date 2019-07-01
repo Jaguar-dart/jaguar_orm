@@ -431,6 +431,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
     final returnList =
         await productItemsBean.findWhere(exp, withConn: withConn);
+
     if (duplicates.length != pivots.length) {
       for (Tuple tup in duplicates.keys) {
         int n = duplicates[tup] - 1;
@@ -499,6 +500,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     }
 
     final returnList = await productBean.findWhere(exp, withConn: withConn);
+
     if (duplicates.length != pivots.length) {
       for (Tuple tup in duplicates.keys) {
         int n = duplicates[tup] - 1;
@@ -817,6 +819,12 @@ abstract class _ProductBean implements Bean<Product> {
 
   void associateCategory(Product child, Category parent) {
     child.categoryId = parent.id;
+  }
+
+  Future<List<Category>> fetchCategory(Product model,
+      {Connection withConn}) async {
+    return categoryBean.findWhere(categoryBean.id.eq(model.categoryId),
+        withConn: withConn);
   }
 
   Future<Product> preload(Product model,
