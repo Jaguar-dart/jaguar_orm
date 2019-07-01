@@ -972,12 +972,14 @@ class Writer {
     }
     _writeln('(${_b.modelType} model, {Connection withConn}) async {');
     _write('return ${m.beanInstanceName}.findOneWhere(');
-    final keys = <String>[];
-    for (int i = 0; i < m.fields.length; i++) {
-      keys.add(
-          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field})');
+    {
+      final keys = <String>[];
+      for (int i = 0; i < m.fields.length; i++) {
+        keys.add(
+            '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field})');
+      }
+      _write(keys.join('&'));
     }
-    _write(keys.join('&'));
     _writeln(', withConn: withConn);');
     _writeln('}');
   }
@@ -989,11 +991,15 @@ class Writer {
     }
     _writeln('(${_b.modelType} model, {Connection withConn}) async {');
     _write('return ${m.beanInstanceName}.findWhere(');
-    for (int i = 0; i < m.fields.length; i++) {
-      _writeln(
-          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field}),');
+    {
+      final keys = <String>[];
+      for (int i = 0; i < m.fields.length; i++) {
+        keys.add(
+            '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field})');
+      }
+      _write(keys.join('&'));
     }
-    _writeln(' withConn: withConn);');
+    _writeln(', withConn: withConn);');
     _writeln('}');
   }
 

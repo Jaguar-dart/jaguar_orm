@@ -13,6 +13,7 @@ String composeExpression(final Expression exp) {
   if (exp is Literal) return composeLiteral(exp);
   if (exp is E) return exp.expr;
   if (exp is Not) return 'NOT ${composeExpression(exp.expr)}';
+  if (exp is Exists) return 'EXISTS (${composeExpression(exp.expr)})';
   if (exp is Func) return composeFunc(exp);
 
   if (exp is Or) {

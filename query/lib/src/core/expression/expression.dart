@@ -163,6 +163,12 @@ class Not extends Expression {
   Not(this.expr);
 }
 
+class Exists extends Expression {
+  final Expression expr;
+
+  Exists(this.expr);
+}
+
 /// [I] represents an identifier.
 class I extends Expression {
   final String name;
