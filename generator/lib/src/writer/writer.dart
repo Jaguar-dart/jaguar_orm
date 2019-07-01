@@ -612,7 +612,9 @@ class Writer {
     final String args =
         _b.primary.map((ParsedField f) => '${f.type} ${f.field}').join(',');
     _w.write(args);
-    _w.writeln(', {bool cascade = false, Connection withConn}) async {');
+    _w.write(', {bool cascade = false, Connection withConn');
+    if (_b.hasManyToManyRelation) _write(', bool removeOrphans = false');
+    _writeln('}) async {');
 
     _writeln('if (cascade) {');
     _w.writeln('final ${_b.modelType} newModel = ');
@@ -631,7 +633,7 @@ class Writer {
         _writeln(', withConn: withConn);');
       } else if (p is PreloadManyToMany) {
         _write(
-            'await ${p.beanInstanceName}.detach${_b.modelType}(newModel, withConn: withConn);');
+            'await ${p.beanInstanceName}.detach${_b.modelType}(newModel, withConn: withConn, removeOrphans: removeOrphans);');
       }
     }
     _w.writeln('}');
@@ -1008,7 +1010,8 @@ class Writer {
     if (m is AssociationByRelation && m.name != null) {
       _write('_for${m.name}');
     }
-    _w.write('(${_cap(m.modelName)} model, {Connection withConn}) async {');
+    _w.write(
+        '(${_cap(m.modelName)} model, {Connection withConn, bool removeOrphans = false}) async {');
     _writeln('int ret = 0;');
     _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
@@ -1018,21 +1021,36 @@ class Writer {
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(', withConn: withConn);');
     final String beanName = m.manyToManyTarget.beanInstanceName;
+    _writeln('if(removeOrphans) {');
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
     AssociationByRelation o = _b.getMatchingManyToMany(m);
-    for (int i = 0; i < o.fields.length; i++) {
-      _write(
-          '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
-      if (i < o.fields.length - 1) {
-        _write('&');
+    {
+      _write('(');
+      final keys = <String>[];
+      for (int i = 0; i < o.fields.length; i++) {
+        keys.add(
+            '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
       }
+      _write(keys.join(' & '));
+      _write(')');
+    }
+    _write('&');
+    {
+      _write('~exists(finder.sel(nil).where(');
+      final keys = <String>[];
+      for (int i = 0; i < o.fields.length; i++) {
+        keys.add('${o.fields[i].field}.eq(t.${o.fields[i].field})');
+      }
+      _write(keys.join(' & '));
+      _write('))');
     }
     _writeln(');');
     _writeln('}');
 
-    _write('return await $beanName.removeWhere(exp, withConn: withConn);');
+    _writeln('await $beanName.removeWhere(exp, withConn: withConn);');
+    _writeln('}');
     _writeln('}');
     _writeln('return ret;');
     _writeln('}');

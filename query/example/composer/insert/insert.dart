@@ -11,7 +11,7 @@ String insertAuthor(String name) {
 
 String insertPost(int authorId, String message, int likes, int dislikes) {
   Insert insert = Sql.insert('post')
-  .set('authorId', authorId)
+      .set('authorId', authorId)
       .set('message', message)
       .setValues({'likes': likes, 'dislikes': dislikes});
   return composeInsert(insert);

@@ -212,12 +212,14 @@ abstract class _ProductItemsBean implements Bean<ProductItems> {
   }
 
   Future<int> remove(String id,
-      {bool cascade = false, Connection withConn}) async {
+      {bool cascade = false,
+      Connection withConn,
+      bool removeOrphans = false}) async {
     if (cascade) {
       final ProductItems newModel = await find(id, withConn: withConn);
       if (newModel != null) {
         await productItemsPivotBean.detachProductItems(newModel,
-            withConn: withConn);
+            withConn: withConn, removeOrphans: removeOrphans);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
@@ -406,16 +408,21 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     child.productId = parent.id;
   }
 
-  Future<int> detachProduct(Product model, {Connection withConn}) async {
+  Future<int> detachProduct(Product model,
+      {Connection withConn, bool removeOrphans = false}) async {
     int ret = 0;
     final dels = await findByProduct(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
       ret = await removeByProduct(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(productItemsBean.id.eq(t.productListId));
+      if (removeOrphans) {
+        final exp = Or();
+        for (final t in dels) {
+          exp.or((productItemsBean.id.eq(t.productListId)) &
+              ~exists(
+                  finder.sel(nil).where(productListId.eq(t.productListId))));
+        }
+        await productItemsBean.removeWhere(exp, withConn: withConn);
       }
-      return await productItemsBean.removeWhere(exp, withConn: withConn);
     }
     return ret;
   }
@@ -486,16 +493,19 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   }
 
   Future<int> detachProductItems(ProductItems model,
-      {Connection withConn}) async {
+      {Connection withConn, bool removeOrphans = false}) async {
     int ret = 0;
     final dels = await findByProductItems(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
       ret = await removeByProductItems(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(productBean.id.eq(t.productId));
+      if (removeOrphans) {
+        final exp = Or();
+        for (final t in dels) {
+          exp.or((productBean.id.eq(t.productId)) &
+              ~exists(finder.sel(nil).where(productId.eq(t.productId))));
+        }
+        await productBean.removeWhere(exp, withConn: withConn);
       }
-      return await productBean.removeWhere(exp, withConn: withConn);
     }
     return ret;
   }
@@ -786,11 +796,14 @@ abstract class _ProductBean implements Bean<Product> {
   }
 
   Future<int> remove(String id,
-      {bool cascade = false, Connection withConn}) async {
+      {bool cascade = false,
+      Connection withConn,
+      bool removeOrphans = false}) async {
     if (cascade) {
       final Product newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await productItemsPivotBean.detachProduct(newModel, withConn: withConn);
+        await productItemsPivotBean.detachProduct(newModel,
+            withConn: withConn, removeOrphans: removeOrphans);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));

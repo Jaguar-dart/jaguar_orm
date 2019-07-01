@@ -8,6 +8,12 @@ class AliasedRowSource {
   AliasedRowSource(this.source, {this.alias});
 }
 
+class RowSourceExpr extends Expression {
+  final RowSource expr;
+
+  RowSourceExpr(this.expr);
+}
+
 /// Table selector
 abstract class RowSource {}
 
@@ -63,7 +69,8 @@ class JoinedTable {
 
   Expression _on;
 
-  JoinedTable(this._type, /* String | RowSource */ source, {String alias, Expression on}) {
+  JoinedTable(this._type, /* String | RowSource */ source,
+      {String alias, Expression on}) {
     _info = QueryJoinedTableInfo(this);
 
     if (source is String) {

@@ -139,15 +139,19 @@ abstract class Expression {
   }
 
   /// Creates a 'logical and' expression of this expression and the [other]
-  And operator&(Expression exp) {
+  And operator &(Expression exp) {
     And ret = And();
     return ret.and(this).and(exp);
   }
 
   /// Creates a 'logical or' expression of this expression and the [other]
-  Or operator|(Expression exp) {
+  Or operator |(Expression exp) {
     Or ret = Or();
     return ret.or(this).or(exp);
+  }
+
+  Expression operator ~() {
+    return Not(this);
   }
 }
 
@@ -167,6 +171,11 @@ class Exists extends Expression {
   final Expression expr;
 
   Exists(this.expr);
+}
+
+Exists exists(/* RowSource | Expression */ expr) {
+  if (expr is RowSource) expr = RowSourceExpr(expr);
+  return Exists(expr);
 }
 
 /// [I] represents an identifier.

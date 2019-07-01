@@ -45,50 +45,50 @@ class Op {
 
 /// DSL to create 'is equal to' relational condition
 Cond eq(
-    /* Literal | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* Literal | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.Eq.make(lhs, rhs);
 
 /// DSL to create 'is not equal to' relational condition
 Cond ne(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.Ne.make(lhs, rhs);
 
 /// DSL to create 'is greater than' relational condition
 Cond gt(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.Gt.make(lhs, rhs);
 
 /// DSL to create 'is greater than or equal to' relational condition
 Cond gtEq(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.GtEq.make(lhs, rhs);
 
 /// DSL to create 'is less than or equal to' relational condition
 Cond ltEq(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.LtEq.make(lhs, rhs);
 
 /// DSL to create 'is less than' relational condition
 Cond lt(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.Lt.make(lhs, rhs);
 
 /// DSL to create 'is like' relational condition
 Cond like(
-    /* String | Expression */ lhs,
-    /* Literal | Expression */ rhs) =>
+        /* String | Expression */ lhs,
+        /* Literal | Expression */ rhs) =>
     Op.Like.make(lhs, rhs);
 
 /// DSL to create 'in-between' relational condition
 Between between(
-    /* Literal | Expression */ lhs,
-    /* Literal | Expression */ low,
-    /* Literal | Expression */ high) =>
+        /* Literal | Expression */ lhs,
+        /* Literal | Expression */ low,
+        /* Literal | Expression */ high) =>
     Between(Expression.toExpression(lhs), Expression.toExpression(low),
         Expression.toExpression(high));

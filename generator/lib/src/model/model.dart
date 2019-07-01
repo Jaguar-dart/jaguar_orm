@@ -55,6 +55,8 @@ class ParsedBean extends UnAssociatedBean {
   /// A map of association to [AssociationWithoutRelation]
   final Map<DartType, AssociationWithoutRelation> associationsWithoutRelations;
 
+  bool get hasManyToManyRelation => preloads.any((p) => p is PreloadManyToMany);
+
   ParsedBean(
     String name, {
     @required String modelType,

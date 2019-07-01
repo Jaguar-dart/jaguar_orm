@@ -214,11 +214,14 @@ abstract class _TodoListBean implements Bean<TodoList> {
   }
 
   Future<int> remove(String id,
-      {bool cascade = false, Connection withConn}) async {
+      {bool cascade = false,
+      Connection withConn,
+      bool removeOrphans = false}) async {
     if (cascade) {
       final TodoList newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await pivotBean.detachTodoList(newModel, withConn: withConn);
+        await pivotBean.detachTodoList(newModel,
+            withConn: withConn, removeOrphans: removeOrphans);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
@@ -469,11 +472,14 @@ abstract class _CategoryBean implements Bean<Category> {
   }
 
   Future<int> remove(String id,
-      {bool cascade = false, Connection withConn}) async {
+      {bool cascade = false,
+      Connection withConn,
+      bool removeOrphans = false}) async {
     if (cascade) {
       final Category newModel = await find(id, withConn: withConn);
       if (newModel != null) {
-        await pivotBean.detachCategory(newModel, withConn: withConn);
+        await pivotBean.detachCategory(newModel,
+            withConn: withConn, removeOrphans: removeOrphans);
       }
     }
     final Remove remove = remover.where(this.id.eq(id));
@@ -659,16 +665,20 @@ abstract class _PivotBean implements Bean<Pivot> {
     child.todolistId = parent.id;
   }
 
-  Future<int> detachTodoList(TodoList model, {Connection withConn}) async {
+  Future<int> detachTodoList(TodoList model,
+      {Connection withConn, bool removeOrphans = false}) async {
     int ret = 0;
     final dels = await findByTodoList(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
       ret = await removeByTodoList(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(categoryBean.id.eq(t.categoryId));
+      if (removeOrphans) {
+        final exp = Or();
+        for (final t in dels) {
+          exp.or((categoryBean.id.eq(t.categoryId)) &
+              ~exists(finder.sel(nil).where(categoryId.eq(t.categoryId))));
+        }
+        await categoryBean.removeWhere(exp, withConn: withConn);
       }
-      return await categoryBean.removeWhere(exp, withConn: withConn);
     }
     return ret;
   }
@@ -732,16 +742,20 @@ abstract class _PivotBean implements Bean<Pivot> {
     child.categoryId = parent.id;
   }
 
-  Future<int> detachCategory(Category model, {Connection withConn}) async {
+  Future<int> detachCategory(Category model,
+      {Connection withConn, bool removeOrphans = false}) async {
     int ret = 0;
     final dels = await findByCategory(model.id, withConn: withConn);
     if (dels.isNotEmpty) {
       ret = await removeByCategory(model.id, withConn: withConn);
-      final exp = Or();
-      for (final t in dels) {
-        exp.or(todoListBean.id.eq(t.todolistId));
+      if (removeOrphans) {
+        final exp = Or();
+        for (final t in dels) {
+          exp.or((todoListBean.id.eq(t.todolistId)) &
+              ~exists(finder.sel(nil).where(todolistId.eq(t.todolistId))));
+        }
+        await todoListBean.removeWhere(exp, withConn: withConn);
       }
-      return await todoListBean.removeWhere(exp, withConn: withConn);
     }
     return ret;
   }

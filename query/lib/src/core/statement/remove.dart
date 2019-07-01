@@ -38,63 +38,63 @@ class Remove implements Statement, Whereable {
 
   /// Adds an '=' [expression] to 'where' clause.
   Remove eq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).eq(rhs));
 
   /// Adds an '<>' [expression] to 'where' clause.
   Remove ne(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).ne(rhs));
 
   /// Adds an 'IS' [expression] to 'where' clause.
   Remove iss(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).iss(rhs));
 
   /// Adds an 'IS NOT' [expression] to 'where' clause.
   Remove isNot(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).isNot(rhs));
 
   /// Adds an '>' [expression] to 'where' clause.
   Remove gt(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).gt(rhs));
 
   /// Adds an '>=' [expression] to 'where' clause.
   Remove gtEq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).gtEq(rhs));
 
   /// Adds an '<=' [expression] to 'where' clause.
   Remove ltEq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).ltEq(rhs));
 
   /// Adds an '<' [expression] to 'where' clause.
   Remove lt(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).lt(rhs));
 
   /// Adds an '%' [expression] to 'where' clause.
   Remove like(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ rhs) =>
       and(I.make(lhs).like(rhs));
 
   /// Adds an 'between' [expression] to 'where' clause.
   Remove between(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ low,
-      /* Literal | Expression */ high) =>
+          /* String | Field | I */ lhs,
+          /* Literal | Expression */ low,
+          /* Literal | Expression */ high) =>
       and(I.make(lhs).between(low, high));
 
   Future<int> exec(Connection connection) => connection.remove(this);
