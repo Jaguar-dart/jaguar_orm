@@ -972,11 +972,13 @@ class Writer {
     }
     _writeln('(${_b.modelType} model, {Connection withConn}) async {');
     _write('return ${m.beanInstanceName}.findOneWhere(');
+    final keys = <String>[];
     for (int i = 0; i < m.fields.length; i++) {
-      _writeln(
-          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field}),');
+      keys.add(
+          '${m.beanInstanceName}.${m.foreignFields[i].field}.eq(model.${m.fields[i].field})');
     }
-    _writeln(' withConn: withConn);');
+    _write(keys.join('&'));
+    _writeln(', withConn: withConn);');
     _writeln('}');
   }
 

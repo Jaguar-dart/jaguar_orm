@@ -480,7 +480,7 @@ abstract class _AddressBean implements Bean<Address> {
 
   Future<User> fetchUser(Address model, {Connection withConn}) async {
     return userBean.findOneWhere(
-        userBean.id.eq(model.userId), userBean.name.eq(model.userName),
+        userBean.id.eq(model.userId) & userBean.name.eq(model.userName),
         withConn: withConn);
   }
 
