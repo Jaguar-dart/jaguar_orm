@@ -407,7 +407,17 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
   }
 
   Future<int> detachProduct(Product model, {Connection withConn}) async {
-    return removeByProduct(model.id, withConn: withConn);
+    int ret = 0;
+    final dels = await findByProduct(model.id, withConn: withConn);
+    if (dels.isNotEmpty) {
+      ret = await removeByProduct(model.id, withConn: withConn);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(productItemsBean.id.eq(t.productListId));
+      }
+      return await productItemsBean.removeWhere(exp, withConn: withConn);
+    }
+    return ret;
   }
 
   Future<List<ProductItems>> fetchByProduct(Product model,
@@ -477,7 +487,17 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
 
   Future<int> detachProductItems(ProductItems model,
       {Connection withConn}) async {
-    return removeByProductItems(model.id, withConn: withConn);
+    int ret = 0;
+    final dels = await findByProductItems(model.id, withConn: withConn);
+    if (dels.isNotEmpty) {
+      ret = await removeByProductItems(model.id, withConn: withConn);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(productBean.id.eq(t.productId));
+      }
+      return await productBean.removeWhere(exp, withConn: withConn);
+    }
+    return ret;
   }
 
   Future<List<Product>> fetchByProductItems(ProductItems model,

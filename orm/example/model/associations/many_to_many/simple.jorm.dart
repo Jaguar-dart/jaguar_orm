@@ -660,7 +660,17 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<int> detachTodoList(TodoList model, {Connection withConn}) async {
-    return removeByTodoList(model.id, withConn: withConn);
+    int ret = 0;
+    final dels = await findByTodoList(model.id, withConn: withConn);
+    if (dels.isNotEmpty) {
+      ret = await removeByTodoList(model.id, withConn: withConn);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(categoryBean.id.eq(t.categoryId));
+      }
+      return await categoryBean.removeWhere(exp, withConn: withConn);
+    }
+    return ret;
   }
 
   Future<List<Category>> fetchByTodoList(TodoList model,
@@ -723,7 +733,17 @@ abstract class _PivotBean implements Bean<Pivot> {
   }
 
   Future<int> detachCategory(Category model, {Connection withConn}) async {
-    return removeByCategory(model.id, withConn: withConn);
+    int ret = 0;
+    final dels = await findByCategory(model.id, withConn: withConn);
+    if (dels.isNotEmpty) {
+      ret = await removeByCategory(model.id, withConn: withConn);
+      final exp = Or();
+      for (final t in dels) {
+        exp.or(todoListBean.id.eq(t.todolistId));
+      }
+      return await todoListBean.removeWhere(exp, withConn: withConn);
+    }
+    return ret;
   }
 
   Future<List<TodoList>> fetchByCategory(Category model,

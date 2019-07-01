@@ -1,14 +1,14 @@
 part of jaguar_orm.generator.model;
 
-class AssociationManyToManyInfo {
+class ManyToManyTarget {
   // TODO bean?
 
-  final String targetBeanInstanceName;
+  final String beanInstanceName;
 
-  final String targetModelName;
+  final String modelName;
 
-  const AssociationManyToManyInfo(
-      {@required this.targetBeanInstanceName, @required this.targetModelName});
+  const ManyToManyTarget(
+      {@required this.beanInstanceName, @required this.modelName});
 }
 
 abstract class Association {
@@ -39,12 +39,12 @@ class AssociationByRelation implements Association {
 
   final bool toMany;
 
-  bool get isManyToMany => manyToManyInfo != null;
+  bool get isManyToMany => manyToManyTarget != null;
 
-  final AssociationManyToManyInfo manyToManyInfo;
+  final ManyToManyTarget manyToManyTarget;
 
   AssociationByRelation(this.bean, this.fields, this.foreignFields,
-      this.manyToManyInfo, this.toMany,
+      this.manyToManyTarget, this.toMany,
       {@required this.name})
       : model = getModelForBean(bean);
 

@@ -1008,18 +1008,39 @@ class Writer {
     if (m is AssociationByRelation && m.name != null) {
       _write('_for${m.name}');
     }
-    _w.writeln('(${_cap(m.modelName)} model, {Connection withConn}) async {');
-
-    _write('return removeBy${_cap(m.modelName)}(');
+    _w.write('(${_cap(m.modelName)} model, {Connection withConn}) async {');
+    _writeln('int ret = 0;');
+    _write('final dels = await findBy${_cap(m.modelName)}(');
     _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
     _writeln(', withConn: withConn);');
+    _writeln('if(dels.isNotEmpty) {');
+    _write('ret = await removeBy${_cap(m.modelName)}(');
+    _write(m.foreignFields.map((f) => 'model.' + f.field).join(', '));
+    _writeln(', withConn: withConn);');
+    final String beanName = m.manyToManyTarget.beanInstanceName;
+    _writeln('final exp = Or();');
+    _writeln('for(final t in dels) {');
+    _write('exp.or(');
+    AssociationByRelation o = _b.getMatchingManyToMany(m);
+    for (int i = 0; i < o.fields.length; i++) {
+      _write(
+          '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
+      if (i < o.fields.length - 1) {
+        _write('&');
+      }
+    }
+    _writeln(');');
+    _writeln('}');
 
+    _write('return await $beanName.removeWhere(exp, withConn: withConn);');
+    _writeln('}');
+    _writeln('return ret;');
     _writeln('}');
   }
 
   void _writeManyToManyFetchOther(AssociationByRelation m) {
-    final String beanName = m.manyToManyInfo.targetBeanInstanceName;
-    final String targetModel = m.manyToManyInfo.targetModelName;
+    final String beanName = m.manyToManyTarget.beanInstanceName;
+    final String targetModel = m.manyToManyTarget.modelName;
     _writeln('Future<List<$targetModel>> fetchBy${_cap(m.modelName)}');
     if (m is AssociationByRelation && m.name != null) {
       _write('_for${m.name}');

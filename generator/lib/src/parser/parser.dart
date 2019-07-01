@@ -128,12 +128,12 @@ class BeanParser {
         if (byHasMany != otherPreload.hasMany) {
           throw Exception('Mismatching association type!');
         }
-        AssociationManyToManyInfo other;
+        ManyToManyTarget other;
 
         if (otherPreload is PreloadManyToMany) {
-          other = AssociationManyToManyInfo(
-              targetBeanInstanceName: otherPreload.targetBeanInstanceName,
-              targetModelName: otherPreload.targetModelName);
+          other = ManyToManyTarget(
+              beanInstanceName: otherPreload.targetBeanInstanceName,
+              modelName: otherPreload.targetModelName);
         }
         current = AssociationByRelation(bean, [], [], other, byHasMany,
             name: foreign.link);
