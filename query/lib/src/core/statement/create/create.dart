@@ -2,7 +2,6 @@ library query.statement.create;
 
 import 'dart:collection';
 import 'package:jaguar_query/jaguar_query.dart';
-import 'package:jaguar_query/jaguar_query.dart' as prefix0;
 import 'package:jaguar_query/src/core/core.dart';
 import 'package:jaguar_query/src/core/datatype/property.dart';
 import 'package:jaguar_query/src/core/expression/expression.dart';

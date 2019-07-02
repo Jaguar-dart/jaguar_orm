@@ -579,7 +579,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     return adapter.createTable(st, withConn: withConn);
   }
 
-  Future<dynamic> insert(Pivot model,
+  Future<void> insert(Pivot model,
       {bool cascade = false,
       bool onlyNonNull = false,
       Set<String> only,
@@ -600,7 +600,7 @@ abstract class _PivotBean implements Bean<Pivot> {
     return;
   }
 
-  Future<dynamic> upsert(Pivot model,
+  Future<void> upsert(Pivot model,
       {bool cascade = false,
       Set<String> only,
       bool onlyNonNull = false,

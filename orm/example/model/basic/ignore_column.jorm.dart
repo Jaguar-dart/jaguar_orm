@@ -81,13 +81,8 @@ abstract class _UserBean implements Bean<User> {
       Set<String> only,
       Connection withConn}) async {
     final Insert insert = inserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
-    var retId = await adapter.insert(insert, withConn: withConn);
-    if (cascade) {
-      User newModel;
-    }
-    return retId;
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    return adapter.insert(insert, withConn: withConn);
   }
 
   Future<void> insertMany(List<User> models,
@@ -107,13 +102,8 @@ abstract class _UserBean implements Bean<User> {
       bool onlyNonNull = false,
       Connection withConn}) async {
     final Upsert upsert = upserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .id(id.name);
-    var retId = await adapter.upsert(upsert, withConn: withConn);
-    if (cascade) {
-      User newModel;
-    }
-    return retId;
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+    return adapter.upsert(upsert, withConn: withConn);
   }
 
   Future<void> upsertMany(List<User> models,

@@ -321,7 +321,7 @@ abstract class _AddressBean implements Bean<Address> {
     return adapter.createTable(st, withConn: withConn);
   }
 
-  Future<dynamic> insert(Address model,
+  Future<void> insert(Address model,
       {bool cascade = false,
       bool onlyNonNull = false,
       Set<String> only,
@@ -342,7 +342,7 @@ abstract class _AddressBean implements Bean<Address> {
     return;
   }
 
-  Future<dynamic> upsert(Address model,
+  Future<void> upsert(Address model,
       {bool cascade = false,
       Set<String> only,
       bool onlyNonNull = false,

@@ -5,8 +5,6 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 
-import '../../../associations/one_to_one/simple.dart' as prefix0;
-
 part 'simple.jorm.dart';
 
 class User {

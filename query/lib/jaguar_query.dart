@@ -6,6 +6,7 @@
 /// More dartdocs go here.
 library query;
 
+import 'package:collection/collection.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 export 'src/adapter/adapter.dart';
@@ -21,4 +22,10 @@ class Tuple {
   Tuple(this.items) : hashCode = hashObjects(items);
 
   dynamic operator [](int index) => items[index];
+
+  @override
+  bool operator ==(other) {
+    if(other is! Tuple) return false;
+    return IterableEquality().equals(this.items, other.items);
+  }
 }

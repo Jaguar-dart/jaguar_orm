@@ -327,7 +327,7 @@ abstract class _PostBean implements Bean<Post> {
     return adapter.createTable(st, withConn: withConn);
   }
 
-  Future<dynamic> insert(Post model,
+  Future<void> insert(Post model,
       {bool cascade = false,
       bool onlyNonNull = false,
       Set<String> only,
@@ -348,7 +348,7 @@ abstract class _PostBean implements Bean<Post> {
     return;
   }
 
-  Future<dynamic> upsert(Post model,
+  Future<void> upsert(Post model,
       {bool cascade = false,
       Set<String> only,
       bool onlyNonNull = false,

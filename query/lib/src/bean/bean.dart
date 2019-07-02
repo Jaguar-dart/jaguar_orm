@@ -121,7 +121,7 @@ abstract class Bean<ModelType> {
 class BeanRepo {
   final _beans = <Type, Bean>{};
 
-  BeanRepo({List<Bean> beans: const []}) {
+  BeanRepo({List<Bean> beans = const []}) {
     addAll(beans);
   }
 

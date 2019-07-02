@@ -322,7 +322,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return adapter.createTable(st, withConn: withConn);
   }
 
-  Future<dynamic> insert(ProductItemsPivot model,
+  Future<void> insert(ProductItemsPivot model,
       {bool cascade = false,
       bool onlyNonNull = false,
       Set<String> only,
@@ -343,7 +343,7 @@ abstract class _ProductItemsPivotBean implements Bean<ProductItemsPivot> {
     return;
   }
 
-  Future<dynamic> upsert(ProductItemsPivot model,
+  Future<void> upsert(ProductItemsPivot model,
       {bool cascade = false,
       Set<String> only,
       bool onlyNonNull = false,

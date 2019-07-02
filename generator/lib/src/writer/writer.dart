@@ -198,9 +198,15 @@ class Writer {
   }
 
   void _writeInsert() {
-    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.isAuto)) {
+    bool hasAuto = _b.primary.any((f) => f.isAuto);
+    if (_b.preloads.isEmpty) {
+      if (hasAuto) {
+        _write('Future<dynamic> ');
+      } else {
+        _write('Future<void> ');
+      }
       _w.writeln(
-          'Future<dynamic> insert(${_b.modelType} model, {bool cascade = false, bool onlyNonNull = false, Set<String> only, Connection withConn}) async {');
+          'insert(${_b.modelType} model, {bool cascade = false, bool onlyNonNull = false, Set<String> only, Connection withConn}) async {');
       _w.write('final Insert insert = inserter');
       _w.writeln(
           '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
@@ -310,9 +316,15 @@ class Writer {
   }
 
   void _writeUpsert() {
-    if (_b.preloads.isEmpty && !_b.primary.any((f) => f.isAuto)) {
+    bool hasAuto = _b.primary.any((f) => f.isAuto);
+    if (_b.preloads.isEmpty) {
+      if (hasAuto) {
+        _write('Future<dynamic> ');
+      } else {
+        _write('Future<void> ');
+      }
       _w.writeln(
-          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false, Connection withConn}) async {');
+          ' upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false, Connection withConn}) async {');
       _w.write('final Upsert upsert = upserter');
       _w.writeln(
           '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');

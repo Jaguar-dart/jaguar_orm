@@ -97,7 +97,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return adapter.createTable(st, withConn: withConn);
   }
 
-  Future<dynamic> insert(CartItem model,
+  Future<void> insert(CartItem model,
       {bool cascade = false,
       bool onlyNonNull = false,
       Set<String> only,
@@ -118,7 +118,7 @@ abstract class _CartItemBean implements Bean<CartItem> {
     return;
   }
 
-  Future<dynamic> upsert(CartItem model,
+  Future<void> upsert(CartItem model,
       {bool cascade = false,
       Set<String> only,
       bool onlyNonNull = false,
