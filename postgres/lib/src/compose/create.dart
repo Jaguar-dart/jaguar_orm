@@ -46,7 +46,25 @@ String composeCreate(final Create create) {
 
   sb.write(' ${info.name} (');
 
-  sb.write(info.columns.values.map(composeProperty).join(', '));
+  // Write col specs
+  {
+    final cols = <String>[];
+
+    for (CreateCol col in info.columns.values) {
+      String colSpec = composeProperty(col);
+
+      // TODO handle other constraints
+
+      Check check = col.constraints.firstWhere((c) => c is Check);
+      if (check != null) {
+        colSpec += ' CHECK( ${composeExpression(check.expression)} )';
+      }
+
+      cols.add(colSpec);
+    }
+
+    sb.write(cols.join(','));
+  }
 
   final List<CreateCol> primaries =
       info.columns.values.where((CreateCol col) => col.isPrimary).toList();

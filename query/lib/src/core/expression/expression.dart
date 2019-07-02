@@ -194,3 +194,11 @@ class I extends Expression {
 }
 
 I col(String name) => I(name);
+
+typedef ExprMaker = Expression Function();
+
+class MakeExpr extends Expression {
+  final ExprMaker maker;
+
+  MakeExpr(this.maker);
+}

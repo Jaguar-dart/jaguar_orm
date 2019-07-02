@@ -46,4 +46,8 @@ const unique = Unique();
 
 // TODO Index constraint
 
-// TODO Check constraint
+class Check implements Constraint {
+  final Expression expression;
+
+  const Check(this.expression);
+}

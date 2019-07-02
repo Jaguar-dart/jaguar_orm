@@ -16,6 +16,7 @@ String composeExpression(final Expression exp) {
   if (exp is Exists) return 'EXISTS (${composeExpression(exp.expr)})';
   if (exp is Func) return composeFunc(exp);
   if (exp is RowSourceExpr) return composeRowSource(exp.expr);
+  if (exp is MakeExpr) return composeExpression(exp.maker());
 
   if (exp is Or) {
     final sb = StringBuffer();
