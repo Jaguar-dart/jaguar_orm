@@ -8,6 +8,6 @@
 library jaguar_query_postgres;
 
 export 'src/adapter.dart';
-export 'src/sql/sql.dart';
+export 'src/types/types.dart';
 export 'package:jaguar_query/jaguar_query.dart';
 export 'package:jaguar_query/jaguar_query.dart';

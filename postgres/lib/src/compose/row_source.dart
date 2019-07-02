@@ -8,7 +8,7 @@ String composeRowSource(RowSource source) {
   } else if (source is Values) {
     return '(' + composeValues(source) + ')';
   } else if (source is ToDialect) {
-    final ret = (source as ToDialect).toDialect("postgres");
+    final ret = (source as ToDialect).toDialect("postgres", composer);
     if (ret is String) return ret;
     if (ret is RowSource) return composeRowSource(ret);
     throw UnsupportedError("Unsupported row source $ret");

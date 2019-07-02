@@ -11,7 +11,7 @@ String composeDataType(final DataType type) {
   } else if (type is prefix0.Double) {
     return 'DECIMAL';
   } else if (type is Array) {
-    return composeDataType(type.itemType) + '[]';
+    return composeDataType(type.type) + '[]';
   } else if (type is HStore) {
     return 'HSTORE';
   } else if (type is Timestamp) {
@@ -51,16 +51,18 @@ String composeCreate(final Create create) {
     final cols = <String>[];
 
     for (CreateCol col in info.columns.values) {
-      String colSpec = composeProperty(col);
+      final colSpec = StringBuffer();
+      colSpec.write(composeProperty(col));
 
       // TODO handle other constraints
 
-      Check check = col.constraints.firstWhere((c) => c is Check);
+      Check check =
+          col.constraints.firstWhere((c) => c is Check, orElse: () => null);
       if (check != null) {
-        colSpec += ' CHECK( ${composeExpression(check.expression)} )';
+        colSpec.write(' CHECK( ${composeExpression(check.expression)} )');
       }
 
-      cols.add(colSpec);
+      cols.add(colSpec.toString());
     }
 
     sb.write(cols.join(','));

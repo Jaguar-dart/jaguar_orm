@@ -2,7 +2,7 @@ part of query.compose;
 
 String composeExpression(final Expression exp) {
   if (exp is ToDialect) {
-    final ret = (exp as ToDialect).toDialect("postgres");
+    final ret = (exp as ToDialect).toDialect("postgres", composer);
     if (ret is String) return ret;
     if (ret is Expression) return composeExpression(ret);
     throw UnsupportedError(
@@ -53,7 +53,7 @@ String composeField(final Field field) => field.name;
 
 String composeLiteral(Literal literal) {
   if (literal is ToDialect) {
-    final val = (literal as ToDialect).toDialect(postgresDialect);
+    final val = (literal as ToDialect).toDialect(postgresDialect, composer);
     if (val is String) return val;
     if (val is Expression) return composeExpression(val);
     throw UnsupportedError(
@@ -72,27 +72,6 @@ String composeLiteral(Literal literal) {
 
   throw Exception("Invalid type ${val.runtimeType}!");
 }
-
-/*
-String composeValue(dynamic val) {
-  if (val == null) return null;
-  if (val is int) {
-    return "$val";
-  } else if (val is String) {
-    return "'${sqlStringEscape(val)}'";
-  } else if (val is double || val is num) {
-    return "$val";
-  } else if (val is DateTime) {
-    return "$val"; //TODO
-  } else if (val is bool) {
-    return val ? 'TRUE' : 'FALSE';
-  } else if (val is Field) {
-    return composeField(val);
-  } else {
-    throw Exception("Invalid type ${val.runtimeType}!");
-  }
-}
- */
 
 String sqlStringEscape(String input) => input.replaceAll("'", "''");
 

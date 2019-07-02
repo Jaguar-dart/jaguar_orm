@@ -44,7 +44,11 @@ class ParsedField {
 
   String get colName => column?.name ?? field;
 
-  String get vType => dataType + 'Field';
+  String get vType {
+    final index = dataType.indexOf('<');
+    if (index == -1) return dataType + 'Field';
+    return dataType.substring(0, index) + 'Field' + dataType.substring(index);
+  }
 }
 
 class ParsedBean extends UnAssociatedBean {

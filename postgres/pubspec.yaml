@@ -17,7 +17,11 @@ dependencies:
 
 dev_dependencies:
   test: ^1.3.0
+  jaguar_orm_gen:
+    path: ../generator
 
 dependency_overrides:
+  jaguar_orm:
+    path: ../orm
   jaguar_query:
     path: ../query
