@@ -11,7 +11,6 @@ import 'package:quiver_hashcode/hashcode.dart';
 export 'src/adapter/adapter.dart';
 export 'src/bean/bean.dart';
 export 'src/core/core.dart';
-export 'src/operators/operators.dart';
 
 class Tuple {
   final List<dynamic> items;
