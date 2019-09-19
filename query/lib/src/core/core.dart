@@ -11,31 +11,31 @@ import 'dart:core' as core;
 import 'package:jaguar_query/src/adapter/adapter.dart';
 
 import 'datatype/datatype.dart';
-import 'statement/create/create.dart';
 import 'expression/expression.dart';
+import 'statement/create/create.dart';
 
-export 'statement/create/create.dart';
 export 'datatype/datatype.dart';
 export 'expression/expression.dart';
+export 'statement/create/create.dart';
 
 part 'statement/alter.dart';
 part 'statement/create_db.dart';
 part 'statement/drop.dart';
 part 'statement/find/find.dart';
-part 'statement/upsert.dart';
-part 'statement/upsert_many.dart';
 part 'statement/insert.dart';
 part 'statement/insert_many.dart';
 part 'statement/remove.dart';
 part 'statement/statements.dart';
 part 'statement/update.dart';
 part 'statement/update_many.dart';
+part 'statement/upsert.dart';
+part 'statement/upsert_many.dart';
 part 'table/table.dart';
 
 /// Main DSL class to create SQL statements
 class Sql {
   /// Creates a new [Find] statement
-  static Find find(/* String | RowSource */ table,
+  static Find find(/* Symbol | RowSource */ table,
           {String alias, Expression where}) =>
       Find(table, alias: alias, where: where);
 
