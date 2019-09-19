@@ -41,6 +41,7 @@ class SqfConn extends Connection<sqf.Database> {
   @override
   Future<Map> findOne(Find st) async {
     String stStr = composeFind(st);
+    if (logger != null) logger(stStr);
     List<Map<String, dynamic>> list = await connection.rawQuery(stStr);
 
     if (list.length == 0) return null;
