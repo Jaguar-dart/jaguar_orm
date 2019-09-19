@@ -17,7 +17,7 @@ abstract class Bean<ModelType> {
   String get tableName;
 
   /// Creates a 'find' query
-  Find get finder => Sql.find(tableName);
+  Find get finder => Sql.find(Table(tableName));
 
   /// Creates a 'delete' query
   Remove get remover => Sql.remove(tableName);
