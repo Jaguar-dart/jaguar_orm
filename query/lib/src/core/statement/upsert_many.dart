@@ -10,40 +10,21 @@ part of query.core;
 class UpsertMany implements Statement {
   final String name;
 
-  final List<Map<String, dynamic>> _bulkValues = [];
+  final List<Upsert> _bulkValues = [];
 
   UpsertMany(this.name) {
     _immutable = ImUpsertMany(this);
   }
 
-  /// Adds a single [row] to be inserted.
-  UpsertMany add(Iterable<SetColumn> row) {
-    _bulkValues.add(_convertColsToMap(row));
-    return this;
-  }
+  UpsertMany addAll(List<List<SetColumn>> items) {
+    _bulkValues.clear();
+    for (var i = 0; i < items.length; ++i) {
+      var item = items[i];
+      _bulkValues.add(Upsert(
+        name,
+      )..setMany(item));
+    }
 
-  /// Adds many [rows] to be inserted.
-  UpsertMany addAll(Iterable<Iterable<SetColumn>> rows) {
-    for (Iterable<SetColumn> row in rows)
-      _bulkValues.add(_convertColsToMap(row));
-    return this;
-  }
-
-  Map<String, dynamic> _convertColsToMap(Iterable<SetColumn> row) {
-    final map = <String, dynamic>{};
-    for (SetColumn d in row) map[d.name] = d.value;
-    return map;
-  }
-
-  /// Adds a single [row] to be inserted.
-  UpsertMany addMap(Map<String, dynamic> row) {
-    _bulkValues.add(row);
-    return this;
-  }
-
-  /// Adds many [rows] to be inserted.
-  UpsertMany addAllMap(Iterable<Map<String, dynamic>> rows) {
-    _bulkValues.addAll(rows);
     return this;
   }
 
@@ -60,10 +41,9 @@ class ImUpsertMany {
   final UpsertMany _inner;
 
   ImUpsertMany(this._inner)
-      : values = UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
-            _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
+      : values = UnmodifiableListView<ImUpsert>(_inner._bulkValues.map((values) => values.asImmutable));
 
   String get table => _inner.name;
 
-  final UnmodifiableListView<UnmodifiableMapView<String, dynamic>> values;
+  final UnmodifiableListView<ImUpsert> values;
 }
