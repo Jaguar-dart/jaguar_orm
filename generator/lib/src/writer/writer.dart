@@ -398,6 +398,7 @@ class Writer {
       _w.writeln('}');
     }
     _w.writeln('}');
+    _w.writeln('model.id = retId;');
     _w.writeln('return retId;');
     _w.writeln('}');
   }
