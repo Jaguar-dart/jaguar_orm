@@ -28,13 +28,6 @@ String composeAliasedRowSource(AliasedRowSource source) {
   return sb.toString();
 }
 
-String composeRow(Row row) {
-  final sb = StringBuffer('(');
-  sb.write(row.columns.map(composeExpression).join(','));
-  sb.write(')');
-  return sb.toString();
-}
-
 String composeValues(Values values) {
   if (values.rows.isEmpty) throw Exception("Values cannot be empty!");
   final sb = StringBuffer();

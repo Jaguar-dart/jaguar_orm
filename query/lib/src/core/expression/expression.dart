@@ -19,7 +19,7 @@ abstract class Expression {
   static Expression toExpression(/* literal | Expression */ value) {
     if (value is Expression) return value;
     {
-      final lit = Literal.tryToLiteral(value);
+      final lit = L.tryToLiteral(value);
       if (lit != null) return lit;
     }
     throw ArgumentError.value(value, 'value', 'Must be Expression | literal');
@@ -201,4 +201,47 @@ class MakeExpr extends Expression {
   final ExprMaker maker;
 
   MakeExpr(this.maker);
+}
+
+class In extends Expression {
+  final Expression expr;
+
+  In(this.expr);
+}
+
+class Any extends Expression {
+  final Expression expr;
+
+  Any(this.expr);
+}
+
+class Every extends Expression {
+  final Expression expr;
+
+  Every(this.expr);
+}
+
+class Row extends Expression {
+  final List<Expression> items;
+
+  Row(this.items);
+
+  factory Row.make(List items) =>
+      Row(items.map(Expression.toExpression).toList());
+}
+
+Row row(List items) => Row.make(items);
+
+class Values implements RowSource {
+  final List<Row> rows;
+
+  Values(this.rows);
+}
+
+class A extends Expression {
+  final List<Expression> items;
+
+  A(this.items);
+
+  factory A.make(List items) => A(items.map(Expression.toExpression).toList());
 }

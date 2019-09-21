@@ -24,18 +24,6 @@ class Table implements RowSource {
   Table(this.name);
 }
 
-class Row {
-  final List<Expression> columns;
-
-  Row(this.columns);
-}
-
-class Values implements RowSource {
-  final List<Row> rows;
-
-  Values(this.rows);
-}
-
 /// A SQL join type that can be used in 'SELECT' statements
 class JoinType {
   /// Identification code for this join type

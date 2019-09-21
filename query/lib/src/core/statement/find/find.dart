@@ -197,7 +197,7 @@ class Find implements Statement, Whereable, RowSource {
 
   Find orderBy(/* String | int | Expression */ expr, {bool desc}) {
     if (expr is String) expr = col(expr);
-    if (expr is int) expr = IntLiteral(expr);
+    if (expr is int) expr = IntL(expr);
     if (expr is! Expression) {
       throw ArgumentError.value(
           expr, 'val', 'Must be String | int | Expression');
@@ -216,7 +216,7 @@ class Find implements Statement, Whereable, RowSource {
   }
 
   Find limit(/* int | Expression */ val) {
-    if (val is int) val = IntLiteral(val);
+    if (val is int) val = IntL(val);
     if (val is! Expression) {
       throw ArgumentError.value(val, 'val', 'Must be int | Expression');
     }
@@ -226,7 +226,7 @@ class Find implements Statement, Whereable, RowSource {
   }
 
   Find offset(/* int | Expression */ val) {
-    if (val is int) val = IntLiteral(val);
+    if (val is int) val = IntL(val);
     if (val is! Expression) {
       throw ArgumentError.value(val, 'val', 'Must be int | Expression');
     }
@@ -237,7 +237,7 @@ class Find implements Statement, Whereable, RowSource {
 
   Find groupBy(/* String | int | Expression */ expr) {
     if (expr is String) expr = col(expr);
-    if (expr is int) expr = IntLiteral(expr);
+    if (expr is int) expr = IntL(expr);
     if (expr is! Expression) {
       throw ArgumentError.value(
           expr, 'val', 'Must be String | int | Expression');

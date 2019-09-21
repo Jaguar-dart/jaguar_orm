@@ -9,32 +9,45 @@ class Array<T> implements DataType<T> {
 }
 
 class A extends Expression implements ToDialect {
-  final List<Expression> items;
+  final Expression expr;
 
-  A(this.items);
+  A(this.expr);
 
-  factory A.from(List items) {
-    return A(items.map(Expression.toExpression).toList());
-  }
+  factory A.from(items) => A(Expression.toExpression(items));
 
   String toDialect(String dialect, Composer composer) {
-    return 'ARRAY[${items.map(composer.expression).join(',')}]';
+    return 'ARRAY[${composer.expression(expr)}]';
   }
 }
 
 class ArrayField<T> extends Field<List<T>> {
   ArrayField(String name) : super(name);
+
+  Expression length({int dim: 1}) => array_length(this, dim: dim);
 }
 
-Func array_length(/* TODO */ array, [int dim]) {
-  final args = [array];
-  if (dim != null) args.add(dim);
+Func array_length(/* Expression */ array, {int dim: 1}) {
+  final args = [Expression.toExpression(array)];
+  if (dim != null) args.add(IntL(dim));
   return Func('array_length', args: args);
 }
 
 class HStore implements DataType {
+  final bool auto = false;
+
   const HStore();
-  bool get auto => false;
 }
 
-// TODO JSON
+class HStoreField extends Field<Map<String, String>> {
+  const HStoreField(String name) : super(name);
+}
+
+class Json implements DataType {
+  final bool auto = false;
+
+  Json();
+}
+
+class JsonField extends Field<dynamic> {
+  JsonField(String name) : super(name);
+}

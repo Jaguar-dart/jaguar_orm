@@ -1,26 +1,27 @@
 part of 'expression.dart';
 
-abstract class Literal extends Expression {
-  dynamic get value;
+abstract class L<T> extends Expression {
+  T get value;
 
-  const Literal();
+  const L();
 
-  static Literal tryToLiteral(dynamic value) {
-    if (value is Literal) return value;
+  static Expression tryToLiteral(dynamic value) {
+    if (value is Expression) return value;
 
-    if (value is int) return IntLiteral(value);
-    if (value is num) return DoubleLiteral(value);
-    if (value is String) return StrLiteral(value);
-    if (value is bool) return BoolLiteral(value);
-    if (value is DateTime) return TimestampLiteral(value);
-    if (value is Duration) return DurationLiteral(value);
+    if (value is int) return IntL(value);
+    if (value is num) return DoubleL(value);
+    if (value is String) return StrL(value);
+    if (value is bool) return BoolL(value);
+    if (value is DateTime) return TimestampL(value);
+    if (value is Duration) return DurationL(value);
+    if(value is List) return Row.make(value);
     if (value == null) return nil;
 
     return null;
   }
 
-  static Literal toLiteral(dynamic value) {
-    Literal ret = tryToLiteral(value);
+  static Expression toLiteral(dynamic value) {
+    Expression ret = tryToLiteral(value);
 
     if (ret == null) {
       throw ArgumentError.value(value, 'value', 'Not a valid literal');
@@ -30,7 +31,7 @@ abstract class Literal extends Expression {
   }
 }
 
-class NilLiteral extends Literal {
+class NilLiteral extends L<Null> {
   final Null value = null;
 
   const NilLiteral._();
@@ -38,38 +39,38 @@ class NilLiteral extends Literal {
 
 const nil = NilLiteral._();
 
-class IntLiteral extends Literal {
+class IntL extends L<int> {
   final int value;
 
-  const IntLiteral(this.value);
+  const IntL(this.value);
 }
 
-class DoubleLiteral extends Literal {
+class DoubleL extends L<double> {
   final double value;
 
-  const DoubleLiteral(this.value);
+  const DoubleL(this.value);
 }
 
-class StrLiteral extends Literal {
+class StrL extends L<String> {
   final String value;
 
-  const StrLiteral(this.value);
+  const StrL(this.value);
 }
 
-class TimestampLiteral extends Literal {
+class TimestampL extends L<DateTime> {
   final DateTime value;
 
-  const TimestampLiteral(this.value);
+  const TimestampL(this.value);
 }
 
-class DurationLiteral extends Literal {
+class DurationL extends L<Duration> {
   final Duration value;
 
-  const DurationLiteral(this.value);
+  const DurationL(this.value);
 }
 
-class BoolLiteral extends Literal {
+class BoolL extends L<bool> {
   final bool value;
 
-  const BoolLiteral(this.value);
+  const BoolL(this.value);
 }

@@ -10,13 +10,9 @@ String composeExpression(final Expression exp) {
   }
 
   if (exp is I) return exp.name;
-  if (exp is Literal) return composeLiteral(exp);
+  if (exp is L) return composeLiteral(exp);
   if (exp is E) return exp.expr;
   if (exp is Not) return 'NOT ${composeExpression(exp.expr)}';
-  if (exp is Exists) return 'EXISTS (${composeExpression(exp.expr)})';
-  if (exp is Func) return composeFunc(exp);
-  if (exp is RowSourceExpr) return composeRowSource(exp.expr);
-  if (exp is MakeExpr) return composeExpression(exp.maker());
 
   if (exp is Or) {
     final sb = StringBuffer();
@@ -46,12 +42,21 @@ String composeExpression(final Expression exp) {
     return '(${composeExpression(exp.lhs)} BETWEEN ${composeExpression(exp.low)} AND ${composeExpression(exp.high)})';
   }
 
+  if (exp is Exists) return 'EXISTS (${composeExpression(exp.expr)})';
+  if (exp is Func) return composeFunc(exp);
+  if (exp is RowSourceExpr) return composeRowSource(exp.expr);
+  if (exp is MakeExpr) return composeExpression(exp.maker());
+
+  if (exp is In) return 'IN ${composeExpression(exp)}';
+  if (exp is Any) return 'ANY ${composeExpression(exp)}';
+  if (exp is Every) return 'EVERY ${composeExpression(exp)}';
+
   throw Exception('Unknown expression ${exp.runtimeType}!');
 }
 
 String composeField(final Field field) => field.name;
 
-String composeLiteral(Literal literal) {
+String composeLiteral(L literal) {
   if (literal is ToDialect) {
     final val = (literal as ToDialect).toDialect(postgresDialect, composer);
     if (val is String) return val;
@@ -86,5 +91,12 @@ String composeFunc(Func func) {
 
   sb.write(')');
 
+  return sb.toString();
+}
+
+String composeRow(Row row) {
+  final sb = StringBuffer('(');
+  sb.write(row.items.map(composeExpression).join(','));
+  sb.write(')');
   return sb.toString();
 }

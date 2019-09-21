@@ -52,27 +52,27 @@ class Insert implements Statement, Settable {
 
   /// Convenience method to set the [value] of int [column].
   Insert setInt(/* String | I */ column, int value) {
-    return set(column, IntLiteral(value));
+    return set(column, IntL(value));
   }
 
   /// Convenience method to set the [value] of string [column].
   Insert setString(/* String | I */ column, String value) {
-    return set(column, StrLiteral(value));
+    return set(column, StrL(value));
   }
 
   /// Convenience method to set the [value] of bool [column].
   Insert setBool(/* String | I */ column, bool value) {
-    return set(column, BoolLiteral(value));
+    return set(column, BoolL(value));
   }
 
   /// Convenience method to set the [value] of date time [column].
   Insert setTimestamp(/* String | I */ column, DateTime value) {
-    return set(column, TimestampLiteral(value));
+    return set(column, TimestampL(value));
   }
 
   /// Convenience method to set the [value] of date time [column].
   Insert setDuration(/* String | I */ column, Duration value) {
-    return set(column, DurationLiteral(value));
+    return set(column, DurationL(value));
   }
 
   /// Executes the statement with the given connection.

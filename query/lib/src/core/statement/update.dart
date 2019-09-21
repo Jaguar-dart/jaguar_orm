@@ -38,27 +38,27 @@ class Update implements Statement, Settable, Whereable {
 
   /// Convenience method to set the [value] of int [column].
   Update setInt(/* String | I */ column, int value) {
-    return set(column, IntLiteral(value));
+    return set(column, IntL(value));
   }
 
   /// Convenience method to set the [value] of string [column].
   Update setString(/* String | I */ column, String value) {
-    return set(column, StrLiteral(value));
+    return set(column, StrL(value));
   }
 
   /// Convenience method to set the [value] of bool [column].
   Update setBool(/* String | I */ column, bool value) {
-    return set(column, BoolLiteral(value));
+    return set(column, BoolL(value));
   }
 
   /// Convenience method to set the [value] of date time [column].
   Update setTimestamp(/* String | I */ column, DateTime value) {
-    return set(column, TimestampLiteral(value));
+    return set(column, TimestampL(value));
   }
 
   /// Convenience method to set the [value] of date time [column].
   Update setDuration(/* String | I */ column, Duration value) {
-    return set(column, DurationLiteral(value));
+    return set(column, DurationL(value));
   }
 
   /// Adds an to 'where' [expression] clause.
