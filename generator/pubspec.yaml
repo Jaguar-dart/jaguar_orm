@@ -11,7 +11,7 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  jaguar_query: ^2.2.8
+  jaguar_query: ^4.1.1
   jaguar_orm: ^4.1.1
   analyzer: ^0.36.0
   build: ^1.1.4
