@@ -10,7 +10,7 @@ import 'package:jaguar_query_sqflite/src/connection.dart';
 import 'package:sqflite/sqflite.dart' as sqf;
 
 class SqfliteAdapter extends Adapter<sqf.Database> {
-  sqf.Database _connection;
+  SqfConn _connection;
 
   final String path;
   final int version;
@@ -21,13 +21,19 @@ class SqfliteAdapter extends Adapter<sqf.Database> {
 
   /// Connects to the database
   Future<Connection> open() async {
-    return SqfConn.open(path, version: version, logger: logger);
+    return _connection ??= await SqfConn.open(path, version: version, logger: logger);
   }
 
   /// Closes all connections to the database.
   Future<void> close() => connection.close();
 
-  sqf.Database get connection => _connection;
+  sqf.Database get connection => _connection.connection;
+
+  @override
+  Future<T> run<T>(Future<T> Function(Connection<sqf.Database> conn) task,
+      {Connection<sqf.Database> withConn}) async {
+    return await super.run(task, withConn: _connection);
+  }
 
   T parseValue<T>(dynamic v) {
     if (T == String) {
