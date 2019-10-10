@@ -126,7 +126,7 @@ class Writer {
         final foreign = f.foreign;
         if (foreign is BelongsToForeign) {
           _write(', foreignTable: ${foreign.beanInstanceName}.tableName');
-          _write(", foreignCol: '${foreign.refCol}'");
+          _write(", foreignCol: ${foreign.beanInstanceName}.${foreign.refCol}.name");
         } else {
           throw Exception('Unimplemented!');
         }
