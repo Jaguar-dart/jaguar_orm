@@ -29,12 +29,6 @@ class SqfliteAdapter extends Adapter<sqf.Database> {
 
   sqf.Database get connection => _connection.connection;
 
-  @override
-  Future<T> run<T>(Future<T> Function(Connection<sqf.Database> conn) task,
-      {Connection<sqf.Database> withConn}) async {
-    return await super.run(task, withConn: _connection);
-  }
-
   T parseValue<T>(dynamic v) {
     if (T == String) {
       return v;
