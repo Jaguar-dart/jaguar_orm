@@ -1,7 +1,7 @@
 part of query.compose;
 
 List<String> composeUpdateMany(final UpdateMany st) {
-  final ImmutableUpdateManyStatement info = st.asImmutable;
+  final ImUpdateMany info = st.asImmutable;
 
   List<String> queries = [];
 
@@ -12,11 +12,9 @@ List<String> composeUpdateMany(final UpdateMany st) {
     sb.write(info.tableName);
     sb.write(' SET ');
 
-    sb.write(item.values.keys
-        .map((String key) => '$key=${composeValue(item.values[key])}')
-        .join(', '));
+    sb.write(item.values.keys.map((String key) => '$key=${composeLiteral(item.values[key])}').join(', '));
 
-    if (item.where.length != 0) {
+    if (item.where != null) {
       sb.write(' WHERE ');
       sb.write(composeExpression(item.where));
     }

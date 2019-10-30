@@ -328,7 +328,9 @@ class Writer {
       _w.write('final Upsert upsert = upserter');
       _w.writeln(
           '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
-      _w.writeln('return adapter.upsert(upsert, withConn: withConn);');
+      _w.writeln('var id = await adapter.upsert(upsert, withConn: withConn);');
+      _w.writeln('model.id = id;');
+      _w.writeln('return id;');
       _w.writeln('}');
       return;
     }
@@ -396,6 +398,7 @@ class Writer {
       _w.writeln('}');
     }
     _w.writeln('}');
+    _w.writeln('model.id = retId;');
     _w.writeln('return retId;');
     _w.writeln('}');
   }

@@ -1,7 +1,7 @@
 part of query.compose;
 
 List<String> composeUpsertMany(final UpsertMany st) {
-  final ImmutableUpsertManyStatement info = st.asImmutable;
+  final ImUpsertMany info = st.asImmutable;
 
   List<String> queries = [];
 
@@ -12,10 +12,10 @@ List<String> composeUpsertMany(final UpsertMany st) {
     sb.write(info.table);
     sb.write('(');
 
-    sb.write(item.keys.join(', '));
+    sb.write(item.values.keys.join(', '));
 
     sb.write(') VALUES (');
-    sb.write(item.values.map(composeValue).join(', '));
+    sb.write(item.values.values.map(composeExpression).join(', '));
     sb.write(')');
 
     sb.write(';');
