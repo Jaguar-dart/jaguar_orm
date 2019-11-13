@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.9
+
++ Add insert or ignore capabilities
+
 ## 2.2.6
 
 + `Alter` statement

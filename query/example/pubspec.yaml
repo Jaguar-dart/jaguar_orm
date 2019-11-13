@@ -1,4 +1,4 @@
-name: jaguar_query
+name: jaguar_query_example
 description: Dialect neutral, fluent Dart DSL to build SQL/NoSQL queries
 version: 2.2.9
 authors:
@@ -11,7 +11,9 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  meta: ^1.1.7
+  jaguar_query:
+    path: ../
 
 dev_dependencies:
-  test: ^1.9.4
+  jaguar_query_postgres:
+    path: ../../postgres

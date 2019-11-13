@@ -10,12 +10,13 @@ part of query;
 /// database.
 class Insert implements Statement, Settable {
   final String name;
+  final bool ignoreIfExist;
 
   String _id;
 
   final Map<String, dynamic> _values = {};
 
-  Insert(this.name) {
+  Insert(this.name, {this.ignoreIfExist = false}) {
     _immutable = ImmutableInsertStatement(this);
   }
 
@@ -104,6 +105,8 @@ class ImmutableInsertStatement {
   String get table => _inner.name;
 
   String get id => _inner._id;
+
+  bool get ignoreIfExist => _inner.ignoreIfExist;
 
   final UnmodifiableMapView<String, dynamic> values;
 }
