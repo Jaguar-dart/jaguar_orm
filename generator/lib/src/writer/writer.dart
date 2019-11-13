@@ -220,7 +220,7 @@ class Writer {
   void _writeUpsert() {
     if (_b.preloads.isEmpty && !_b.primary.any((f) => f.autoIncrement)) {
       _w.writeln(
-          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false}) async {');
+          'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false, isForeignKeyEnabled = false}) async {');
       _w.write('final Upsert upsert = upserter');
       _w.writeln(
           '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
@@ -230,7 +230,26 @@ class Writer {
     }
 
     _w.writeln(
-        'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false}) async {');
+        'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false, isForeignKeyEnabled = false}) async {');
+
+    _w.writeln('if (isForeignKeyEnabled) {');
+    _w.write('final Insert insert = Insert(tableName, ignoreIfExist: true)');
+    _w.writeln(
+        '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
+    _w.writeln('var retId = await adapter.insert(insert);');
+    _w.writeln('if (retId == null) {');
+    _w.write('final Update update = updater.');
+    final String wheres = _b.primary
+        .map((Field f) => 'where(this.${f.field}.eq(model.${f.field}))')
+        .join('.');
+    _w.write(wheres);
+    _w.write('.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
+    _w.writeln('retId = adapter.update(update);');
+
+    _w.writeln('}');
+    _w.writeln('return retId;');
+
+    _w.writeln('} else {');
     _w.write('final Upsert upsert = upserter');
     _w.write(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))');
@@ -289,6 +308,7 @@ class Writer {
     _w.writeln('}');
     _w.writeln('return retId;');
     _w.writeln('}');
+    _w.writeln('}');
   }
 
   void _writeUpsertMany() {
@@ -297,12 +317,12 @@ class Writer {
       cascade = 'bool cascade = false, ';
     }
     _w.writeln(
-        'Future<void> upsertMany(List<${_b.modelType}> models, {${cascade} bool onlyNonNull = false, Set<String> only}) async {');
+        'Future<void> upsertMany(List<${_b.modelType}> models, {${cascade} bool onlyNonNull = false, Set<String> only, isForeignKeyEnabled = false}) async {');
     if (cascade.isNotEmpty) {
-      _w.write('if(cascade)  {');
+      _w.write('if(cascade || isForeignKeyEnabled)  {');
       _w.write('final List<Future> futures = [];');
       _w.write('for (var model in models) {');
-      _w.write('futures.add(upsert(model, cascade: cascade));');
+      _w.write('futures.add(upsert(model, cascade: cascade, isForeignKeyEnabled: isForeignKeyEnabled));');
       _w.write('}');
       _w.writeln('await Future.wait(futures);');
       _w.writeln('return;');
