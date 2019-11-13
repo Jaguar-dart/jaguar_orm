@@ -4,7 +4,11 @@ String composeInsert(final Insert st) {
   final ImmutableInsertStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
-  sb.write('INSERT INTO ');
+  sb.write('INSERT');
+  if (info.ignoreIfExist) {
+    sb.write(' OR IGNORE');
+  }
+  sb.write(' INTO ');
   sb.write(info.table);
   sb.write('(');
 
