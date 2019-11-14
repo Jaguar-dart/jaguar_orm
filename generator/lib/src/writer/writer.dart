@@ -232,11 +232,12 @@ class Writer {
     _w.writeln(
         'Future<dynamic> upsert(${_b.modelType} model, {bool cascade = false, Set<String> only, bool onlyNonNull = false, isForeignKeyEnabled = false}) async {');
 
+    _w.writeln('var retId;');
     _w.writeln('if (isForeignKeyEnabled) {');
     _w.write('final Insert insert = Insert(tableName, ignoreIfExist: true)');
     _w.writeln(
         '.setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));');
-    _w.writeln('var retId = await adapter.insert(insert);');
+    _w.writeln('retId = await adapter.insert(insert);');
     _w.writeln('if (retId == null) {');
     _w.write('final Update update = updater.');
     final String wheres = _b.primary
@@ -247,7 +248,6 @@ class Writer {
     _w.writeln('retId = adapter.update(update);');
 
     _w.writeln('}');
-    _w.writeln('return retId;');
 
     _w.writeln('} else {');
     _w.write('final Upsert upsert = upserter');
@@ -257,7 +257,8 @@ class Writer {
       if (f.autoIncrement) _w.write('.id(${f.field}.name)');
     }
     _w.writeln(';');
-    _w.writeln('var retId = await adapter.upsert(upsert);');
+    _w.writeln('retId = await adapter.upsert(upsert);');
+    _w.writeln('}');
 
     _w.writeln('if(cascade) {');
     _w.writeln('${_b.modelType} newModel;');
@@ -307,7 +308,6 @@ class Writer {
     }
     _w.writeln('}');
     _w.writeln('return retId;');
-    _w.writeln('}');
     _w.writeln('}');
   }
 

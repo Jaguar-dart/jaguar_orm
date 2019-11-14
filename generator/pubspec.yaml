@@ -1,6 +1,6 @@
 name: jaguar_orm_gen
 description: Generator for jaguar_orm
-version: 2.2.28
+version: 2.2.29
 authors:
 - Ravi Teja Gudapati <tejainece@gmail.com>
 - Kevin Segaud <segaud.kevin@gmail.com>
@@ -11,7 +11,7 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  jaguar_query: ^2.2.8
+  jaguar_query: ^2.2.9
   jaguar_orm: ^2.2.7
     #path: ../orm
   analyzer: ^0.34.0
