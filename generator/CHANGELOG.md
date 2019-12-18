@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.30
+
++ Update dependencies to be ok with last flutter stable
+
 ## 2.2.29
 
 + Fix upsert that wsa not doing on cascade upsert when foreign key used
