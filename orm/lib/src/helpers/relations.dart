@@ -31,8 +31,8 @@ typedef List<dynamic> AssociationKeysGetter<Model>(Model model);
 
 typedef Future<List<Child>> OneToXChildrenGetterForAll<Parent, Child>(
     List<Parent> models,
-    {bool preload,
-    bool cascade});
+    {bool? preload,
+    bool? cascade});
 
 typedef void AssociationSetter<Parent, Child>(Parent p, Child c);
 
@@ -58,7 +58,7 @@ class OneToXHelper {
     if (parents.length == 0) return;
 
     final Map<HashableValues, Parent> map = {};
-    List<List> args;
+    List<List>? args;
     for (Parent parent in parents) {
       final List key = parentAssociationGetter(parent);
       if (args == null) {
@@ -75,7 +75,7 @@ class OneToXHelper {
 
     for (Child child in children) {
       final key = new HashableValues(childAssociationGetter(child));
-      final Parent parent = map[key];
+      final Parent? parent = map[key];
       if (parent == null) continue;
       setter(parent, child);
     }
