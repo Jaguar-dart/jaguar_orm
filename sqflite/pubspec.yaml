@@ -9,20 +9,21 @@ homepage: https://github.com/Jaguar-dart/jaguar_orm
 documentation:
 
 environment:
-  sdk: '>=2.0.0-dev.65.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 flutter:
 
 dependencies:
   flutter:
     sdk: flutter
-  sqflite: ^1.1.7+2
-  jaguar_query: ^2.2.9
+  sqflite: #^1.1.7+2
+  jaguar_query: #^2.2.9
+    path: ../query
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
 dependency_overrides:
-  #jaguar_query:
-  #  path: ../query
+    jaguar_query:
+      path: ../query

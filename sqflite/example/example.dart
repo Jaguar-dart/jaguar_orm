@@ -13,17 +13,17 @@ class Post {
 
   Post.make(this.id, this.msg, this.author);
 
-  int id;
+  int? id;
 
-  String msg;
+  String? msg;
 
-  String author;
+  String? author;
 
   String toString() => '$id $msg $author';
 }
 
 /// The adapter
-SqfliteAdapter _adapter;
+late SqfliteAdapter _adapter;
 
 /// The bean
 class PostBean {
@@ -75,7 +75,7 @@ class PostBean {
 
     updater.where(this.id.eq(id));
 
-    Map map = await _adapter.findOne(updater);
+    Map map = await (_adapter.findOne(updater) as FutureOr<Map<dynamic, dynamic>>);
 
     Post post = new Post();
     post.id = map['_id'];
