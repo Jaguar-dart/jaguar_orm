@@ -56,7 +56,7 @@ bool isBuiltin(DartType type) {
 }
 
 DartType getModelForBean(DartType bean) {
-  ClassElement c = bean.element;
+  ClassElement c = bean.element as ClassElement;
   InterfaceType i =
       c.allSupertypes.firstWhere((InterfaceType i) => isBean.isExactlyType(i));
   return i.typeArguments[0];

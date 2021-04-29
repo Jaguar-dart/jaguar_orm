@@ -1,5 +1,6 @@
 library jaguar_orm.generator.writer;
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:jaguar_orm_gen/src/model/model.dart';
 
 class Writer {
@@ -557,7 +558,7 @@ class Writer {
     _w.write(
         'data.add(toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());');
 
-    String wheres;
+    String? wheres;
     for (var prim in _b.primary) {
       if (wheres == null) {
         wheres = 'this.${prim.field}.eq(model.${prim.field})';
@@ -806,9 +807,9 @@ class Writer {
         _write(_b.modelType);
         _write('(');
         final String args = p.foreignFields
-            .map((Field f) => f.foreign.refCol)
+            .map((Field f) => f.foreign!.refCol)
             .map(_b.fieldByColName)
-            .map((Field f) => 'model.${f.field}')
+            .map((Field? f) => 'model.${f!.field}')
             .join(',');
         _write(args);
         _write(', preload: cascade, cascade: cascade');
@@ -840,9 +841,9 @@ class Writer {
         _write('(${_b.modelType} model) => [');
         {
           final String args = p.foreignFields
-              .map((Field f) => f.foreign.refCol)
+              .map((Field f) => f.foreign!.refCol)
               .map(_b.fieldByColName)
-              .map((Field f) => 'model.${f.field}')
+              .map((Field? f) => 'model.${f!.field}')
               .join(',');
           _write(args);
         }
@@ -922,7 +923,7 @@ class Writer {
 
     for (Field f in _b.fields.values) {
       if (f.foreign is BelongsToForeign) {
-        BelongsToForeign fb = f.foreign;
+        BelongsToForeign fb = f.foreign as BelongsToForeign;
         if (written.contains(fb.beanInstanceName)) continue;
         written.add(fb.beanInstanceName);
 
@@ -963,7 +964,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in dels) {');
     _write('exp.or(');
-    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    BelongsToAssociation o = _b.getMatchingManyToMany(m)!;
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -996,7 +997,7 @@ class Writer {
     _writeln('final exp = Or();');
     _writeln('for(final t in pivots) {');
     _write('exp.or(');
-    BelongsToAssociation o = _b.getMatchingManyToMany(m);
+    BelongsToAssociation o = _b.getMatchingManyToMany(m)!;
     for (int i = 0; i < o.fields.length; i++) {
       _write(
           '$beanName.${o.foreignFields[i].field}.eq(t.${o.fields[i].field})');
@@ -1012,13 +1013,12 @@ class Writer {
   }
 
   void _writeAttach() {
-    final BelongsToAssociation m = _b.belongTos.values.firstWhere(
+    final BelongsToAssociation? m = _b.belongTos.values.firstWhereOrNull(
         (BelongsToAssociation f) =>
-            f is BelongsToAssociation && f.belongsToMany,
-        orElse: () => null);
+            f is BelongsToAssociation && f.belongsToMany);
     if (m == null) return;
 
-    final BelongsToAssociation m1 = _b.getMatchingManyToMany(m);
+    final BelongsToAssociation m1 = _b.getMatchingManyToMany(m)!;
 
     _writeln('Future<dynamic> attach(');
     if (m.modelName.compareTo(m1.modelName) > 0) {
