@@ -15,10 +15,10 @@ abstract class Adapter<ConnType> {
   ConnType get connection;
 
   /// Returns a row found by executing [statement]
-  Future<Map> findOne(Find statement);
+  Future<Map<String, dynamic>?> findOne(Find statement);
 
   /// Returns a list of rows found by executing [statement]
-  Future<List<Map>> find(Find statement);
+  Future<List<Map<String, dynamic>>> find(Find statement);
 
   /// Executes the insert or update statement and returns the primary key of
   /// inserted row
@@ -58,7 +58,7 @@ abstract class Adapter<ConnType> {
   Future<void> dropDb(DropDb st);
 
   /// Parses values coming from database into Dart values
-  T parseValue<T>(dynamic v);
+  T? parseValue<T>(dynamic v);
 }
 
 /// Convenience class to execute `Find` statement using [adapter]
