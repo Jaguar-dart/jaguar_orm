@@ -145,7 +145,7 @@ class ImmutableCreateStatement {
 abstract class CreateColumn<ValType> {
   String get name;
 
-  bool? get isNullable;
+  bool get isNullable;
 
   bool get isPrimary;
 

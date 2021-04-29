@@ -6,7 +6,7 @@ class Find implements Statement, Whereable {
 
   final TableName from;
 
-  final _joins = <JoinedTable?>[];
+  final _joins = <JoinedTable>[];
 
   JoinedTable? _curJoin;
 
@@ -32,42 +32,43 @@ class Find implements Statement, Whereable {
     if (join == null) throw Exception('Join cannot be null!');
 
     _curJoin = join;
-    _joins.add(_curJoin);
+    _joins.add(join);
+
     return this;
   }
 
   /// Adds a 'inner join' clause to the select statement.
   Find innerJoin(String tableName, [String? alias]) {
-    _curJoin = JoinedTable.innerJoin(tableName, alias);
-    _joins.add(_curJoin);
+    addJoin(JoinedTable.innerJoin(tableName, alias));
+
     return this;
   }
 
   /// Adds a 'left join' clause to the select statement.
   Find leftJoin(String tableName, [String? alias]) {
-    _curJoin = JoinedTable.leftJoin(tableName, alias);
-    _joins.add(_curJoin);
+    addJoin(JoinedTable.leftJoin(tableName, alias));
+
     return this;
   }
 
   /// Adds a 'right join' clause to the select statement.
   Find rightJoin(String tableName, [String? alias]) {
-    _curJoin = JoinedTable.rightJoin(tableName, alias);
-    _joins.add(_curJoin);
+    addJoin(JoinedTable.rightJoin(tableName, alias));
+
     return this;
   }
 
   /// Adds a 'full join' clause to the select statement.
   Find fullJoin(String tableName, [String? alias]) {
-    _curJoin = JoinedTable.fullJoin(tableName, alias);
-    _joins.add(_curJoin);
+    addJoin(JoinedTable.fullJoin(tableName, alias));
+
     return this;
   }
 
   /// Adds 'cross join' clause to the select statement.
   Find crossJoin(String tableName, [String? alias]) {
-    _curJoin = JoinedTable.crossJoin(tableName, alias);
-    _joins.add(_curJoin);
+    addJoin(JoinedTable.crossJoin(tableName, alias));
+
     return this;
   }
 
@@ -229,7 +230,7 @@ class ImmutableFindStatement {
 
   final UnmodifiableListView<SelColumn> selects;
 
-  final UnmodifiableListView<JoinedTable?> joins;
+  final UnmodifiableListView<JoinedTable> joins;
 
   // TODO return immutable
   Expression get where => _find._where;
