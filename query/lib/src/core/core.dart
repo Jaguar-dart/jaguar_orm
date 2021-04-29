@@ -37,7 +37,7 @@ part 'table/table.dart';
 /// Main DSL class to create SQL statements
 class Sql {
   /// Creates a new [Find] statement
-  static Find find(String table, {String alias}) => Find(table, alias: alias);
+  static Find find(String table, {String? alias}) => Find(table, alias: alias);
 
   /// Creates a new [Upsert] statement
   static Upsert upsert(String table) => Upsert(table);
@@ -52,7 +52,7 @@ class Sql {
   static InsertMany insertMany(String table) => InsertMany(table);
 
   /// Creates a new [Update] statement
-  static Update update(String table, {Expression where}) =>
+  static Update update(String table, {Expression? where}) =>
       Update(table, where: where);
 
   /// Creates a new [UpdateMany] statement

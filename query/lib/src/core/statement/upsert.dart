@@ -13,7 +13,7 @@ class Upsert implements Statement {
 
   final Map<String, dynamic> _values = {};
 
-  String _id;
+  String? _id;
 
   ImmutableUpsertStatement get asImmutable => ImmutableUpsertStatement(this);
 

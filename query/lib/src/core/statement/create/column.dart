@@ -10,9 +10,9 @@ class CreateInt implements CreateColumn<int> {
 
   final bool isPrimary;
 
-  final Foreign foreignKey;
+  final Foreign? foreignKey;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   const CreateInt(this.name,
       {this.isNullable = false,
@@ -41,9 +41,9 @@ class CreateDouble extends CreateColumn<double> {
 
   final bool isPrimary;
 
-  final Foreign foreignKey;
+  final Foreign? foreignKey;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   CreateDouble(this.name,
       {this.isNullable = false,
@@ -65,9 +65,9 @@ class CreateBool extends CreateColumn<bool> {
 
   final bool isPrimary;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
-  final Foreign foreignKey = null;
+  final Foreign? foreignKey = null;
 
   CreateBool(this.name,
       {this.isNullable = false, this.isPrimary = false, this.uniqueGroup});
@@ -75,15 +75,15 @@ class CreateBool extends CreateColumn<bool> {
 
 /// Clause to create datetime column in SQL table.
 class CreateDateTime extends CreateColumn<DateTime> {
-  final bool isNullable;
+  final bool? isNullable;
 
   final String name;
 
   final bool isPrimary;
 
-  final Foreign foreignKey;
+  final Foreign? foreignKey;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   CreateDateTime(this.name,
       {this.isNullable = false,
@@ -102,9 +102,9 @@ class CreateStr extends CreateColumn<String> {
 
   final int length;
 
-  final Foreign foreignKey;
+  final Foreign? foreignKey;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   CreateStr(this.name,
       {this.isNullable = false,

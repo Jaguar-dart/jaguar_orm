@@ -41,7 +41,7 @@ abstract class Bean<ModelType> {
   InsertMany get inserters => Sql.insertMany(tableName);
 
   /// Returns one row found by executing [statement]
-  Future<ModelType> findOne(Find statement) async {
+  Future<ModelType?> findOne(Find statement) async {
     Map row = await adapter.findOne(statement);
     if (row != null) return fromMap(row);
     return null;
@@ -64,7 +64,7 @@ abstract class Bean<ModelType> {
   /// Removes all rows in table/document
   Future<int> removeAll() => adapter.remove(remover);
 
-  Future<ModelType> findOneWhere(
+  Future<ModelType?> findOneWhere(
       /* Expression | ExpressionMaker<ModelType> */ exp) async {
     final Find find = finder.where(exp);
     return findOne(find);
@@ -106,5 +106,5 @@ abstract class Bean<ModelType> {
   /// Creates list of 'set' column from model to be used in update or insert
   /// query
   List<SetColumn> toSetColumns(ModelType model,
-      {bool update = false, Set<String> only});
+      {bool update = false, Set<String>? only});
 }

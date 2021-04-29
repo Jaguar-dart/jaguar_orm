@@ -6,9 +6,9 @@ class Find implements Statement, Whereable {
 
   final TableName from;
 
-  final _joins = <JoinedTable>[];
+  final _joins = <JoinedTable?>[];
 
-  JoinedTable _curJoin;
+  JoinedTable? _curJoin;
 
   Expression _where = And();
 
@@ -16,13 +16,13 @@ class Find implements Statement, Whereable {
 
   final List<String> _groupBy = [];
 
-  int _limit;
+  int? _limit;
 
-  int _offset;
+  int? _offset;
 
   ImmutableFindStatement get asImmutable => ImmutableFindStatement(this);
 
-  Find(String tableName, {String alias, Expression where})
+  Find(String tableName, {String? alias, Expression? where})
       : from = TableName(tableName, alias) {
     if (where != null) this.where(where);
   }
@@ -37,35 +37,35 @@ class Find implements Statement, Whereable {
   }
 
   /// Adds a 'inner join' clause to the select statement.
-  Find innerJoin(String tableName, [String alias]) {
+  Find innerJoin(String tableName, [String? alias]) {
     _curJoin = JoinedTable.innerJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'left join' clause to the select statement.
-  Find leftJoin(String tableName, [String alias]) {
+  Find leftJoin(String tableName, [String? alias]) {
     _curJoin = JoinedTable.leftJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'right join' clause to the select statement.
-  Find rightJoin(String tableName, [String alias]) {
+  Find rightJoin(String tableName, [String? alias]) {
     _curJoin = JoinedTable.rightJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds a 'full join' clause to the select statement.
-  Find fullJoin(String tableName, [String alias]) {
+  Find fullJoin(String tableName, [String? alias]) {
     _curJoin = JoinedTable.fullJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
   }
 
   /// Adds 'cross join' clause to the select statement.
-  Find crossJoin(String tableName, [String alias]) {
+  Find crossJoin(String tableName, [String? alias]) {
     _curJoin = JoinedTable.crossJoin(tableName, alias);
     _joins.add(_curJoin);
     return this;
@@ -75,20 +75,20 @@ class Find implements Statement, Whereable {
   Find joinOn(Expression exp) {
     if (_curJoin == null) throw Exception('No joins in the join stack!');
 
-    _curJoin.joinOn(exp);
+    _curJoin!.joinOn(exp);
     return this;
   }
 
   /// Selects a [column] to be fetched from the [table]. Use [alias] to alias
   /// the column name.
-  Find sel(String column, {String alias, String table}) {
+  Find sel(String column, {String? alias, String? table}) {
     String col = (table == null ? '' : table + '.') + column;
     _column.add(SelColumn(col, alias));
     return this;
   }
 
   /// Selects a [column] to be fetched. Use [alias] to alias the column name.
-  Find selAll([String table]) {
+  Find selAll([String? table]) {
     String col = (table == null ? '' : table + '.') + '*';
     _column.add(SelColumn(col));
     return this;
@@ -96,7 +96,7 @@ class Find implements Statement, Whereable {
 
   /// Selects many [columns] to be fetched in the given [table]. Use [alias] to
   /// alias the column name.
-  Find selMany(Iterable<String> columns, {String table}) {
+  Find selMany(Iterable<String> columns, {String? table}) {
     if (table == null) {
       for (String columnName in columns) {
         final String name = columnName;
@@ -111,7 +111,7 @@ class Find implements Statement, Whereable {
     return this;
   }
 
-  Find count(String column, {String alias, bool isDistinct = false}) {
+  Find count(String column, {String? alias, bool isDistinct = false}) {
     _column.add(CountSelColumn(column, alias: alias, isDistinct: isDistinct));
     return this;
   }
@@ -221,7 +221,7 @@ class ImmutableFindStatement {
 
   ImmutableFindStatement(this._find)
       : selects = UnmodifiableListView<SelColumn>(_find._column),
-        joins = UnmodifiableListView<JoinedTable>(_find._joins),
+        joins = UnmodifiableListView<JoinedTable?>(_find._joins),
         orderBy = UnmodifiableListView<OrderBy>(_find._orderBy),
         groupBy = UnmodifiableListView<String>(_find._groupBy);
 
@@ -229,7 +229,7 @@ class ImmutableFindStatement {
 
   final UnmodifiableListView<SelColumn> selects;
 
-  final UnmodifiableListView<JoinedTable> joins;
+  final UnmodifiableListView<JoinedTable?> joins;
 
   // TODO return immutable
   Expression get where => _find._where;
@@ -238,9 +238,9 @@ class ImmutableFindStatement {
 
   final UnmodifiableListView<String> groupBy;
 
-  int get limit => _find._limit;
+  int? get limit => _find._limit;
 
-  int get offset => _find._offset;
+  int? get offset => _find._offset;
 }
 
 typedef MappedExpression<T> = Expression Function(T value);

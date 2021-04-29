@@ -12,7 +12,7 @@ class Insert implements Statement, Settable {
   final String name;
   final bool ignoreIfExist;
 
-  String _id;
+  String? _id;
 
   final Map<String, dynamic> _values = {};
 
@@ -99,7 +99,7 @@ class ImmutableInsertStatement {
 
   String get table => _inner.name;
 
-  String get id => _inner._id;
+  String? get id => _inner._id;
 
   bool get ignoreIfExist => _inner.ignoreIfExist;
 

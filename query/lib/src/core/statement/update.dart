@@ -9,7 +9,7 @@ class Update implements Statement, Settable, Whereable {
 
   Expression _where = And();
 
-  Update(this.name, {Expression where}) {
+  Update(this.name, {Expression? where}) {
     if (where != null) this.where(where);
   }
 

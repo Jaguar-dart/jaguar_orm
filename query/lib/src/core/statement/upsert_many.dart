@@ -48,7 +48,7 @@ class UpsertMany implements Statement {
   }
 
   /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.upsertMany<T>(this);
+  Future<T> exec<T>(Adapter adapter) => adapter.upsertMany<T>(this) as Future<T>;
 
 }
 

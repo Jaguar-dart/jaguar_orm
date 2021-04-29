@@ -7,7 +7,7 @@ abstract class Table {}
 class TableName implements Table {
   final String tableName;
 
-  final String alias;
+  final String? alias;
 
   TableName(this.tableName, [this.alias]);
 }
@@ -47,22 +47,22 @@ class JoinedTable implements Table {
 
   QueryJoinedTableInfo get info => QueryJoinedTableInfo(this);
 
-  JoinedTable(this._type, String tableName, [String alias])
+  JoinedTable(this._type, String tableName, [String? alias])
       : _to = TableName(tableName, alias);
 
-  factory JoinedTable.innerJoin(String tableName, [String alias]) =>
+  factory JoinedTable.innerJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.InnerJoin, tableName, alias);
 
-  factory JoinedTable.leftJoin(String tableName, [String alias]) =>
+  factory JoinedTable.leftJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.LeftJoin, tableName, alias);
 
-  factory JoinedTable.rightJoin(String tableName, [String alias]) =>
+  factory JoinedTable.rightJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.RightJoin, tableName, alias);
 
-  factory JoinedTable.fullJoin(String tableName, [String alias]) =>
+  factory JoinedTable.fullJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.FullJoin, tableName, alias);
 
-  factory JoinedTable.crossJoin(String tableName, [String alias]) =>
+  factory JoinedTable.crossJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.CrossJoin, tableName, alias);
 
   JoinedTable joinOn(Expression onExp) {
