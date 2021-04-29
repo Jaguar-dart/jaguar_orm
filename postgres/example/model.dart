@@ -7,11 +7,11 @@ class Post {
 
   Post.make({this.id, this.msg, this.author});
 
-  int id;
+  int? id;
 
-  String msg;
+  String? msg;
 
-  String author;
+  String? author;
 
   String toString() => '$id $msg $author';
 }
@@ -27,7 +27,7 @@ class PostBean extends Bean<Post> {
   /// Field DSL for author column
   final StrField author = new StrField('author');
 
-  Map<String, Field> _fields;
+  Map<String, Field>? _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         msg.name: msg,
@@ -38,13 +38,13 @@ class PostBean extends Bean<Post> {
 
   @override
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String>? only}) {
     final ret = <SetColumn>[];
 
-    if (!update) ret.add(id.set(model.id));
+    if (!update) ret.add(id.set(model.id!));
 
-    ret.add(msg.set(model.msg));
-    ret.add(author.set(model.author));
+    ret.add(msg.set(model.msg!));
+    ret.add(author.set(model.author!));
 
     return ret;
   }
@@ -86,7 +86,7 @@ class PostBean extends Bean<Post> {
   }
 
   /// Finds one post by [id]
-  Future<Post> findById(int id) async {
+  Future<Post?> findById(int id) async {
     Find st = finder.where(this.id.eq(id));
     return findOne(st);
   }

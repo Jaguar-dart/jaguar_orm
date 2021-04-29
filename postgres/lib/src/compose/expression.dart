@@ -51,9 +51,9 @@ String composeExpression(final Expression exp) {
 }
 
 String composeField(final Field col) =>
-    (col.tableName != null ? col.tableName + '.' : '') + col.name;
+    (col.tableName != null ? col.tableName! + '.' : '') + col.name;
 
-String composeValue(dynamic val) {
+String? composeValue(dynamic val) {
   if (val == null) return null;
   if (val is int) {
     return "$val";

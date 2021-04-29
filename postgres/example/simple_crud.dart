@@ -22,7 +22,7 @@ main() async {
   await bean.insert(new Post.make(id: 2, msg: 'Whatever 2', author: 'bob'));
 
   // Find one post
-  Post post = await bean.findById(1);
+  Post? post = await bean.findById(1);
   print(post);
 
   // Find all posts

@@ -9,16 +9,16 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 import 'package:postgres/postgres.dart' as pg;
 
-class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
-  pg.PostgreSQLConnection _connection;
+class PgAdapter implements Adapter<pg.PostgreSQLConnection?> {
+  pg.PostgreSQLConnection? _connection;
 
   final String host;
 
   final int port;
 
   final String databaseName;
-  final String username;
-  final String password;
+  final String? username;
+  final String? password;
 
   PgAdapter(this.databaseName,
       {this.username, this.password, this.host: 'localhost', this.port: 5432});
@@ -36,19 +36,19 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
     if (_connection == null)
       _connection = new pg.PostgreSQLConnection(host, port, databaseName,
           username: username, password: password);
-    if (_connection.isClosed) await connection.open();
+    if (_connection!.isClosed) await connection!.open();
   }
 
   /// Closes all connections to the database.
-  Future<void> close() => _connection.close();
+  Future<void> close() => _connection!.close();
 
-  pg.PostgreSQLConnection get connection => _connection;
+  pg.PostgreSQLConnection? get connection => _connection;
 
   /// Finds one record in the table
-  Future<Map> findOne(Find st) async {
+  Future<Map?> findOne(Find st) async {
     String stStr = composeFind(st);
     List<Map<String, Map<String, dynamic>>> rows =
-        await _connection.mappedResultsQuery(stStr);
+        await _connection!.mappedResultsQuery(stStr);
 
     if (rows.isEmpty) return null;
 
@@ -67,15 +67,15 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   Future<List<Map>> find(Find st) async {
     String stStr = composeFind(st);
     List<Map<String, Map<String, dynamic>>> list =
-        await _connection.mappedResultsQuery(stStr);
+        await _connection!.mappedResultsQuery(stStr);
 
     return list.map((v) => v.values.first).toList();
   }
 
   /// Inserts a record into the table
-  Future<T> insert<T>(Insert st) async {
+  Future<T?> insert<T>(Insert st) async {
     String strSt = composeInsert(st);
-    var ret = await _connection.query(strSt);
+    var ret = await _connection!.query(strSt);
     if (ret.isEmpty || ret.first.isEmpty) return null;
     return ret.first.first;
   }
@@ -97,34 +97,34 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection> {
   }
 
   /// Updates a record in the table
-  Future<int> update(Update st) => _connection.execute(composeUpdate(st));
+  Future<int> update(Update st) => _connection!.execute(composeUpdate(st));
 
   /// Deletes a record from the table
-  Future<int> remove(Remove st) => _connection.execute(composeRemove(st));
+  Future<int> remove(Remove st) => _connection!.execute(composeRemove(st));
 
   @override
   Future<void> alter(Alter statement) async {
-    await _connection.execute(composeAlter(statement));
+    await _connection!.execute(composeAlter(statement));
   }
 
   /// Creates the table
   Future<void> createTable(Create statement) async {
-    await _connection.execute(composeCreate(statement));
+    await _connection!.execute(composeCreate(statement));
   }
 
   /// Create the database
   Future<void> createDatabase(CreateDb st) async {
-    await _connection.execute(composeCreateDb(st));
+    await _connection!.execute(composeCreateDb(st));
   }
 
   /// Drops tables from database
   Future<void> dropTable(Drop st) async {
     String stStr = composeDrop(st);
-    await _connection.execute(stStr);
+    await _connection!.execute(stStr);
   }
 
   Future<void> dropDb(DropDb st) async {
-    await _connection.execute(composeDropDb(st));
+    await _connection!.execute(composeDropDb(st));
   }
 
   @override
