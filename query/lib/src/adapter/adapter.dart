@@ -29,7 +29,7 @@ abstract class Adapter<ConnType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<T> insert<T>(Insert statement);
+  Future<T?> insert<T>(Insert statement);
 
   /// Executes the insert statement for many element
   Future<void> insertMany<T>(InsertMany statement);

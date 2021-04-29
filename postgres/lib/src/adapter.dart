@@ -45,7 +45,7 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection?> {
   pg.PostgreSQLConnection? get connection => _connection;
 
   /// Finds one record in the table
-  Future<Map?> findOne(Find st) async {
+  Future<Map<String, dynamic>?> findOne(Find st) async {
     String stStr = composeFind(st);
     List<Map<String, Map<String, dynamic>>> rows =
         await _connection!.mappedResultsQuery(stStr);
@@ -64,7 +64,7 @@ class PgAdapter implements Adapter<pg.PostgreSQLConnection?> {
   }
 
   // Finds many records in the table
-  Future<List<Map>> find(Find st) async {
+  Future<List<Map<String, dynamic>>> find(Find st) async {
     String stStr = composeFind(st);
     List<Map<String, Map<String, dynamic>>> list =
         await _connection!.mappedResultsQuery(stStr);

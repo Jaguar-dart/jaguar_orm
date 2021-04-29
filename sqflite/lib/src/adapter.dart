@@ -57,7 +57,7 @@ class SqfliteAdapter implements Adapter<sqf.Database?> {
   }
 
   /// Inserts a record into the table
-  Future<T> insert<T>(Insert st) async {
+  Future<T?> insert<T>(Insert st) async {
     String strSt = composeInsert(st);
     return connection!.rawInsert(strSt) as Future<T>;
   }
