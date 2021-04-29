@@ -43,12 +43,12 @@ class JoinedTable implements Table {
 
   final TableName _to;
 
-  final _on = And();
+  final And _on = And();
+
+  QueryJoinedTableInfo get info => QueryJoinedTableInfo(this);
 
   JoinedTable(this._type, String tableName, [String alias])
-      : _to = TableName(tableName, alias) {
-    _info = QueryJoinedTableInfo(this);
-  }
+      : _to = TableName(tableName, alias);
 
   factory JoinedTable.innerJoin(String tableName, [String alias]) =>
       JoinedTable(JoinType.InnerJoin, tableName, alias);
@@ -87,9 +87,6 @@ class JoinedTable implements Table {
     }
   }
 
-  QueryJoinedTableInfo _info;
-
-  QueryJoinedTableInfo get info => _info;
 }
 
 class QueryJoinedTableInfo {

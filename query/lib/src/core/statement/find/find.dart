@@ -20,10 +20,11 @@ class Find implements Statement, Whereable {
 
   int _offset;
 
+  ImmutableFindStatement get asImmutable => ImmutableFindStatement(this);
+
   Find(String tableName, {String alias, Expression where})
       : from = TableName(tableName, alias) {
     if (where != null) this.where(where);
-    _immutable = ImmutableFindStatement(this);
   }
 
   /// Adds a 'join' clause to the select statement
@@ -213,9 +214,6 @@ class Find implements Statement, Whereable {
   FindExecutor<ConnType> exec<ConnType>(Adapter<ConnType> adapter) =>
       FindExecutor<ConnType>(adapter, this);
 
-  ImmutableFindStatement _immutable;
-
-  ImmutableFindStatement get asImmutable => _immutable;
 }
 
 class ImmutableFindStatement {

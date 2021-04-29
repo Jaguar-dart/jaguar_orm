@@ -12,9 +12,9 @@ class InsertMany implements Statement {
 
   final List<Map<String, dynamic>> _bulkValues = [];
 
-  InsertMany(this.name) {
-    _immutable = ImmutableInsertManyStatement(this);
-  }
+  ImmutableInsertManyStatement get asImmutable => ImmutableInsertManyStatement(this);
+
+  InsertMany(this.name);
 
   /// Adds a single [row] to be inserted.
   InsertMany add(Iterable<SetColumn> row) {
@@ -48,12 +48,8 @@ class InsertMany implements Statement {
   }
 
   /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
+  Future<void> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
 
-  ImmutableInsertManyStatement _immutable;
-
-  /// Read-only representation of this statement.
-  ImmutableInsertManyStatement get asImmutable => _immutable;
 }
 
 class ImmutableInsertManyStatement {

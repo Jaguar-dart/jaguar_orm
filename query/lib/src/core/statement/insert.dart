@@ -16,9 +16,9 @@ class Insert implements Statement, Settable {
 
   final Map<String, dynamic> _values = {};
 
-  Insert(this.name, {this.ignoreIfExist = false}) {
-    _immutable = ImmutableInsertStatement(this);
-  }
+  ImmutableInsertStatement get asImmutable => ImmutableInsertStatement(this);
+
+  Insert(this.name, {this.ignoreIfExist = false});
 
   /// Id is the auto-generated primary key that is set by the database. [Adapter]
   /// will request the database to return this column on inserts.
@@ -79,11 +79,6 @@ class Insert implements Statement, Settable {
 
   /// Executes the statement with the given adapter.
   Future<T> exec<T>(Adapter adapter) => adapter.insert<T>(this);
-
-  ImmutableInsertStatement _immutable;
-
-  /// Read-only representation of this statement.
-  ImmutableInsertStatement get asImmutable => _immutable;
 
 //  Insert setId<ValType>(Field<ValType> field, ValType value) {
 //    _id = field.name;

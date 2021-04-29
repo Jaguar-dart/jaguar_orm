@@ -7,9 +7,9 @@ class Create implements Statement {
 
   final Map<String, CreateColumn> _columns = {};
 
-  Create(this.name, {this.ifNotExists = false}) {
-    _immutable = ImmutableCreateStatement(this);
-  }
+  ImmutableCreateStatement get asImmutable => ImmutableCreateStatement(this);
+
+  Create(this.name, {this.ifNotExists = false});
 
   Create addInt(String name,
       {bool isNullable = false,
@@ -126,9 +126,6 @@ class Create implements Statement {
 
   Future<void> exec(Adapter adapter) => adapter.createTable(this);
 
-  ImmutableCreateStatement _immutable;
-
-  ImmutableCreateStatement get asImmutable => _immutable;
 }
 
 class ImmutableCreateStatement {

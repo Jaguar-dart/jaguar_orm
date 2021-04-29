@@ -1,13 +1,13 @@
 part of query;
 
 class UpdateMany implements Statement /*, Whereable */ {
-  String name;
+  final String name;
 
   final List<Update> _bulkValues = [];
 
-  UpdateMany(this.name) {
-    _immutable = ImmutableUpdateManyStatement(this);
-  }
+  ImmutableUpdateManyStatement get asImmutable => ImmutableUpdateManyStatement(this);
+
+  UpdateMany(this.name);
 
   UpdateMany addAll(List<List<SetColumn>> items, List<Expression> where) {
     _bulkValues.clear();
@@ -23,12 +23,8 @@ class UpdateMany implements Statement /*, Whereable */ {
     return this;
   }
 
-  Future<T> exec<T>(Adapter adapter) => adapter.updateMany(this);
+  Future<void> exec<T>(Adapter adapter) => adapter.updateMany(this);
 
-  ImmutableUpdateManyStatement _immutable;
-
-  /// Read-only representation of this statement.
-  ImmutableUpdateManyStatement get asImmutable => _immutable;
 }
 
 class ImmutableUpdateManyStatement {

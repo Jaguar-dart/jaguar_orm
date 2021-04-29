@@ -3,11 +3,11 @@ part of query;
 class Remove implements Statement, Whereable {
   final String name;
 
+  QueryRemoveInfo get info => QueryRemoveInfo(this);
+
   Expression _where = And();
 
-  Remove(this.name) {
-    _info = QueryRemoveInfo(this);
-  }
+  Remove(this.name);
 
   Remove or(Expression exp) {
     _where = _where.or(exp);
@@ -61,9 +61,6 @@ class Remove implements Statement, Whereable {
 
   Future<int> exec(Adapter adapter) => adapter.remove(this);
 
-  QueryRemoveInfo _info;
-
-  QueryRemoveInfo get info => _info;
 }
 
 class QueryRemoveInfo {

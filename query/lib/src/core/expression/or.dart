@@ -5,14 +5,9 @@ class Or extends Expression {
   /// List of expressions composing this 'logical and' expression
   final _expressions = <Expression>[];
 
-  Or() {
-    _expOut = UnmodifiableListView<Expression>(_expressions);
-  }
+  UnmodifiableListView<Expression> get expressions => UnmodifiableListView<Expression>(_expressions);
 
-  UnmodifiableListView<Expression> _expOut;
-
-  /// List of expressions composing this 'logical or' expression
-  UnmodifiableListView<Expression> get expressions => _expOut;
+  Or();
 
   /// Number of expressions composing this 'logical or' expression
   int get length => _expressions.length;

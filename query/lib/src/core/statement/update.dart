@@ -5,11 +5,12 @@ class Update implements Statement, Settable, Whereable {
 
   final Map<String, dynamic> _values = {};
 
+  ImmutableUpdateStatement get asImmutable => ImmutableUpdateStatement(this);
+
   Expression _where = And();
 
   Update(this.name, {Expression where}) {
     if (where != null) this.where(where);
-    _immutable = ImmutableUpdateStatement(this);
   }
 
   Update set<ValType>(Field<ValType> field, ValType value) {
@@ -108,9 +109,6 @@ class Update implements Statement, Settable, Whereable {
 
   Future<int> exec(Adapter adapter) => adapter.update(this);
 
-  ImmutableUpdateStatement _immutable;
-
-  ImmutableUpdateStatement get asImmutable => _immutable;
 }
 
 class ImmutableUpdateStatement {
