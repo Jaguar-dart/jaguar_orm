@@ -38,7 +38,7 @@ class PostBean extends Bean<Post> {
 
   @override
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String>? only}) {
+      {bool update = false, bool onlyNonNull = false, Set<String>? only}) {
     final ret = <SetColumn>[];
 
     if (!update) ret.add(id.set(model.id!));

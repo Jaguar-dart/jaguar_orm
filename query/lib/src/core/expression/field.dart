@@ -32,14 +32,14 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<String> phone = Field<String>('phone');
   ///     find.where(phone.iss(null));
-  Cond<ValType> iss(ValType value) => Cond.iss<ValType>(this, value);
+  Cond<ValType> get isNull => Cond.isNull<ValType>(this);
 
   /// Returns an "IS NOT" condition, i.e. 'where var IS NOT null'
   ///
   ///     FindStatement find = FindStatement();
   ///     Field<String> phone = Field<String>('phone');
   ///     find.where(phone.isNot(null));
-  Cond<ValType> isNot(ValType value) => Cond.isNot<ValType>(this, value);
+  Cond<ValType> get isNotNull => Cond.isNotNull<ValType>(this);
 
   /// Returns a "not equal to" condition
   ///
@@ -195,6 +195,8 @@ class Field<ValType> {
   ///     update.set(age.set(20));
   SetColumn<ValType> set(ValType value) => SetColumn<ValType>(name, value);
 
+  SetColumn<ValType?> setNullable(ValType? value) => SetColumn<ValType?>(name, value);
+
   Cond<ValType> operator <(ValType other) {
     return lt(other);
   }
@@ -321,7 +323,7 @@ class DateTimeField extends Field<DateTime> {
   DateTimeField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool? isNullable, String? uniqueGroup}) {
+  void create(Create statement, {bool isNullable = false, String? uniqueGroup}) {
     statement.addDateTime(name,
         isNullable: isNullable, uniqueGroup: uniqueGroup);
   }

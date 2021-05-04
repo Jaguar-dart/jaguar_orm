@@ -42,7 +42,7 @@ abstract class Bean<ModelType> {
 
   /// Returns one row found by executing [statement]
   Future<ModelType?> findOne(Find statement) async {
-    Map row = await adapter.findOne(statement);
+    Map<String, dynamic>? row = await adapter.findOne(statement);
     if (row != null) return fromMap(row);
     return null;
   }
@@ -106,5 +106,5 @@ abstract class Bean<ModelType> {
   /// Creates list of 'set' column from model to be used in update or insert
   /// query
   List<SetColumn> toSetColumns(ModelType model,
-      {bool update = false, Set<String>? only});
+      {bool update = false, Set<String>? only, bool onlyNonNull = false});
 }

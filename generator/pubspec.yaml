@@ -30,7 +30,7 @@ dependency_overrides:
 
 dev_dependencies:
   test: ^1.17.1
-  build_runner: ^2.0.1
+  build_runner: ^2.0.2
   build_test: ^2.1.0
   collection: ^1.15.0
   path: ^1.8.0

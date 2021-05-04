@@ -23,7 +23,7 @@ class PostBean1 extends PostBean {
 
   @override
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String>? only}) {
+      {bool update = false, bool onlyNonNull = false, Set<String>? only}) {
     final ret = <SetColumn>[];
 
     ret.add(msg.set(model.msg!));

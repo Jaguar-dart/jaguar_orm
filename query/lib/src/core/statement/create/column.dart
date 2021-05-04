@@ -75,7 +75,7 @@ class CreateBool extends CreateColumn<bool> {
 
 /// Clause to create datetime column in SQL table.
 class CreateDateTime extends CreateColumn<DateTime> {
-  final bool? isNullable;
+  final bool isNullable;
 
   final String name;
 

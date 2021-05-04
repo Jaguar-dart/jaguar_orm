@@ -66,24 +66,14 @@ class JoinedTable implements Table {
       JoinedTable(JoinType.CrossJoin, tableName, alias);
 
   JoinedTable joinOn(Expression onExp) {
-    if (_type == null || _to == null) {
-      throw Exception('Query has no join on it!');
-    }
-
     _on.and(onExp);
 
     return this;
   }
 
   void validate() {
-    if (_to == null) {
-      if (_type != null || _on.length != 0) {
-        throw Exception('Join not initialized properly!');
-      }
-    } else {
-      if (_type == null || _on.length == 0) {
-        throw Exception('Join not initialized properly!');
-      }
+    if (_on.length == 0) {
+      throw Exception('Join not initialized properly!');
     }
   }
 

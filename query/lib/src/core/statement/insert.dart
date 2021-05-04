@@ -78,7 +78,7 @@ class Insert implements Statement, Settable {
   }
 
   /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.insert<T>(this);
+  Future<T?> exec<T>(Adapter adapter) => adapter.insert<T>(this);
 
 //  Insert setId<ValType>(Field<ValType> field, ValType value) {
 //    _id = field.name;

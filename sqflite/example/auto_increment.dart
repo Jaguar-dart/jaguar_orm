@@ -90,7 +90,7 @@ class PostBean {
 
     List<Map> maps = await (await _adapter.find(finder)).toList();
 
-    List<Post> posts = new List<Post>();
+    List<Post> posts = <Post>[];
 
     for (Map map in maps) {
       Post post = new Post();

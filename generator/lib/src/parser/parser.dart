@@ -334,7 +334,7 @@ class ParsedBean {
           if (!_relation(clazz!.thisType, field)) {
             final vf = Field(field.type.name!, field.name, field.name,
                 unique: null,
-                length: null,
+                length: 0,
                 autoIncrement: false,
                 isNullable: false,
                 foreign: null,
@@ -418,11 +418,13 @@ class ParsedBean {
         final WriterModel targetInfo =
             ParsedBean(target.element as ClassElement?, doRelations: false).detect();
         preloads.add(PreloadManyToMany(
-            pivot, target, f.name, targetInfo, beanInfo, g?.fields));
+            pivot, target, f.name, targetInfo, beanInfo, g.fields));
         return;
       }
 
-      preloads.add(PreloadManyToMany(pivot, target, f.name, null, null, null));
+      // TODO: this would cause a null pointer issue in the writer, is it actually sensible to have a PreloadManyToMany without a relationship
+      // preloads.add(PreloadManyToMany(pivot, target, f.name, null, null, <Field>[]));
+
       return;
     }
 
@@ -440,7 +442,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
     return Field(f.type.name!, f.name, colName,
         isNullable: isNullable!,
         autoIncrement: autoIncrement!,
-        length: length!,
+        length: length ?? 0,
         foreign: null,
         isPrimary: false,
         unique: unique,
@@ -450,7 +452,7 @@ Field parseColumn(FieldElement f, DartObject obj) {
         isNullable: isNullable!,
         isPrimary: true,
         autoIncrement: autoIncrement!,
-        length: length!,
+        length: length ?? 0,
         foreign: null,
         unique: unique,
         isFinal: f.isFinal);

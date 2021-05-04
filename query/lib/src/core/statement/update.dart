@@ -72,7 +72,7 @@ class Update implements Statement, Settable, Whereable {
   Update orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
+      _where = _where.or(exp);
     });
     return this;
   }
@@ -80,7 +80,7 @@ class Update implements Statement, Settable, Whereable {
   Update andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
+      _where = _where.and(exp);
     });
     return this;
   }

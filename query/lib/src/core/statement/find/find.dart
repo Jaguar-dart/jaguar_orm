@@ -29,8 +29,6 @@ class Find implements Statement, Whereable {
 
   /// Adds a 'join' clause to the select statement
   Find addJoin(JoinedTable join) {
-    if (join == null) throw Exception('Join cannot be null!');
-
     _curJoin = join;
     _joins.add(join);
 
@@ -132,7 +130,7 @@ class Find implements Statement, Whereable {
   Find orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
+      _where = _where.or(exp);
     });
     return this;
   }
@@ -140,7 +138,7 @@ class Find implements Statement, Whereable {
   Find andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
+      _where = _where.and(exp);
     });
     return this;
   }
@@ -222,7 +220,7 @@ class ImmutableFindStatement {
 
   ImmutableFindStatement(this._find)
       : selects = UnmodifiableListView<SelColumn>(_find._column),
-        joins = UnmodifiableListView<JoinedTable?>(_find._joins),
+        joins = UnmodifiableListView<JoinedTable>(_find._joins),
         orderBy = UnmodifiableListView<OrderBy>(_find._orderBy),
         groupBy = UnmodifiableListView<String>(_find._groupBy);
 

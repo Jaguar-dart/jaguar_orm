@@ -41,7 +41,7 @@ class PgAdapter implements Adapter<pg.Connection> {
   pg.Connection get connection => _connection;
 
   /// Finds one record in the table
-  Future<Map> findOne(Find st) async {
+  Future<Map<String, dynamic>?> findOne(Find st) async {
     Stream<pg.Row> stream = await _connection.query(composeFind(st));
 
     pg.Row rowFound;

@@ -48,7 +48,7 @@ class InsertMany implements Statement {
   }
 
   /// Executes the statement with the given adapter.
-  Future<void> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
+  Future<void> exec<T>(Adapter adapter) => adapter.insertMany(this);
 
 }
 

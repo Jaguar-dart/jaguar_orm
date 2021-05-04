@@ -72,7 +72,7 @@ class Create implements Statement {
   }
 
   Create addDateTime(String name,
-      {bool? isNullable = false, String? uniqueGroup}) {
+      {bool isNullable = false, String? uniqueGroup}) {
     _columns[name] =
         CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
