@@ -73,9 +73,7 @@ class Cart {
     );
   }
 
-  String get amountLabel {
-    //return kCurrencyFormat.format(amount);
-  }
+  String get amountLabel => "\$$amount";
 
   @override
   String toString() => 'id=$id, amount=$amount, items=$items';

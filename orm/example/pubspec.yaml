@@ -12,6 +12,8 @@ environment:
 dependencies:
   jaguar_orm:
     path: ../
+  jaguar_query_postgres:
+    path: ../../postgres
 
 dev_dependencies:
   build_runner:
