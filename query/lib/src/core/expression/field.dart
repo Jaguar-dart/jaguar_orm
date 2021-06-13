@@ -84,6 +84,14 @@ class Field<ValType> {
   Between<ValType> between(ValType low, ValType high) =>
       Cond.between<ValType>(this, low, high);
 
+  /// Returns an "in" condition
+  ///
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
+  ///     find.where(age.isIn(<int>{20, 30}));
+  InOperation<ValType> isIn(Set<ValType> value) =>
+      Cond.isIn<ValType>(this, value);
+
   Field<ValType> aliasAs(String tableAlias) =>
       Field<ValType>.inTable(tableAlias, name);
 

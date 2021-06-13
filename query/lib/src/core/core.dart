@@ -16,6 +16,7 @@ part 'expression/condition.dart';
 part 'expression/expressions.dart';
 part 'expression/field.dart';
 part 'expression/in_between.dart';
+part 'expression/in_operation.dart';
 part 'expression/or.dart';
 part 'operators/comparision.dart';
 part 'statement/alter.dart';

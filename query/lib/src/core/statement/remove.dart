@@ -59,6 +59,9 @@ class Remove implements Statement, Whereable {
   Remove between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
+  Remove isIn<T>(String column, Set<T> values) =>
+      and(q.isIn<T>(column, values));
+
   Future<int> exec(Adapter adapter) => adapter.remove(this);
 
 }

@@ -174,6 +174,10 @@ class Find implements Statement, Whereable {
   Find between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
+  /// Adds an 'between' [expression] to 'where' clause.
+  Find isIn<T>(String column, Set<T> values) =>
+      and(q.isIn<T>(column, values));
+
   Find orderBy(String column, [bool ascending = false]) {
     _orderBy.add(OrderBy(column, ascending));
     return this;

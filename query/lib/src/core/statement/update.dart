@@ -107,6 +107,9 @@ class Update implements Statement, Settable, Whereable {
   Update between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
+  Update isIn<T>(String column, Set<T> values) =>
+      and(q.isIn<T>(column, values));
+
   Future<int> exec(Adapter adapter) => adapter.update(this);
 
 }

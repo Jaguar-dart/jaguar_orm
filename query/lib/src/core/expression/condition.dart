@@ -68,6 +68,12 @@ class Cond<ValType> extends Expression {
   static Between<ValType> between<ValType>(
           Field<ValType> field, ValType low, ValType high) =>
       Between<ValType>(field, low, high);
+
+  /// DSL to create 'in' relational condition
+  static InOperation<ValType> isIn<ValType>(
+      Field<ValType> field, Set<ValType> values) =>
+      InOperation<ValType>(field, values);
+
 }
 
 /// A relational conditional expression
@@ -146,4 +152,10 @@ class CondCol<ValType> extends Expression {
   static InBetweenCol<ValType> between<ValType>(
           Field<ValType> field, Field<ValType> low, Field<ValType> high) =>
       InBetweenCol<ValType>(field, low, high);
+
+  // /// DSL to create 'in' relational condition
+  // static InOperationCol<ValType> isIn<ValType>(
+  //     Field<ValType> field, Field<Set<ValType>> values) =>
+  //     InOperationCol<ValType>(field, values);
+
 }

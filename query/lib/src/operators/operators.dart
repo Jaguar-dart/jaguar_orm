@@ -39,3 +39,8 @@ Cond<String> like(String field, String value, {String? tableName}) =>
 Between<ValType> between<ValType>(String field, ValType low, ValType high,
         {String? tableName}) =>
     Between<ValType>(Field<ValType>.inTable(tableName, field), low, high);
+
+/// DSL to create 'in-between' relational condition
+InOperation<ValType> isIn<ValType>(String field, Set<ValType> values,
+      {String? tableName}) =>
+    InOperation<ValType>(Field<ValType>.inTable(tableName, field), values);

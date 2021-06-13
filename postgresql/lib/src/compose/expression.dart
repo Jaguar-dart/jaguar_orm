@@ -45,6 +45,8 @@ String composeExpression(final Expression exp) {
     return '(${composeCol(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
   } else if (exp is InBetweenCol) {
     return '(${composeCol(exp.field)} BETWEEN ${composeCol(exp.low)} AND ${composeCol(exp.high)})';
+  } else if (exp is InOperation) {
+    return '(${composeCol(exp.field)} IN (${exp.values.map(composeValue).map((value) => value!).join(", ")}))';
   } else {
     throw new Exception('Unknown expression ${exp.runtimeType}!');
   }

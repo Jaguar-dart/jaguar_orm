@@ -40,9 +40,11 @@ String composeExpression(final Expression exp) {
   } else if (exp is Cond) {
     return '${composeField(exp.lhs)} ${exp.op.string} ${composeValue(exp.rhs)}';
   } else if (exp is CondCol) {
-    return '${composeField(exp.lhs)} ${exp.op.string} ${composeField(exp.rhs)}';
+    return '${composeField(exp.lhs)} ${exp.op.string} ${composeField(exp.rhs!)}';
   } else if (exp is Between) {
     return '(${composeField(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
+  } else if (exp is InOperation) {
+    return '(${composeField(exp.field)} IN (${exp.values.map(composeValue).map((value) => value!).join(", ")}))';
   } else if (exp is InBetweenCol) {
     return '(${composeField(exp.field)} BETWEEN ${composeField(exp.low)} AND ${composeField(exp.high)})';
   } else {

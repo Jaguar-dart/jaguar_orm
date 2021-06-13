@@ -80,4 +80,6 @@ abstract class Whereable implements Statement {
   Whereable like(String column, String val);
 
   Whereable between<T>(String column, T low, T high);
+
+  Whereable isIn<T>(String column, Set<T> values);
 }
