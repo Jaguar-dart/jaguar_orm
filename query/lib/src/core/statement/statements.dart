@@ -1,57 +1,57 @@
-part of query.core;
+part of query;
 
-class SelClause {
-  final Expression expr;
+class SelColumn {
+  final String name;
 
-  final String alias;
+  final String? alias;
 
-  SelClause(this.expr, {this.alias});
+  SelColumn(this.name, [this.alias]);
+}
+
+class CountSelColumn extends SelColumn {
+  final bool isDistinct;
+
+  CountSelColumn(String name, {String? alias, this.isDistinct = false})
+      : super(name, alias);
 }
 
 /// name:value pair used to set a column named [name] to [value]. Used during
 /// inserts and updates.
-class SetColumn {
+class SetColumn<ValType> {
   /// Name of the column to set
   final String name;
 
   /// Value of the column
-  final Expression value;
+  final ValType? value;
 
   SetColumn(this.name, this.value);
 
   /// Returns a [SetColumn] that sets the current column to new [value].
-  SetColumn setTo(/* literal | Expression */ value) =>
-      SetColumn(name, Expression.toExpression(value));
+  SetColumn<ValType> setTo(ValType value) => SetColumn<ValType>(name, value);
 }
 
 abstract class Statement {}
 
 abstract class Settable implements Statement {
-  Settable set(/* String | I */ field, /* literal | Expression */ value);
-
-  Settable setValues(Map<String, dynamic> values);
-
-  Settable setOne(SetColumn col);
+  Settable set<ValType>(Field<ValType> field, ValType value);
 
   Settable setMany(List<SetColumn> columns);
 
+  Settable setValue<ValType>(String column, ValType value);
+
+  Settable setValues(Map<String, dynamic> values);
+
   /// Convenience method to set the [value] of int [column].
-  Settable setInt(/* String | I */ column, int value);
+  Settable setInt(String column, int value);
 
   /// Convenience method to set the [value] of string [column].
-  Settable setString(/* String | I */ column, String value);
+  Settable setString(String column, String value);
 
   /// Convenience method to set the [value] of bool [column].
-  Settable setBool(/* String | I */ column, bool value);
+  Settable setBool(String column, bool value);
 
   /// Convenience method to set the [value] of date time [column].
-  Settable setTimestamp(
-      /* String | I */ column,
-      DateTime value);
-
-  Settable setDuration(
-      /* String | I */ column,
-      Duration value);
+  Settable setDateTime(String column, DateTime value);
 }
 
 abstract class Whereable implements Statement {
@@ -59,38 +59,25 @@ abstract class Whereable implements Statement {
 
   Whereable and(Expression exp);
 
+  Whereable orMap<T>(Iterable<T> iterable, MappedExpression<T> func);
+
+  Whereable andMap<T>(Iterable<T> iterable, MappedExpression<T> func);
+
   Whereable where(Expression exp);
 
-  Whereable eq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable eq<T>(String column, T val);
 
-  Whereable ne(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable ne<T>(String column, T val);
 
-  Whereable gt(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable gt<T>(String column, T val);
 
-  Whereable gtEq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable gtEq<T>(String column, T val);
 
-  Whereable ltEq(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable ltEq<T>(String column, T val);
 
-  Whereable lt(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable lt<T>(String column, T val);
 
-  Whereable like(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ rhs);
+  Whereable like(String column, String val);
 
-  Whereable between(
-      /* String | Field | I */ lhs,
-      /* Literal | Expression */ low,
-      /* Literal | Expression */ high);
+  Whereable between<T>(String column, T low, T high);
 }

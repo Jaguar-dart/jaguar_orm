@@ -74,7 +74,7 @@ package [**jaguar_query_postgres**](https://github.com/Jaguar-dart/jaguar_query_
 
 ```dart
 final PgAdapter _adapter =
-    PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
+    new PgAdapter('example', username: 'postgres', password: 'dart_jaguar');
 await _adapter.connect();
 ```
 
@@ -84,7 +84,7 @@ await _adapter.connect();
 database. Lets create an instance of `UserBean`.
 
 ```dart
-final userBean = UserBean(_adapter);
+final userBean = new UserBean(_adapter);
 ```
 
 ## Dropping the table
@@ -100,10 +100,10 @@ await userBean.createTable();
 
 ```
 
-## Inserting a record
+## Inserting a new record
 
 ```dart
-await userBean.insert(User()
+await userBean.insert(new User()
     ..id = '1'
     ..name = 'teja');
 ```
@@ -176,7 +176,7 @@ class Address {
 @GenBean()
 class UserBean extends Bean<User> with _UserBean {
   UserBean(Adapter adapter)
-      : addressBean = AddressBean(adapter),
+      : addressBean = new AddressBean(adapter),
         super(adapter);
 
   final AddressBean addressBean;
@@ -206,30 +206,30 @@ class AddressBean extends Bean<Address> with _AddressBean {
 
 /// The adapter
 PgAdapter _adapter =
-    PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
+    new PgAdapter('postgres://postgres:dart_jaguar@localhost/example');
 
 main() async {
   // Connect to database
   await _adapter.connect();
 
   // Create beans
-  final userBean = UserBean(_adapter);
-  final addressBean = AddressBean(_adapter);
+  final userBean = new UserBean(_adapter);
+  final addressBean = new AddressBean(_adapter);
 
   // Drop old tables
   await addressBean.drop();
   await userBean.drop();
 
-  // Create tables
+  // Create new tables
   await userBean.createTable();
   await addressBean.createTable();
 
   // Cascaded One-To-One insert
   {
-    final user = User()
+    final user = new User()
       ..id = '1'
       ..name = 'Teja'
-      ..address = (Address()
+      ..address = (new Address()
         ..id = '1'
         ..street = 'Stockholm');
     await userBean.insert(user, cascade: true);
@@ -243,14 +243,14 @@ main() async {
 
   // Manual One-To-One insert
   {
-    User user = User()
+    User user = new User()
       ..id = '2'
       ..name = 'Kleak';
     await userBean.insert(user, cascade: true);
 
     user = await userBean.find('2');
 
-    final address = Address()
+    final address = new Address()
       ..id = '2'
       ..street = 'Stockholm';
     addressBean.associateUser(address, user);

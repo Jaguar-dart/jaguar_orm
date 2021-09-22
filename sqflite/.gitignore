@@ -22,3 +22,4 @@ doc/api/
 *.ipr
 *.iws
 /.flutter-plugins
+.fvm/flutter_sdk

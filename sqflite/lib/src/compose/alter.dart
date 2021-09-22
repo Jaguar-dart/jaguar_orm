@@ -9,7 +9,9 @@ String composeAlter(Alter st) {
   // Add columns
   if (st.adds.isNotEmpty) {
     sb.write('ADD ');
-    final adds = st.adds.values.map((AddColumn c) => composeProperty(c.column)).join(', ');
+    final adds = st.adds.values
+        .map((AddColumn c) => composeCreateColumn(c.column))
+        .join(', ');
     sb.write(adds);
     sb.write(' ');
   }
@@ -23,8 +25,6 @@ String composeAlter(Alter st) {
   }
 
   // Modify columns
-  /* TODO
-  // Modify columns
   if (st.mods.isNotEmpty) {
     sb.write('ALTER COLUMN ');
     final mods = st.mods.values
@@ -33,7 +33,6 @@ String composeAlter(Alter st) {
     sb.write(mods);
     sb.write(' ');
   }
-  */
 
   if (st.shouldDropPrimary) {
     sb.write('DROP PRIMARY KEY ');

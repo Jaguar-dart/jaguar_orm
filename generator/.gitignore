@@ -10,3 +10,4 @@ doc/api/
 
 .idea
 *.iml
+.fvm/flutter_sdk

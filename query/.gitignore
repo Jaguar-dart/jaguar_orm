@@ -30,4 +30,4 @@ doc/api/
 *.iws
 
 pubspec.lock
-
+.fvm/flutter_sdk

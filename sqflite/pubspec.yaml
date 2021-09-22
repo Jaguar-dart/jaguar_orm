@@ -1,28 +1,28 @@
 name: jaguar_query_sqflite
 description: SQFLite database adapter for jaguar_query for Flutter. Use it in combination with jaguar_orm to write concise and readable database queries.
-version: 4.1.1-dev
+version: 2.2.11
 authors:
-- Ravi Teja Gudapati <tejainece@gmail.com>
-- Kevin Segaud <segaud.kevin@gmail.com>
-- Aumard Jimmy <jimmy.aumard@gmail.com>
+  - Ravi Teja Gudapati <tejainece@gmail.com>
+  - Kevin Segaud <segaud.kevin@gmail.com>
+  - Aumard Jimmy <jimmy.aumard@gmail.com>
 homepage: https://github.com/Jaguar-dart/jaguar_orm
-documentation:
+# documentation:
 
 environment:
-  sdk: '>=2.0.0-dev.65.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 flutter:
 
 dependencies:
   flutter:
     sdk: flutter
-  sqflite: ^1.1.1
-  jaguar_query: # ^4.1.1
+  sqflite: ^2.0.0+3
+  jaguar_query: 
+    path: ../query
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 dependency_overrides:
   jaguar_query:
     path: ../query

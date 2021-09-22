@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.30
+
++ Update dependencies to be ok with last flutter stable
+
+## 2.2.29
+
++ Fix upsert that wsa not doing on cascade upsert when foreign key used
+
+## 2.2.28
+
++ Fix upsert when foreign keys are enabled by adding a flag on the generated method
+
 ## 2.2.24
 
 + Fixed bugs related to or expression in generated methods

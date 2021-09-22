@@ -1,11 +1,11 @@
-part of query.core;
+part of query;
 
 /// Insert many SQL statement builder.
 ///
 /// Use `into` method to set the table to insert into.
 /// Use `add`, `addAll`, `addMap` and `addAllMap` to set column values.
 ///
-/// Use `exec` statement or `Connection` to execute the statement against a
+/// Use `exec` statement or `Adapter` to execute the statement against a
 /// database.
 class InsertMany implements Statement {
   final String name;
@@ -13,7 +13,7 @@ class InsertMany implements Statement {
   final List<Map<String, dynamic>> _bulkValues = [];
 
   InsertMany(this.name) {
-    _immutable = ImInsertMany(this);
+    _immutable = ImmutableInsertManyStatement(this);
   }
 
   /// Adds a single [row] to be inserted.
@@ -47,19 +47,19 @@ class InsertMany implements Statement {
     return this;
   }
 
-  /// Executes the statement with the given connection.
-  Future<T> exec<T>(Connection connection) => connection.insertMany<T>(this);
+  /// Executes the statement with the given adapter.
+  Future<void> exec<T>(Adapter adapter) => adapter.insertMany<T>(this);
 
-  ImInsertMany _immutable;
+  late ImmutableInsertManyStatement _immutable;
 
   /// Read-only representation of this statement.
-  ImInsertMany get asImmutable => _immutable;
+  ImmutableInsertManyStatement get asImmutable => _immutable;
 }
 
-class ImInsertMany {
+class ImmutableInsertManyStatement {
   final InsertMany _inner;
 
-  ImInsertMany(this._inner)
+  ImmutableInsertManyStatement(this._inner)
       : values = UnmodifiableListView<UnmodifiableMapView<String, dynamic>>(
             _inner._bulkValues.map((values) => UnmodifiableMapView(values)));
 

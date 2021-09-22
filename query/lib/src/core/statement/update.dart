@@ -1,169 +1,127 @@
-part of query.core;
+part of query;
 
 class Update implements Statement, Settable, Whereable {
   final String name;
 
-  final Map<String, Expression> _values = {};
+  final Map<String, dynamic> _values = {};
 
-  Expression _where;
+  Expression _where = And();
 
-  Update(this.name, {Expression where}) {
-    _where = where;
-    _immutable = ImUpdate(this);
+  Update(this.name, {Expression? where}) {
+    if (where != null) this.where(where);
+    _immutable = ImmutableUpdateStatement(this);
   }
 
-  /// Set the the [value] of given column ([field]).
-  Update set(/* String | I */ column, /* literal | Expression */ value) {
-    if (column is I) column = column.name;
-    _values[column] = Expression.toExpression(value);
+  Update set<ValType>(Field<ValType> field, ValType value) {
+    setValue(field.name, value);
+    return this;
+  }
+
+  Update setMany(List<SetColumn> columns) {
+    columns.forEach((SetColumn column) {
+      setValue(column.name, column.value);
+    });
+    return this;
+  }
+
+  Update setValue<ValType>(String column, ValType value) {
+    _values[column] = value;
+    return this;
+  }
+
+  Update setValues(Map<String, dynamic> values) {
+    _values.addAll(values);
     return this;
   }
 
   /// Convenience method to set the [value] of int [column].
-  Update setValues(Map<String, /* literal | Expression */ dynamic> values) {
-    values.forEach(set);
+  Update setInt(String column, int value) {
+    _values[column] = value;
     return this;
-  }
-
-  Update setOne(SetColumn col) {
-    _values[col.name] = col.value;
-    return this;
-  }
-
-  /// Sets many [columns] with a single call.
-  Update setMany(Iterable<SetColumn> columns) {
-    for (SetColumn c in columns) _values[c.name] = c.value;
-    return this;
-  }
-
-  /// Convenience method to set the [value] of int [column].
-  Update setInt(/* String | I */ column, int value) {
-    return set(column, IntL(value));
   }
 
   /// Convenience method to set the [value] of string [column].
-  Update setString(/* String | I */ column, String value) {
-    return set(column, StrL(value));
+  Update setString(String column, String value) {
+    _values[column] = value;
+    return this;
   }
 
   /// Convenience method to set the [value] of bool [column].
-  Update setBool(/* String | I */ column, bool value) {
-    return set(column, BoolL(value));
-  }
-
-  /// Convenience method to set the [value] of date time [column].
-  Update setTimestamp(/* String | I */ column, DateTime value) {
-    return set(column, TimestampL(value));
-  }
-
-  /// Convenience method to set the [value] of date time [column].
-  Update setDuration(/* String | I */ column, Duration value) {
-    return set(column, DurationL(value));
-  }
-
-  /// Adds an to 'where' [expression] clause.
-  Update where(Expression expression) {
-    _where = expression;
+  Update setBool(String column, bool value) {
+    _values[column] = value;
     return this;
   }
 
-  /// Adds an 'AND' [expression] to 'where' clause.
-  Update and(Expression exp) {
-    if (_where == null) {
-      _where = exp;
-    } else {
-      _where = _where.and(exp);
-    }
+  /// Convenience method to set the [value] of date time [column].
+  Update setDateTime(String column, DateTime value) {
+    _values[column] = value;
     return this;
   }
 
-  /// Adds an 'OR' [expression] to 'where' clause.
   Update or(Expression exp) {
-    if (_where == null) {
-      _where = exp;
-    } else {
-      _where = _where.or(exp);
-    }
+    _where = _where.or(exp);
     return this;
   }
 
-  /// Adds an '=' [expression] to 'where' clause.
-  Update eq(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).eq(rhs));
+  Update and(Expression exp) {
+    _where = _where.and(exp);
+    return this;
+  }
 
-  /// Adds an '<>' [expression] to 'where' clause.
-  Update ne(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).ne(rhs));
+  Update orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
+    iterable.forEach((T v) {
+      final Expression exp = func(v);
+      if (exp != null) _where = _where.or(exp);
+    });
+    return this;
+  }
 
-  /// Adds an 'IS' [expression] to 'where' clause.
-  Update iss(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).iss(rhs));
+  Update andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
+    iterable.forEach((T v) {
+      final Expression exp = func(v);
+      if (exp != null) _where = _where.and(exp);
+    });
+    return this;
+  }
 
-  /// Adds an 'IS NOT' [expression] to 'where' clause.
-  Update isNot(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).isNot(rhs));
+  Update where(Expression exp) {
+    _where = _where.and(exp);
+    return this;
+  }
 
-  /// Adds an '>' [expression] to 'where' clause.
-  Update gt(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).gt(rhs));
+  Update eq<T>(String column, T val) => and(q.eq<T>(column, val));
 
-  /// Adds an '>=' [expression] to 'where' clause.
-  Update gtEq(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).gtEq(rhs));
+  Update ne<T>(String column, T val) => and(q.ne<T>(column, val));
 
-  /// Adds an '<=' [expression] to 'where' clause.
-  Update ltEq(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).ltEq(rhs));
+  Update gt<T>(String column, T val) => and(q.gt<T>(column, val));
 
-  /// Adds an '<' [expression] to 'where' clause.
-  Update lt(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).lt(rhs));
+  Update gtEq<T>(String column, T val) => and(q.gtEq<T>(column, val));
 
-  /// Adds an '%' [expression] to 'where' clause.
-  Update like(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ rhs) =>
-      and(I.make(lhs).like(rhs));
+  Update ltEq<T>(String column, T val) => and(q.ltEq<T>(column, val));
 
-  /// Adds an 'between' [expression] to 'where' clause.
-  Update between(
-          /* String | Field | I */ lhs,
-          /* Literal | Expression */ low,
-          /* Literal | Expression */ high) =>
-      and(I.make(lhs).between(low, high));
+  Update lt<T>(String column, T val) => and(q.lt<T>(column, val));
 
-  Future<int> exec(Connection connection) => connection.update(this);
+  Update like(String column, String val) => and(q.like(column, val));
 
-  ImUpdate _immutable;
+  Update between<T>(String column, T low, T high) =>
+      and(q.between<T>(column, low, high));
 
-  ImUpdate get asImmutable => _immutable;
+  Future<int> exec(Adapter adapter) => adapter.update(this);
+
+  late ImmutableUpdateStatement _immutable;
+
+  ImmutableUpdateStatement get asImmutable => _immutable;
 }
 
-class ImUpdate {
+class ImmutableUpdateStatement {
   final Update _inner;
 
-  ImUpdate(this._inner)
-      : values = UnmodifiableMapView<String, Expression>(_inner._values);
+  ImmutableUpdateStatement(this._inner)
+      : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get tableName => _inner.name;
 
-  final UnmodifiableMapView<String, Expression> values;
+  final UnmodifiableMapView<String, dynamic> values;
 
   //TODO immutable
   Expression get where => _inner._where;

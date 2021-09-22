@@ -1,100 +1,95 @@
 library jaguar_orm.generator.model;
 
-import 'package:jaguar_orm/jaguar_orm.dart';
-import 'package:meta/meta.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:jaguar_orm_gen/src/common/common.dart';
-import 'package:jaguar_orm/src/annotations/column.dart';
-import 'package:tuple/tuple.dart';
-import 'preloads.dart';
-
-export 'preloads.dart';
 
 part 'association.dart';
 part 'foreign.dart';
 
-class ParsedField {
+class Field {
   final String type;
 
   final String field;
 
   final bool isFinal;
 
-  final Column column;
-
-  final String dataType;
-
-  final String dataTypeDecl;
-
-  final ForeignSpec foreign;
-
-  final bool isAuto;
-
-  final List<String> constraints;
-
-  ParsedField(this.type, this.field,
-      {@required Column column,
-      @required this.dataType,
-      @required this.dataTypeDecl,
-      @required this.foreign,
-      @required this.isFinal,
-      @required this.isAuto,
-      this.constraints: const []})
-      : column = column ?? Column();
-
-  String get colName => column?.name ?? field;
-
   String get vType {
-    final index = dataType.indexOf('<');
-    if (index == -1) return dataType + 'Field';
-    return dataType.substring(0, index) + 'Field' + dataType.substring(index);
+    try {
+      return getValType(type);
+    } catch (e) {
+      throw new FieldSpecException(field, e.toString());
+    }
   }
+
+  final String colName;
+
+  final bool isNullable;
+
+  final bool autoIncrement;
+
+  final int? length;
+
+  final bool isPrimary;
+
+  final Foreign? foreign;
+
+  final String? unique;
+
+  Field(this.type, this.field, String? colName,
+      {required this.isNullable,
+      required this.autoIncrement,
+      required this.length,
+      required this.isPrimary,
+      required this.foreign,
+      required this.unique,
+      required this.isFinal})
+      : colName = colName ?? field;
 }
 
-class ParsedBean extends UnAssociatedBean {
-  /// A map of bean to [AssociationByRelation]
-  final Map<Tuple2<DartType, String>, AssociationByRelation>
-      associationsWithRelations;
+class WriterModel {
+  final String name;
 
-  /// A map of association to [AssociationWithoutRelation]
-  final Map<DartType, AssociationWithoutRelation> associationsWithoutRelations;
+  final String modelType;
 
-  bool get hasManyToManyRelation => preloads.any((p) => p is PreloadManyToMany);
+  final Map<String, Field> fields;
 
-  ParsedBean(
-    String name, {
-    @required String modelType,
-    @required Map<String, ParsedField> fields,
-    @required List<ParsedField> primary,
-    @required List<Preload> preloads,
-    @required Map<String, RelationSpec> relations,
-    @required this.associationsWithRelations,
-    @required this.associationsWithoutRelations,
-  }) : super(name, modelType,
-            fields: fields,
-            primary: primary,
-            relations: relations,
-            preloads: preloads);
+  final List<Field> primary;
 
-  factory ParsedBean.fromPreAssociated(
-    UnAssociatedBean bean, {
-    @required Map<Tuple2<DartType, String>, AssociationByRelation> belongTos,
-    @required
-        Map<DartType, AssociationWithoutRelation> beanedForeignAssociations,
-  }) {
-    return ParsedBean(bean.name,
-        modelType: bean.modelType,
-        fields: bean.fields,
-        primary: bean.primary,
-        preloads: bean.preloads,
-        relations: bean.relations,
-        associationsWithRelations: belongTos,
-        associationsWithoutRelations: beanedForeignAssociations);
+  /// A map of bean to [BelongsToAssociation]
+  final Map<DartType, BelongsToAssociation> belongTos;
+
+  /// A map of association to [BeanedForeignAssociation]
+  final Map<DartType, BeanedForeignAssociation> beanedForeignAssociations;
+
+  /// A map of association to [ForeignKey]
+  // TODO final Map<String, BaseForeignKey> getByForeignTabled;
+
+  final List<Preload> preloads;
+
+  Field? fieldByColName(String colName) =>
+      fields.values.firstWhereOrNull((Field f) => f.colName == colName);
+
+  WriterModel(this.name, this.modelType, this.fields, this.primary,
+      this.belongTos, this.beanedForeignAssociations, this.preloads);
+
+  Preload? findHasXByAssociation(DartType association) {
+    return preloads.firstWhereOrNull((p) =>
+        p.bean.getDisplayString(withNullability: false) ==
+        association.getDisplayString(withNullability: false));
+
+    /*
+    if (found == null) {
+      throw new Exception('Association not found!');
+    }
+
+    return found;
+    */
   }
 
-  AssociationByRelation getMatchingManyToMany(AssociationByRelation val) {
-    for (AssociationByRelation f in associationsWithRelations.values) {
-      if (!f.isManyToMany) continue;
+  BelongsToAssociation? getMatchingManyToMany(BelongsToAssociation val) {
+    for (BelongsToAssociation f in belongTos.values) {
+      if (!f.belongsToMany) continue;
 
       if (f == val) continue;
 
@@ -104,31 +99,83 @@ class ParsedBean extends UnAssociatedBean {
   }
 }
 
-class UnAssociatedBean {
-  final String name;
-
-  final String modelType;
-
-  final Map<String, ParsedField> fields;
-
-  final List<ParsedField> primary;
-
-  final List<Preload> preloads;
-
-  /// Map of field name to relation.
-  final Map<String, RelationSpec> relations;
-
-  UnAssociatedBean(this.name, this.modelType,
-      {@required this.fields,
-      @required this.primary,
-      @required this.relations,
-      @required this.preloads});
-
-  Preload findHasXByAssociation(DartType association, {@required String name}) {
-    return preloads.firstWhere((p) => p.bean == association && p.linkBy == name,
-        orElse: () => null);
+String getValType(String type) {
+  if (type == 'String' || type == 'String?') {
+    return 'StrField';
+  } else if (type == 'bool'  || type == 'bool?') {
+    return 'BoolField';
+  } else if (type == 'int'  || type == 'int?') {
+    return 'IntField';
+  } else if (type == 'num' || type == 'double' || type == 'double?') {
+    return 'DoubleField';
+  } else if (type == 'DateTime' || type == 'DateTime?') {
+    return 'DateTimeField';
   }
 
-  ParsedField fieldByColName(String colName) => fields.values
-      .firstWhere((ParsedField f) => f.colName == colName, orElse: () => null);
+  throw new Exception('Field type not recognised: $type!');
+}
+
+/// Contains information about `HasOne`, `HasMany`, `ManyToMany` relationships
+abstract class Preload {
+  DartType get bean;
+
+  String get beanName => bean.getDisplayString(withNullability: false);
+
+  String get beanInstanceName => uncap(modelName) + 'Bean';
+
+  String get modelName =>
+      getModelForBean(bean).getDisplayString(withNullability: false);
+
+  String get property;
+
+  List<Field> get fields;
+
+  List<Field>? get foreignFields;
+
+  bool get hasMany;
+}
+
+/// Contains information about `HasOne`, `HasMany` relationships
+class PreloadOneToX extends Preload {
+  final DartType bean;
+
+  final String property;
+
+  final List<Field> fields = <Field>[];
+
+  final List<Field> foreignFields;
+
+  /// true for `HasMany`. false for `HasOne`
+  final bool hasMany;
+
+  PreloadOneToX(this.bean, this.property, this.foreignFields, this.hasMany);
+}
+
+class PreloadManyToMany extends Preload {
+  final DartType bean;
+
+  final DartType targetBean;
+
+  String get targetBeanName =>
+      targetBean.getDisplayString(withNullability: false);
+
+  String get targetBeanInstanceName => uncap(targetModelName) + 'Bean';
+
+  String get targetModelName =>
+      getModelForBean(targetBean).getDisplayString(withNullability: false);
+
+  final String property;
+
+  final WriterModel? targetInfo;
+
+  final WriterModel? beanInfo;
+
+  final List<Field> fields = <Field>[];
+
+  final List<Field>? foreignFields;
+
+  final bool hasMany = true;
+
+  PreloadManyToMany(this.bean, this.targetBean, this.property, this.targetInfo,
+      this.beanInfo, this.foreignFields);
 }

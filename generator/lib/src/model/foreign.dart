@@ -1,46 +1,31 @@
 part of jaguar_orm.generator.model;
 
-abstract class ForeignSpec implements ColumnDef {
-  String get references;
+abstract class Foreign {
+  String get refCol;
 }
 
-class BelongsToSpec implements ForeignSpec {
+class BelongsToForeign implements Foreign {
   final DartType bean;
 
-  final String references;
+  final String refCol;
 
   final DartType model;
 
+  final bool? byHasMany;
+
   final bool belongsToMany;
 
-  /// Name of the foreign key.
-  ///
-  /// Is also used to connect to [Relation]. Same as [BelongsTo.link].
-  final String link;
-
-  BelongsToSpec(this.bean, this.references, this.belongsToMany, {this.link})
+  BelongsToForeign(this.bean, this.refCol, this.byHasMany, this.belongsToMany)
       : model = getModelForBean(bean);
 
-  String get beanName => bean.name;
+  String get beanName => bean.getDisplayString(withNullability: false);
 
-  String get modelName => model.name;
+  String get modelName => model.getDisplayString(withNullability: false);
 
   String get beanInstanceName => uncap(modelName) + 'Bean';
 }
 
-class ReferencesSpec implements ForeignSpec {
-  final String table;
-
-  final String references;
-
-  final String link;
-
-  // TODO association
-
-  ReferencesSpec(this.table, this.references, {this.link});
-}
-
-/* TODO
+/*
 class BeanedForeign implements Foreign {
   final DartType bean;
 
@@ -51,3 +36,11 @@ class BeanedForeign implements Foreign {
   BeanedForeign(this.bean, this.refCol) : model = getModelForBean(bean);
 }
 */
+
+class TableForeign implements Foreign {
+  final String table;
+
+  final String refCol;
+
+  TableForeign(this.table, this.refCol);
+}

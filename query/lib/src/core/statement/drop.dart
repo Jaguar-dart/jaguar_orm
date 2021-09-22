@@ -1,4 +1,4 @@
-part of query.core;
+part of query;
 
 class Drop implements Statement {
   final _tables = <String>[];
@@ -7,7 +7,7 @@ class Drop implements Statement {
 
   Drop(/* String | Iterable<String> */ table, {this.onlyIfExists = false}) {
     if (table is String) _tables.add(table);
-    if (table is Iterable) _tables.addAll(table);
+    if (table is Iterable<String>) _tables.addAll(table);
   }
 
   Iterable<String> get tables => _tables;
@@ -22,5 +22,5 @@ class Drop implements Statement {
     return this;
   }
 
-  Future<void> exec(Connection connection) => connection.dropTable(this);
+  Future<void> exec(Adapter adapter) => adapter.dropTable(this);
 }

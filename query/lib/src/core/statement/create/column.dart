@@ -1,53 +1,120 @@
-part of 'create.dart';
+part of query;
 
-class CreateCol<T> implements Property {
+/// Clause to create int column in SQL table.
+class CreateInt implements CreateColumn<int> {
+  final bool isNullable;
+
   final String name;
 
-  final DataType<T> type;
-
-  final bool notNull;
+  final bool autoIncrement;
 
   final bool isPrimary;
 
-  final References foreign;
+  final Foreign? foreignKey;
 
-  final List<Constraint> constraints;
+  final String? uniqueGroup;
 
-  CreateCol(this.name, this.type,
-      {this.notNull = false,
+  const CreateInt(this.name,
+      {this.isNullable = false,
+      this.autoIncrement = false,
       this.isPrimary = false,
-      this.foreign,
-      this.constraints = const []});
+      this.foreignKey,
+      this.uniqueGroup});
+
+  const CreateInt.primary(this.name, {this.foreignKey, this.uniqueGroup})
+      : isPrimary = true,
+        isNullable = false,
+        autoIncrement = false;
+
+  const CreateInt.autoPrimary(this.name, {this.uniqueGroup})
+      : isPrimary = true,
+        autoIncrement = true,
+        foreignKey = null,
+        isNullable = false;
 }
 
-class References {
-  /// The table in which foreign key references the column [col]
-  final String table;
+/// Clause to create double column in SQL table.
+class CreateDouble extends CreateColumn<double> {
+  final bool isNullable;
 
-  /// References column in table [table]
-  final String col;
+  final String name;
 
-  /// Name of the constraint
-  final String link;
+  final bool isPrimary;
 
-  const References(this.table, this.col, {this.link});
+  final Foreign? foreignKey;
+
+  final String? uniqueGroup;
+
+  CreateDouble(this.name,
+      {this.isNullable = false,
+      this.isPrimary = false,
+      this.foreignKey,
+      this.uniqueGroup});
+
+  CreateDouble.primary(this.name, {this.foreignKey})
+      : isPrimary = true,
+        isNullable = false,
+        uniqueGroup = null;
 }
 
-abstract class Constraint {}
+/// Clause to create bool column in SQL table.
+class CreateBool extends CreateColumn<bool> {
+  final bool isNullable;
 
-/// SQL UNIQUE constraint
-class Unique implements Constraint {
-  final String group;
+  final String name;
 
-  const Unique({this.group});
+  final bool isPrimary;
+
+  final String? uniqueGroup;
+
+  final Foreign? foreignKey = null;
+
+  CreateBool(this.name,
+      {this.isNullable = false, this.isPrimary = false, this.uniqueGroup});
 }
 
-const unique = Unique();
+/// Clause to create datetime column in SQL table.
+class CreateDateTime extends CreateColumn<DateTime> {
+  final bool isNullable;
 
-// TODO Index constraint
+  final String name;
 
-class Check implements Constraint {
-  final Expression expression;
+  final bool isPrimary;
 
-  const Check(this.expression);
+  final Foreign? foreignKey;
+
+  final String? uniqueGroup;
+
+  CreateDateTime(this.name,
+      {this.isNullable = false,
+      this.isPrimary = false,
+      this.foreignKey,
+      this.uniqueGroup});
+}
+
+/// Clause to create string column in SQL table.
+class CreateStr extends CreateColumn<String> {
+  final bool isNullable;
+
+  final String name;
+
+  final bool isPrimary;
+
+  final int length;
+
+  final Foreign? foreignKey;
+
+  final String? uniqueGroup;
+
+  CreateStr(this.name,
+      {this.isNullable = false,
+      this.isPrimary = false,
+      this.length = 20,
+      this.foreignKey,
+      this.uniqueGroup});
+
+  CreateStr.primary(this.name,
+      {this.length = 20, this.foreignKey, this.uniqueGroup})
+      : isPrimary = true,
+        isNullable = false;
 }

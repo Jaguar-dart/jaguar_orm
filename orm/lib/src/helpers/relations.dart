@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:jaguar_orm/jaguar_orm.dart';
 import 'package:quiver/core.dart';
 
 class HashableValues {
@@ -33,8 +32,7 @@ typedef List<dynamic> AssociationKeysGetter<Model>(Model model);
 typedef Future<List<Child>> OneToXChildrenGetterForAll<Parent, Child>(
     List<Parent> models,
     {bool preload,
-    bool cascade,
-    Connection withConn});
+    bool cascade});
 
 typedef void AssociationSetter<Parent, Child>(Parent p, Child c);
 
@@ -56,29 +54,28 @@ class OneToXHelper {
       OneToXChildrenGetterForAll<Parent, Child> childFetcher,
       AssociationKeysGetter<Child> childAssociationGetter,
       AssociationSetter<Parent, Child> setter,
-      {bool cascade = false,
-      Connection withConn}) async {
+      {bool cascade = false}) async {
     if (parents.length == 0) return;
 
     final Map<HashableValues, Parent> map = {};
-    List<List> args;
+    List<List>? args;
     for (Parent parent in parents) {
       final List key = parentAssociationGetter(parent);
       if (args == null) {
-        args = List.filled(key.length, [], growable: false);
+        args = new List.filled(key.length, [], growable: false);
       }
-      map[HashableValues(key)] = parent;
+      map[new HashableValues(key)] = parent;
       for (int i = 0; i < key.length; i++) {
         args[i].add(key[i]);
       }
     }
 
-    final List<Child> children = await childFetcher(parents,
-        preload: cascade, cascade: cascade, withConn: withConn);
+    final List<Child> children =
+        await childFetcher(parents, preload: cascade, cascade: cascade);
 
     for (Child child in children) {
-      final key = HashableValues(childAssociationGetter(child));
-      final Parent parent = map[key];
+      final key = new HashableValues(childAssociationGetter(child));
+      final Parent? parent = map[key];
       if (parent == null) continue;
       setter(parent, child);
     }

@@ -1,7 +1,7 @@
 part of query.compose;
 
 String composeInsertMany(final InsertMany st) {
-  final ImInsertMany info = st.asImmutable;
+  final ImmutableInsertManyStatement info = st.asImmutable;
   final sb = new StringBuffer();
 
   sb.write('INSERT INTO ');
@@ -11,7 +11,7 @@ String composeInsertMany(final InsertMany st) {
   sb.write(' SELECT ');
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
-    sb.write('${composeLiteral(info.values[0][key])} AS \'$key\'');
+    sb.write('${composeValue(info.values[0][key])} AS \'$key\'');
     if (i < keys.length - 1) {
       sb.write(', ');
     }
@@ -24,7 +24,7 @@ String composeInsertMany(final InsertMany st) {
     sb.write('UNION ALL SELECT ');
     for (var j = 0; j < keys.length; ++j) {
       var key = keys[j];
-      sb.write('${composeLiteral(values[key])}');
+      sb.write('${composeValue(values[key])}');
       if (j < keys.length - 1) {
         sb.write(', ');
       }

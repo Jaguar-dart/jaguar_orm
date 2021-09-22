@@ -3,190 +3,91 @@ library jaguar_orm.adapter;
 import 'dart:async';
 
 import 'package:jaguar_query/jaguar_query.dart';
-import 'connection.dart';
-
-export 'connection.dart';
-export 'to_dialect.dart';
-
-typedef Logger = void Function(String statement);
 
 /// Adapter interface that must be implemented to support new databases
 abstract class Adapter<ConnType> {
-  Logger get logger;
+  /// Makes a new connection to database
+  Future<void> connect();
 
-  /// Opens a new connection to database
-  Future<Connection> open();
+  /// Closes the connection
+  Future<void> close();
 
-  Future<T> run<T>(Future<T> Function(Connection<ConnType> conn) task,
-      {Connection<ConnType> withConn}) async {
-    if (withConn == null) {
-      withConn = await open();
-      T ret;
-      try {
-        ret = await task(withConn);
-      } catch (e) {
-        await withConn.release();
-        rethrow;
-      } finally {
-        await withConn.release();
-      }
-      return ret;
-    }
-
-    return await task(withConn);
-  }
-
-  Future<T> transaction<T>(Future<T> Function(Connection<ConnType> conn) tx,
-      {Connection<ConnType> withConn}) async {
-    final task = (Connection<ConnType> conn) async {
-      return conn.transaction(tx);
-    };
-    return run(task, withConn: withConn);
-  }
-
-  Future<dynamic> query(String sql, {Connection withConn}) {
-    return run((conn) {
-      return conn.query(sql);
-    }, withConn: withConn);
-  }
-
-  Future<dynamic> exec(String sql, {Connection withConn}) {
-    return run((conn) {
-      return conn.exec(sql);
-    }, withConn: withConn);
-  }
+  ConnType get connection;
 
   /// Returns a row found by executing [statement]
-  Future<Map> findOne(Find statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.findOne(statement);
-    }, withConn: withConn);
-  }
+  Future<Map<String, dynamic>?> findOne(Find statement);
 
   /// Returns a list of rows found by executing [statement]
-  Future<List<Map>> find(Find statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.find(statement);
-    }, withConn: withConn);
-  }
+  Future<List<Map<String, dynamic>>> find(Find statement);
 
   /// Executes the insert or update statement and returns the primary key of
   /// inserted row
-  Future<T> upsert<T>(Upsert statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.upsert<T>(statement);
-    }, withConn: withConn);
-  }
+  Future<T> upsert<T>(Upsert statement);
 
   /// Executes bulk insert or update statement
-  Future<void> upsertMany<T>(UpsertMany statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.upsertMany(statement);
-    }, withConn: withConn);
-  }
+  Future<void> upsertMany<T>(UpsertMany statement);
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<T> insert<T>(Insert statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.insert(statement);
-    }, withConn: withConn);
-  }
+  Future<T> insert<T>(Insert statement);
 
   /// Executes the insert statement for many element
-  Future<void> insertMany<T>(InsertMany statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.insertMany(statement);
-    }, withConn: withConn);
-  }
+  Future<void> insertMany<T>(InsertMany statement);
 
   /// Updates the row and returns the number of rows updated
-  Future<int> update(Update statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.update(statement);
-    }, withConn: withConn);
-  }
+  Future<int> update(Update statement);
 
   /// Updates many rows
-  Future<void> updateMany(UpdateMany statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.updateMany(statement);
-    }, withConn: withConn);
-  }
+  Future<void> updateMany(UpdateMany statement);
 
   /// Deletes the requested row
-  Future<int> remove(Remove statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.remove(statement);
-    }, withConn: withConn);
-  }
+  Future<int> remove(Remove statement);
 
-  Future<void> alter(Alter statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.alter(statement);
-    }, withConn: withConn);
-  }
+  Future<void> alter(Alter statement);
 
   /// Creates the table
-  Future<void> createTable(Create statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.createTable(statement);
-    }, withConn: withConn);
-  }
+  Future<void> createTable(Create statement);
 
   /// Create the database
-  Future<void> createDatabase(CreateDb statement, {Connection withConn}) {
-    return run((conn) {
-      return conn.createDatabase(statement);
-    }, withConn: withConn);
-  }
+  Future<void> createDatabase(CreateDb statement);
 
   /// Drops tables from database
-  Future<void> dropTable(Drop st, {Connection withConn}) {
-    return run((conn) {
-      return conn.dropTable(st);
-    }, withConn: withConn);
-  }
+  Future<void> dropTable(Drop st);
 
   /// Drops tables from database
-  Future<void> dropDb(DropDb st, {Connection withConn}) {
-    return run((conn) {
-      return conn.dropDb(st);
-    }, withConn: withConn);
-  }
+  Future<void> dropDb(DropDb st);
 
   /// Parses values coming from database into Dart values
   T parseValue<T>(dynamic v);
-
-  Future<Connection> beginTx({Connection withConn}) {
-    return run((conn) {
-      return conn.startTx();
-    }, withConn: withConn);
-  }
 }
 
-/// Convenience class to execute `Find` statement using [connection]
+/// Convenience class to execute `Find` statement using [adapter]
 class FindExecutor<ConnType> {
   /// The adapter used to execute find statement
-  final Connection<ConnType> connection;
+  final Adapter<ConnType> adapter;
 
   final Find _st;
 
-  FindExecutor(this.connection, this._st);
+  FindExecutor(this.adapter, this._st);
 
   /// Returns a row found by executing [statement]
-  Future<Map> one() => connection.findOne(_st);
+  Future<Map<String, dynamic>?> one() => adapter.findOne(_st);
 
   /// Returns a row found by executing [statement]
-  Future<List<Map>> many() async => await connection.find(_st);
+  Future<List<Map<String, dynamic>>> many() async => await adapter.find(_st);
 
   /// Returns a row found by executing [statement]
-  Future<T> oneTo<T>(T converter(Map v)) async {
-    final Map map = await connection.findOne(_st);
+  Future<T?> oneTo<T>(T converter(Map v)) async {
+    final Map<String, dynamic>? map = await adapter.findOne(_st);
+
+    if (map == null) {
+      return null;
+    }
+
     return converter(map);
   }
 
   /// Returns a row found by executing [statement]
   Future<List<T>> manyTo<T>(T converter(Map v)) async =>
-      (await connection.find(_st)).map(converter).toList();
+      (await adapter.find(_st)).map(converter).toList();
 }

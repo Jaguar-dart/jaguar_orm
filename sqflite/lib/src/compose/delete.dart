@@ -7,7 +7,7 @@ String composeRemove(final Remove st) {
   sb.write('DELETE FROM ');
   sb.write(st.info.tableName);
 
-  if (info.where != null) {
+  if (info.where.length != 0) {
     sb.write(' WHERE ');
     sb.write(composeExpression(info.where));
   }
@@ -20,5 +20,7 @@ String composeRemove(final Remove st) {
 String composeDropDb(final DropDb st) => "DROP DATABASE ${st.name}";
 
 String composeDrop(final Drop st) {
-  return "DROP TABLE " + (st.onlyIfExists ? 'IF EXISTS ' : '') + st.tables.join(', ');
+  return "DROP TABLE " +
+      (st.onlyIfExists ? 'IF EXISTS ' : '') +
+      st.tables.join(', ');
 }

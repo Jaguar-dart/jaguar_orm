@@ -1,4 +1,4 @@
-part of query.core;
+part of query;
 
 /// Insert SQL statement builder.
 ///
@@ -6,20 +6,21 @@ part of query.core;
 /// Use `set`, `setMany`, `setValue`, `setInt`, `setString`, `setBool`,
 /// `setDateTime` and `setValues` to set column values.
 ///
-/// Use `exec` statement or `Connection` to execute the statement against a
+/// Use `exec` statement or `Adapter` to execute the statement against a
 /// database.
 class Insert implements Statement, Settable {
   final String name;
+  final bool ignoreIfExist;
 
-  String _id;
+  String? _id;
 
-  final Map<String, Expression> _values = {};
+  final Map<String, dynamic> _values = {};
 
-  Insert(this.name) {
-    _immutable = ImInsert(this);
+  Insert(this.name, {this.ignoreIfExist = false}) {
+    _immutable = ImmutableInsertStatement(this);
   }
 
-  /// Id is the auto-generated primary key that is set by the database. [Connection]
+  /// Id is the auto-generated primary key that is set by the database. [Adapter]
   /// will request the database to return this column on inserts.
   Insert id(String id) {
     _id = id;
@@ -27,61 +28,62 @@ class Insert implements Statement, Settable {
   }
 
   /// Set the the [value] of given column ([field]).
-  Insert set(/* String | I */ column, /* literal | Expression */ value) {
-    if (column is I) column = column.name;
-    _values[column] = Expression.toExpression(value);
-    return this;
-  }
-
-  /// Convenience method to set the [value] of int [column].
-  Insert setValues(Map<String, /* literal | Expression */ dynamic> values) {
-    values.forEach(set);
-    return this;
-  }
-
-  Insert setOne(SetColumn col) {
-    _values[col.name] = col.value;
+  Insert set<ValType>(Field<ValType> field, ValType value) {
+    setValue(field.name, value);
     return this;
   }
 
   /// Sets many [columns] with a single call.
   Insert setMany(Iterable<SetColumn> columns) {
-    for (SetColumn c in columns) _values[c.name] = c.value;
+    for (SetColumn col in columns) {
+      _values[col.name] = col.value;
+    }
+    return this;
+  }
+
+  /// Sets the [value] of the given [column].
+  Insert setValue<ValType>(String column, ValType value) {
+    _values[column] = value;
     return this;
   }
 
   /// Convenience method to set the [value] of int [column].
-  Insert setInt(/* String | I */ column, int value) {
-    return set(column, IntL(value));
+  Insert setValues(Map<String, dynamic> values) {
+    _values.addAll(values);
+    return this;
+  }
+
+  /// Convenience method to set the [value] of int [column].
+  Insert setInt(String column, int value) {
+    _values[column] = value;
+    return this;
   }
 
   /// Convenience method to set the [value] of string [column].
-  Insert setString(/* String | I */ column, String value) {
-    return set(column, StrL(value));
+  Insert setString(String column, String value) {
+    _values[column] = value;
+    return this;
   }
 
   /// Convenience method to set the [value] of bool [column].
-  Insert setBool(/* String | I */ column, bool value) {
-    return set(column, BoolL(value));
+  Insert setBool(String column, bool value) {
+    _values[column] = value;
+    return this;
   }
 
   /// Convenience method to set the [value] of date time [column].
-  Insert setTimestamp(/* String | I */ column, DateTime value) {
-    return set(column, TimestampL(value));
+  Insert setDateTime(String column, DateTime value) {
+    _values[column] = value;
+    return this;
   }
 
-  /// Convenience method to set the [value] of date time [column].
-  Insert setDuration(/* String | I */ column, Duration value) {
-    return set(column, DurationL(value));
-  }
+  /// Executes the statement with the given adapter.
+  Future<T> exec<T>(Adapter adapter) => adapter.insert<T>(this);
 
-  /// Executes the statement with the given connection.
-  Future<T> exec<T>(Connection connection) => connection.insert<T>(this);
-
-  ImInsert _immutable;
+  late ImmutableInsertStatement _immutable;
 
   /// Read-only representation of this statement.
-  ImInsert get asImmutable => _immutable;
+  ImmutableInsertStatement get asImmutable => _immutable;
 
 //  Insert setId<ValType>(Field<ValType> field, ValType value) {
 //    _id = field.name;
@@ -94,15 +96,17 @@ class Insert implements Statement, Settable {
 //  }
 }
 
-class ImInsert {
+class ImmutableInsertStatement {
   final Insert _inner;
 
-  ImInsert(this._inner)
-      : values = UnmodifiableMapView<String, Expression>(_inner._values);
+  ImmutableInsertStatement(this._inner)
+      : values = UnmodifiableMapView<String, dynamic>(_inner._values);
 
   String get table => _inner.name;
 
-  String get id => _inner._id;
+  String? get id => _inner._id;
 
-  final UnmodifiableMapView<String, Expression> values;
+  bool get ignoreIfExist => _inner.ignoreIfExist;
+
+  final UnmodifiableMapView<String, dynamic> values;
 }

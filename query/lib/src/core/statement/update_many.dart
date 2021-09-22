@@ -1,4 +1,4 @@
-part of query.core;
+part of query;
 
 class UpdateMany implements Statement /*, Whereable */ {
   String name;
@@ -6,7 +6,7 @@ class UpdateMany implements Statement /*, Whereable */ {
   final List<Update> _bulkValues = [];
 
   UpdateMany(this.name) {
-    _immutable = ImUpdateMany(this);
+    _immutable = ImmutableUpdateManyStatement(this);
   }
 
   UpdateMany addAll(List<List<SetColumn>> items, List<Expression> where) {
@@ -23,22 +23,22 @@ class UpdateMany implements Statement /*, Whereable */ {
     return this;
   }
 
-  Future<T> exec<T>(Connection connection) => connection.updateMany(this);
+  Future<void> exec<T>(Adapter adapter) => adapter.updateMany(this);
 
-  ImUpdateMany _immutable;
+  late ImmutableUpdateManyStatement _immutable;
 
   /// Read-only representation of this statement.
-  ImUpdateMany get asImmutable => _immutable;
+  ImmutableUpdateManyStatement get asImmutable => _immutable;
 }
 
-class ImUpdateMany {
+class ImmutableUpdateManyStatement {
   final UpdateMany _inner;
 
-  ImUpdateMany(this._inner)
-      : values = UnmodifiableListView<ImUpdate>(
+  ImmutableUpdateManyStatement(this._inner)
+      : values = UnmodifiableListView<ImmutableUpdateStatement>(
             _inner._bulkValues.map((values) => values.asImmutable));
 
   String get tableName => _inner.name;
 
-  final UnmodifiableListView<ImUpdate> values;
+  final UnmodifiableListView<ImmutableUpdateStatement> values;
 }

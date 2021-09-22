@@ -296,7 +296,3 @@ main() async {
   exit(0);
 }
 ```
-
-# TODO
-
-+ [ ] Transactions
