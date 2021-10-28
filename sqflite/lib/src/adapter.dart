@@ -12,7 +12,7 @@ import 'package:sqflite/sqflite.dart' as sqf;
 class SqfliteAdapter implements Adapter<sqf.Database> {
   late sqf.Database _connection;
 
-  final String? path;
+  final String path;
   final int? version;
 
   SqfliteAdapter(this.path, {this.version});
@@ -20,18 +20,18 @@ class SqfliteAdapter implements Adapter<sqf.Database> {
   @Deprecated("Use fromConnection instead")
   SqfliteAdapter.FromConnection(sqf.Database connection)
       : _connection = connection,
-        path = null,
+        path = connection.path,
         version = null;
 
   SqfliteAdapter.fromConnection(sqf.Database connection)
       : _connection = connection,
-        path = null,
+        path = connection.path,
         version = null;
 
   /// Connects to the database
   Future<void> connect() async {
     if (_connection == null) {
-      _connection = await sqf.openDatabase(path!, version: version);
+      _connection = await sqf.openDatabase(path, version: version);
     }
   }
 
