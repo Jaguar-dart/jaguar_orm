@@ -14,7 +14,7 @@ class Field<ValType> {
   /// Name of the field
   final String name;
 
-  final String tableName;
+  final String? tableName;
 
   const Field(this.name) : tableName = null;
 
@@ -32,14 +32,14 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<String> phone = Field<String>('phone');
   ///     find.where(phone.iss(null));
-  Cond<ValType> iss(ValType value) => Cond.iss<ValType>(this, value);
+  Cond<ValType> get isNull => Cond.isNull<ValType>(this);
 
   /// Returns an "IS NOT" condition, i.e. 'where var IS NOT null'
   ///
   ///     FindStatement find = FindStatement();
   ///     Field<String> phone = Field<String>('phone');
   ///     find.where(phone.isNot(null));
-  Cond<ValType> isNot(ValType value) => Cond.isNot<ValType>(this, value);
+  Cond<ValType> get isNotNull => Cond.isNotNull<ValType>(this);
 
   /// Returns a "not equal to" condition
   ///
@@ -83,6 +83,14 @@ class Field<ValType> {
   ///     find.where(age.between(20, 30));
   Between<ValType> between(ValType low, ValType high) =>
       Cond.between<ValType>(this, low, high);
+
+  /// Returns an "in" condition
+  ///
+  ///     FindStatement find = FindStatement();
+  ///     Field<int> age = Field<int>('age');
+  ///     find.where(age.isIn(<int>{20, 30}));
+  InOperation<ValType> isIn(Set<ValType> value) =>
+      Cond.isIn<ValType>(this, value);
 
   Field<ValType> aliasAs(String tableAlias) =>
       Field<ValType>.inTable(tableAlias, name);
@@ -145,7 +153,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.eqCol(col('age', 'employee')));
-  CondCol<ValType> eqF(String name, {String table}) =>
+  CondCol<ValType> eqF(String name, {String? table}) =>
       CondCol.eq<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "not equal to" condition
@@ -153,7 +161,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.neCol(col('age', 'employee')));
-  CondCol<ValType> neF(String name, {String table}) =>
+  CondCol<ValType> neF(String name, {String? table}) =>
       CondCol.ne<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "greater than" condition
@@ -161,7 +169,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtCol(col('age', 'employee')));
-  CondCol<ValType> gtF(String name, {String table}) =>
+  CondCol<ValType> gtF(String name, {String? table}) =>
       CondCol.gt<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "greater than equal to" condition
@@ -169,7 +177,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.gtEqCol(col('age', 'employee')));
-  CondCol<ValType> gtEqF(String name, {String table}) =>
+  CondCol<ValType> gtEqF(String name, {String? table}) =>
       CondCol.gtEq<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "less than equal to" condition
@@ -177,7 +185,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltEqCol(col('age', 'employee')));
-  CondCol<ValType> ltEqF(String name, {String table}) =>
+  CondCol<ValType> ltEqF(String name, {String? table}) =>
       CondCol.ltEq<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "less than" condition
@@ -185,7 +193,7 @@ class Field<ValType> {
   ///     FindStatement find = FindStatement();
   ///     Field<int> age = Field<int>('age');
   ///     find.where(age.ltCol(col('age', 'employee')));
-  CondCol<ValType> ltF(String name, {String table}) =>
+  CondCol<ValType> ltF(String name, {String? table}) =>
       CondCol.lt<ValType>(this, Field<ValType>.inTable(table, name));
 
   /// Returns a "set column" clause
@@ -194,6 +202,8 @@ class Field<ValType> {
   ///     Field<int> age = Field<int>('age');
   ///     update.set(age.set(20));
   SetColumn<ValType> set(ValType value) => SetColumn<ValType>(name, value);
+
+  SetColumn<ValType?> setNullable(ValType? value) => SetColumn<ValType?>(name, value);
 
   Cond<ValType> operator <(ValType other) {
     return lt(other);
@@ -230,9 +240,9 @@ class IntField extends Field<int> {
       {bool autoIncrement = false,
       bool primary = false,
       bool isNullable = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
     statement.addInt(name,
         isNullable: isNullable,
         autoIncrement: autoIncrement,
@@ -260,9 +270,9 @@ class DoubleField extends Field<double> {
   void create(Create statement,
       {bool isNullable = false,
       bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
     statement.addDouble(name,
         isNullable: isNullable,
         primary: primary,
@@ -302,9 +312,9 @@ class StrField extends Field<String> {
       {bool isNullable = false,
       int length = 20,
       bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
     statement.addStr(name,
         isNullable: isNullable,
         length: length,
@@ -321,7 +331,7 @@ class DateTimeField extends Field<DateTime> {
   DateTimeField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool isNullable, String uniqueGroup}) {
+  void create(Create statement, {bool isNullable = false, String? uniqueGroup}) {
     statement.addDateTime(name,
         isNullable: isNullable, uniqueGroup: uniqueGroup);
   }
@@ -333,7 +343,7 @@ class BoolField extends Field<bool> {
   BoolField(String name) : super(name);
 
   /// Adds the field to create statement
-  void create(Create statement, {bool isNullable = false, String uniqueGroup}) {
+  void create(Create statement, {bool isNullable = false, String? uniqueGroup}) {
     statement.addBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
   }
 }

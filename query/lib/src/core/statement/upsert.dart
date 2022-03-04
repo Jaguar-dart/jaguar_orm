@@ -13,11 +13,11 @@ class Upsert implements Statement {
 
   final Map<String, dynamic> _values = {};
 
-  String _id;
+  String? _id;
 
-  Upsert(this.name) {
-    _immutable = ImmutableUpsertStatement(this);
-  }
+  ImmutableUpsertStatement get asImmutable => ImmutableUpsertStatement(this);
+
+  Upsert(this.name);
 
   /// Id is the auto-generated primary key that is set by the database. [Adapter]
   /// will request the database to return this column on inserts.
@@ -79,10 +79,6 @@ class Upsert implements Statement {
   /// Executes the statement with the given adapter.
   Future<T> exec<T>(Adapter adapter) => adapter.upsert<T>(this);
 
-  ImmutableUpsertStatement _immutable;
-
-  /// Read-only representation of this statement.
-  ImmutableUpsertStatement get asImmutable => _immutable;
 }
 
 class ImmutableUpsertStatement {

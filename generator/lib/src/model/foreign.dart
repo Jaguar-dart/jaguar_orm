@@ -11,16 +11,16 @@ class BelongsToForeign implements Foreign {
 
   final DartType model;
 
-  final bool byHasMany;
+  final bool? byHasMany;
 
-  final bool belongsToMany;
+  final bool? belongsToMany;
 
   BelongsToForeign(this.bean, this.refCol, this.byHasMany, this.belongsToMany)
       : model = getModelForBean(bean);
 
-  String get beanName => bean.name;
+  String get beanName => bean.name!;
 
-  String get modelName => model.name;
+  String get modelName => model.name!;
 
   String get beanInstanceName => uncap(modelName) + 'Bean';
 }

@@ -7,7 +7,7 @@ abstract class Table {}
 class TableName implements Table {
   final String tableName;
 
-  final String alias;
+  final String? alias;
 
   TableName(this.tableName, [this.alias]);
 }
@@ -43,53 +43,40 @@ class JoinedTable implements Table {
 
   final TableName _to;
 
-  final _on = And();
+  final And _on = And();
 
-  JoinedTable(this._type, String tableName, [String alias])
-      : _to = TableName(tableName, alias) {
-    _info = QueryJoinedTableInfo(this);
-  }
+  QueryJoinedTableInfo get info => QueryJoinedTableInfo(this);
 
-  factory JoinedTable.innerJoin(String tableName, [String alias]) =>
+  JoinedTable(this._type, String tableName, [String? alias])
+      : _to = TableName(tableName, alias);
+
+  factory JoinedTable.innerJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.InnerJoin, tableName, alias);
 
-  factory JoinedTable.leftJoin(String tableName, [String alias]) =>
+  factory JoinedTable.leftJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.LeftJoin, tableName, alias);
 
-  factory JoinedTable.rightJoin(String tableName, [String alias]) =>
+  factory JoinedTable.rightJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.RightJoin, tableName, alias);
 
-  factory JoinedTable.fullJoin(String tableName, [String alias]) =>
+  factory JoinedTable.fullJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.FullJoin, tableName, alias);
 
-  factory JoinedTable.crossJoin(String tableName, [String alias]) =>
+  factory JoinedTable.crossJoin(String tableName, [String? alias]) =>
       JoinedTable(JoinType.CrossJoin, tableName, alias);
 
   JoinedTable joinOn(Expression onExp) {
-    if (_type == null || _to == null) {
-      throw Exception('Query has no join on it!');
-    }
-
     _on.and(onExp);
 
     return this;
   }
 
   void validate() {
-    if (_to == null) {
-      if (_type != null || _on.length != 0) {
-        throw Exception('Join not initialized properly!');
-      }
-    } else {
-      if (_type == null || _on.length == 0) {
-        throw Exception('Join not initialized properly!');
-      }
+    if (_on.length == 0) {
+      throw Exception('Join not initialized properly!');
     }
   }
 
-  QueryJoinedTableInfo _info;
-
-  QueryJoinedTableInfo get info => _info;
 }
 
 class QueryJoinedTableInfo {

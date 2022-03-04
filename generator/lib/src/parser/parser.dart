@@ -1,5 +1,6 @@
 library jaguar_orm.generator.parser;
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -13,7 +14,7 @@ class FieldParseException implements Exception {
 
   String fieldName;
 
-  String message;
+  String? message;
 
   StackTrace trace;
 
@@ -43,13 +44,13 @@ class ParsedBean {
   final bool doAssociation;
 
   /// The [ClassElement] element of the `GenBean` spec.
-  final ClassElement clazz;
+  final ClassElement? clazz;
 
   /// The model of the Bean
-  DartType model;
+  late DartType model;
 
   /// Constant reader used to read fields from the `GenBean`
-  ConstantReader reader;
+  late ConstantReader reader;
 
   /// Parsed fields are stored here while being parsed.
   ///
@@ -79,20 +80,20 @@ class ParsedBean {
       if (!doAssociation) continue;
       if (f.foreign is! BelongsToForeign) continue;
 
-      final BelongsToForeign foreign = f.foreign;
+      final BelongsToForeign foreign = f.foreign as BelongsToForeign;
       final DartType bean = foreign.bean;
-      BelongsToAssociation current = beanedAssociations[bean];
+      BelongsToAssociation? current = beanedAssociations[bean];
 
       final WriterModel info =
-          ParsedBean(bean.element, doRelations: false, doAssociation: false)
+          ParsedBean(bean.element as ClassElement?, doRelations: false, doAssociation: false)
               .detect();
 
-      final Preload other = info.findHasXByAssociation(clazz.type);
+      final Preload? other = info.findHasXByAssociation(clazz!.thisType);
 
       if (other == null) continue;
 
       if (current == null) {
-        bool byHasMany = foreign.byHasMany;
+        bool? byHasMany = foreign.byHasMany;
         if (byHasMany != null) {
           if (byHasMany != other.hasMany) {
             throw Exception('Mismatching association type!');
@@ -112,7 +113,7 @@ class ParsedBean {
       } else {
         throw Exception('Table and bean associations mixed!');
       }
-      beanedAssociations[bean].fields.add(f);
+      beanedAssociations[bean]!.fields.add(f);
     }
 
     // Collect [BeanedForeignAssociation] from [BelongsToForeign]
@@ -120,14 +121,14 @@ class ParsedBean {
       if (!doAssociation) continue;
       if (f.foreign is! BelongsToForeign) continue;
 
-      final BelongsToForeign foreign = f.foreign;
+      final BelongsToForeign foreign = f.foreign as BelongsToForeign;
       final DartType bean = foreign.bean;
 
       {
         final WriterModel info =
-            ParsedBean(bean.element, doRelations: false, doAssociation: false)
+            ParsedBean(bean.element as ClassElement?, doRelations: false, doAssociation: false)
                 .detect();
-        final Preload other = info.findHasXByAssociation(clazz.type);
+        final Preload? other = info.findHasXByAssociation(clazz!.thisType);
         if (other != null) continue;
       }
 
@@ -135,10 +136,10 @@ class ParsedBean {
         throw Exception(
             'For un-associated foreign keys, "byHasMany" must be specified!');
 
-      BeanedForeignAssociation current = beanedForeignAssociations[bean];
+      BeanedForeignAssociation? current = beanedForeignAssociations[bean];
 
       if (current == null) {
-        current = BeanedForeignAssociation(bean, [], [], foreign.byHasMany);
+        current = BeanedForeignAssociation(bean, [], [], foreign.byHasMany!);
         beanedForeignAssociations[bean] = current;
       } else if (current is BeanedForeignAssociation) {
         if (current.byHasMany != foreign.byHasMany) {
@@ -147,7 +148,7 @@ class ParsedBean {
       } else {
         throw Exception('Table and bean associations mixed!');
       }
-      beanedForeignAssociations[bean].fields.add(f);
+      beanedForeignAssociations[bean]!.fields.add(f);
     }
 
     // Collect [TabledForeignAssociation] from [TableForeign]
@@ -181,11 +182,11 @@ class ParsedBean {
 
     for (BelongsToAssociation m in beanedAssociations.values) {
       final WriterModel info =
-          ParsedBean(m.bean.element, doRelations: false, doAssociation: false)
+          ParsedBean(m.bean.element as ClassElement?, doRelations: false, doAssociation: false)
               .detect();
 
       for (Field f in m.fields) {
-        Field ff = info.fieldByColName(f.foreign.refCol);
+        Field? ff = info.fieldByColName(f.foreign!.refCol);
 
         if (ff == null)
           throw Exception('Foreign key in foreign model not found!');
@@ -196,10 +197,10 @@ class ParsedBean {
 
     for (BeanedForeignAssociation m in beanedForeignAssociations.values) {
       final WriterModel info =
-          ParsedBean(m.bean.element, doRelations: false).detect();
+          ParsedBean(m.bean.element as ClassElement?, doRelations: false).detect();
 
       for (Field f in m.fields) {
-        Field ff = info.fieldByColName(f.foreign.refCol);
+        Field? ff = info.fieldByColName(f.foreign!.refCol);
 
         if (ff == null)
           throw Exception('Foreign key in foreign model not found!');
@@ -208,16 +209,16 @@ class ParsedBean {
       }
     }
 
-    final ret = WriterModel(clazz.name, model.name, fields, primaries,
+    final ret = WriterModel(clazz!.name, model.name!, fields, primaries,
         beanedAssociations, beanedForeignAssociations, preloads);
 
     if (doRelations) {
       for (Preload p in preloads) {
-        if (p.bean == clazz.type) {
-          p.foreignFields.addAll(beanedAssociations[p.bean].fields);
+        if (p.bean == clazz!.thisType) {
+          p.foreignFields.addAll(beanedAssociations[p.bean]!.fields);
         }
         for (Field f in p.foreignFields) {
-          Field ff = ret.fieldByColName(f.foreign.refCol);
+          Field? ff = ret.fieldByColName(f.foreign!.refCol);
           if (ff == null)
             throw Exception('Foreign key in foreign model not found!');
           p.fields.add(ff);
@@ -230,18 +231,17 @@ class ParsedBean {
 
   /// Parses and populates [model] and [reader]
   void _getModel() {
-    if (!isBean.isAssignableFromType(clazz.type)) {
+    if (!isBean.isAssignableFromType(clazz!.thisType)) {
       throw Exception("Beans must implement Bean interface!");
     }
 
-    final ElementAnnotation meta = clazz.metadata.firstWhere(
-        (m) => isGenBean.isExactlyType(m.computeConstantValue().type),
-        orElse: () => null);
+    final ElementAnnotation? meta = clazz!.metadata.firstWhereOrNull(
+        (m) => isGenBean.isExactlyType(m.computeConstantValue()!.type!));
     if (meta == null)
       throw Exception("Cannot find or parse `GenBean` annotation!");
     reader = ConstantReader(meta.computeConstantValue());
 
-    final InterfaceType interface = clazz.allSupertypes
+    final InterfaceType interface = clazz!.allSupertypes
         .firstWhere((InterfaceType i) => isBean.isExactlyType(i));
 
     model = interface.typeArguments.first;
@@ -255,42 +255,42 @@ class ParsedBean {
   void _parseFields() {
     final ignores = Set<String>();
 
-    final ClassElement modelClass = model.element;
+    final ClassElement? modelClass = model.element as ClassElement?;
 
     final relations = Set<String>();
 
     // Parse relations from GenBean::relations specification
     {
       final Map cols = reader.read('relations').mapValue;
-      for (DartObject name in cols.keys) {
-        final fieldName = name.toStringValue();
-        final field = modelClass.getField(fieldName);
+      for (DartObject? name in cols.keys as Iterable<DartObject?>) {
+        final fieldName = name!.toStringValue()!;
+        final field = modelClass!.getField(fieldName);
 
         if (field == null) throw Exception('Cannot find field $fieldName!');
 
         relations.add(fieldName);
 
         final DartObject spec = cols[name];
-        parseRelation(clazz.type, field, spec);
+        parseRelation(clazz!.thisType, field, spec);
       }
     }
 
     // Parse columns from GenBean::columns specification
     {
       final Map cols = reader.read('columns').mapValue;
-      for (DartObject name in cols.keys) {
-        final fieldName = name.toStringValue();
+      for (DartObject? name in cols.keys as Iterable<DartObject?>) {
+        final fieldName = name!.toStringValue()!;
 
         if (relations.contains(fieldName))
           throw Exception(
               'Cannot have both a column and relation: $fieldName!');
 
-        final field = modelClass.getField(fieldName);
+        final field = modelClass!.getField(fieldName);
 
         if (field == null) throw Exception('Cannot find field $fieldName!');
 
         final DartObject spec = cols[name];
-        if (isIgnore.isExactlyType(spec.type)) {
+        if (isIgnore.isExactlyType(spec.type!)) {
           ignores.add(fieldName);
           continue;
         }
@@ -303,7 +303,7 @@ class ParsedBean {
     }
 
     /// Parse getters, setters and fields in model
-    for (FieldElement field in modelClass.fields) {
+    for (FieldElement field in modelClass!.fields) {
       try {
         if (fields.containsKey(field.name)) continue;
         if (relations.contains(field.name)) continue;
@@ -331,15 +331,15 @@ class ParsedBean {
           fields[val.field] = val;
           if (val.isPrimary) primaries.add(val);
         } else {
-          if (!_relation(clazz.type, field)) {
-            final vf = Field(field.type.name, field.name, field.name,
+          if (!_relation(clazz!.thisType, field)) {
+            final vf = Field(field.type.name!, field.name, field.name,
                 unique: null,
-                length: null,
+                length: 0,
                 autoIncrement: false,
                 isNullable: false,
                 foreign: null,
                 isPrimary: false,
-                isFinal: field.isFinal && field.getter.isSynthetic);
+                isFinal: field.isFinal && field.getter!.isSynthetic);
             fields[vf.field] = vf;
           }
         }
@@ -349,11 +349,11 @@ class ParsedBean {
     }
   }
 
-  static Field _makeField(FieldElement f) {
+  static Field? _makeField(FieldElement f) {
     List<Field> fields = f.metadata
         .map((ElementAnnotation annot) => annot.computeConstantValue())
-        .where((DartObject i) => isColumnBase.isAssignableFromType(i.type))
-        .map((DartObject i) => parseColumn(f, i))
+        .where((DartObject? i) => isColumnBase.isAssignableFromType(i!.type!))
+        .map((DartObject? i) => parseColumn(f, i!))
         .toList();
 
     if (fields.length > 1) {
@@ -366,38 +366,38 @@ class ParsedBean {
   }
 
   bool _relation(DartType curBean, FieldElement f) {
-    DartObject rel = isRelation.firstAnnotationOf(f);
+    DartObject? rel = isRelation.firstAnnotationOf(f);
     if (rel == null) return false;
     parseRelation(curBean, f, rel);
     return true;
   }
 
   void parseRelation(DartType curBean, FieldElement f, DartObject obj) {
-    if (isHasOne.isExactlyType(obj.type) || isHasMany.isExactlyType(obj.type)) {
-      final DartType bean = obj.getField('bean').toTypeValue();
+    if (isHasOne.isExactlyType(obj.type!) || isHasMany.isExactlyType(obj.type!)) {
+      final DartType bean = obj.getField('bean')!.toTypeValue()!;
 
       if (!isBean.isAssignableFromType(bean)) {
         throw Exception("Non-bean type provided!");
       }
 
-      BelongsToAssociation g;
+      BelongsToAssociation? g;
       if (doRelations) {
         if (bean != curBean) {
           final WriterModel info =
-              ParsedBean(bean.element, doRelations: false).detect();
+              ParsedBean(bean.element as ClassElement?, doRelations: false).detect();
           g = info.belongTos[curBean];
           if (g == null || g is! BelongsToAssociation)
             throw Exception('Association $bean not found! Field ${f.name}.');
         }
       }
 
-      final bool hasMany = isHasMany.isExactlyType(obj.type);
+      final bool hasMany = isHasMany.isExactlyType(obj.type!);
 
       preloads.add(PreloadOneToX(bean, f.name, g?.fields ?? [], hasMany));
       return;
-    } else if (isManyToMany.isExactlyType(obj.type)) {
-      final DartType pivot = obj.getField('pivotBean').toTypeValue();
-      final DartType target = obj.getField('targetBean').toTypeValue();
+    } else if (isManyToMany.isExactlyType(obj.type!)) {
+      final DartType pivot = obj.getField('pivotBean')!.toTypeValue()!;
+      final DartType target = obj.getField('targetBean')!.toTypeValue()!;
 
       if (!isBean.isAssignableFromType(pivot)) {
         throw Exception("Non-bean type provided!");
@@ -407,22 +407,24 @@ class ParsedBean {
         throw Exception("Non-bean type provided!");
       }
 
-      BelongsToAssociation g;
+      BelongsToAssociation? g;
       if (doRelations) {
         final WriterModel beanInfo =
-            ParsedBean(pivot.element, doRelations: false).detect();
+            ParsedBean(pivot.element as ClassElement?, doRelations: false).detect();
         g = beanInfo.belongTos[curBean];
         if (g == null || g is! BelongsToAssociation) {
           throw Exception('Association $curBean not found! Field ${f.name}.');
         }
         final WriterModel targetInfo =
-            ParsedBean(target.element, doRelations: false).detect();
+            ParsedBean(target.element as ClassElement?, doRelations: false).detect();
         preloads.add(PreloadManyToMany(
-            pivot, target, f.name, targetInfo, beanInfo, g?.fields));
+            pivot, target, f.name, targetInfo, beanInfo, g.fields));
         return;
       }
 
-      preloads.add(PreloadManyToMany(pivot, target, f.name, null, null, null));
+      // TODO: this would cause a null pointer issue in the writer, is it actually sensible to have a PreloadManyToMany without a relationship
+      // preloads.add(PreloadManyToMany(pivot, target, f.name, null, null, <Field>[]));
+
       return;
     }
 
@@ -431,62 +433,62 @@ class ParsedBean {
 }
 
 Field parseColumn(FieldElement f, DartObject obj) {
-  final String colName = obj.getField('name').toStringValue();
-  final bool isNullable = obj.getField('isNullable').toBoolValue();
-  final String unique = obj.getField('uniqueGroup').toStringValue();
-  final bool autoIncrement = obj.getField('auto').toBoolValue();
-  final int length = obj.getField('length').toIntValue();
-  if (isColumn.isExactlyType(obj.type)) {
-    return Field(f.type.name, f.name, colName,
-        isNullable: isNullable,
-        autoIncrement: autoIncrement,
-        length: length,
+  final String? colName = obj.getField('name')!.toStringValue();
+  final bool? isNullable = obj.getField('isNullable')!.toBoolValue();
+  final String? unique = obj.getField('uniqueGroup')!.toStringValue();
+  final bool? autoIncrement = obj.getField('auto')!.toBoolValue();
+  final int? length = obj.getField('length')!.toIntValue();
+  if (isColumn.isExactlyType(obj.type!)) {
+    return Field(f.type.name!, f.name, colName,
+        isNullable: isNullable!,
+        autoIncrement: autoIncrement!,
+        length: length ?? 0,
         foreign: null,
         isPrimary: false,
         unique: unique,
         isFinal: f.isFinal);
-  } else if (isPrimaryKey.isExactlyType(obj.type)) {
-    return Field(f.type.name, f.name, colName,
-        isNullable: isNullable,
+  } else if (isPrimaryKey.isExactlyType(obj.type!)) {
+    return Field(f.type.name!, f.name, colName,
+        isNullable: isNullable!,
         isPrimary: true,
-        autoIncrement: autoIncrement,
-        length: length,
+        autoIncrement: autoIncrement!,
+        length: length ?? 0,
         foreign: null,
         unique: unique,
         isFinal: f.isFinal);
-  } else if (isForeignKey.isAssignableFromType(obj.type)) {
-    final String table = obj.getField('toTable').toStringValue();
-    final String refCol = obj.getField('refCol').toStringValue();
-    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
+  } else if (isForeignKey.isAssignableFromType(obj.type!)) {
+    final String table = obj.getField('toTable')!.toStringValue()!;
+    final String refCol = obj.getField('refCol')!.toStringValue()!;
+    final bool isPrimary = obj.getField('isPrimary')!.toBoolValue()!;
 
     Foreign fore = TableForeign(table, refCol);
 
-    return Field(f.type.name, f.name, colName,
-        isNullable: isNullable,
+    return Field(f.type.name!, f.name, colName,
+        isNullable: isNullable!,
         isPrimary: isPrimary,
         foreign: fore,
-        autoIncrement: autoIncrement,
-        length: length,
+        autoIncrement: autoIncrement!,
+        length: length!,
         unique: unique,
         isFinal: f.isFinal);
-  } else if (isBelongsTo.isAssignableFromType(obj.type)) {
-    final DartType bean = obj.getField('bean').toTypeValue();
-    final String refCol = obj.getField('refCol').toStringValue();
-    final bool byHasMany = obj.getField('byHasMany').toBoolValue();
-    final bool toMany = obj.getField('toMany').toBoolValue();
-    final bool isPrimary = obj.getField('isPrimary').toBoolValue();
+  } else if (isBelongsTo.isAssignableFromType(obj.type!)) {
+    final DartType bean = obj.getField('bean')!.toTypeValue()!;
+    final String refCol = obj.getField('refCol')!.toStringValue()!;
+    final bool? byHasMany = obj.getField('byHasMany')!.toBoolValue();
+    final bool? toMany = obj.getField('toMany')!.toBoolValue();
+    final bool isPrimary = obj.getField('isPrimary')!.toBoolValue()!;
 
     if (!isBean.isAssignableFromType(bean)) {
       throw Exception("Non-bean type provided!");
     }
 
     Foreign fore = BelongsToForeign(bean, refCol, byHasMany, toMany);
-    return Field(f.type.name, f.name, colName,
-        isNullable: isNullable,
+    return Field(f.type.name!, f.name, colName,
+        isNullable: isNullable!,
         isPrimary: isPrimary,
         foreign: fore,
-        autoIncrement: autoIncrement,
-        length: length,
+        autoIncrement: autoIncrement!,
+        length: length!,
         unique: unique,
         isFinal: f.isFinal);
   }

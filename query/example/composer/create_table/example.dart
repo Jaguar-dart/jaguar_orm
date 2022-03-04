@@ -2,19 +2,19 @@ import 'package:jaguar_query/jaguar_query.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 
 class Post {
-  String id;
+  String? id;
 
-  String authorId;
+  String? authorId;
 
-  String author;
+  String? author;
 
-  String message;
+  String? message;
 
-  int likes;
+  int? likes;
 
   //TODO DateTime publishedOn;
 
-  bool public;
+  bool? public;
 }
 
 main() {

@@ -7,18 +7,18 @@ class Create implements Statement {
 
   final Map<String, CreateColumn> _columns = {};
 
-  Create(this.name, {this.ifNotExists = false}) {
-    _immutable = ImmutableCreateStatement(this);
-  }
+  ImmutableCreateStatement get asImmutable => ImmutableCreateStatement(this);
+
+  Create(this.name, {this.ifNotExists = false});
 
   Create addInt(String name,
       {bool isNullable = false,
       bool autoIncrement = false,
       bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
-    Foreign foreign;
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
+    Foreign? foreign;
     if (foreignTable != null) {
       foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
@@ -32,8 +32,8 @@ class Create implements Statement {
   }
 
   Create addPrimaryInt(String name,
-      {String foreignTable, String foreignCol, String uniqueGroup}) {
-    Foreign foreign;
+      {String? foreignTable, String? foreignCol, String? uniqueGroup}) {
+    Foreign? foreign;
     if (foreignTable != null) {
       foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
@@ -42,7 +42,7 @@ class Create implements Statement {
     return this;
   }
 
-  Create addAutoPrimaryInt(String name, {String uniqueGroup}) {
+  Create addAutoPrimaryInt(String name, {String? uniqueGroup}) {
     _columns[name] = CreateInt.autoPrimary(name, uniqueGroup: uniqueGroup);
     return this;
   }
@@ -50,10 +50,10 @@ class Create implements Statement {
   Create addDouble(String name,
       {bool isNullable = false,
       bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
-    Foreign foreign;
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
+    Foreign? foreign;
     if (foreignTable != null) {
       foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
@@ -65,14 +65,14 @@ class Create implements Statement {
     return this;
   }
 
-  Create addBool(String name, {bool isNullable = false, String uniqueGroup}) {
+  Create addBool(String name, {bool isNullable = false, String? uniqueGroup}) {
     _columns[name] =
         CreateBool(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
   }
 
   Create addDateTime(String name,
-      {bool isNullable = false, String uniqueGroup}) {
+      {bool isNullable = false, String? uniqueGroup}) {
     _columns[name] =
         CreateDateTime(name, isNullable: isNullable, uniqueGroup: uniqueGroup);
     return this;
@@ -82,10 +82,10 @@ class Create implements Statement {
       {bool isNullable = false,
       int length = 20,
       bool primary = false,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
-    Foreign foreign;
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
+    Foreign? foreign;
     if (foreignTable != null) {
       foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
@@ -100,10 +100,10 @@ class Create implements Statement {
 
   Create addPrimaryStr(String name,
       {int length = 20,
-      String foreignTable,
-      String foreignCol,
-      String uniqueGroup}) {
-    Foreign foreign;
+      String? foreignTable,
+      String? foreignCol,
+      String? uniqueGroup}) {
+    Foreign? foreign;
     if (foreignTable != null) {
       foreign = Foreign(foreignTable, foreignCol != null ? foreignCol : name);
     }
@@ -126,9 +126,6 @@ class Create implements Statement {
 
   Future<void> exec(Adapter adapter) => adapter.createTable(this);
 
-  ImmutableCreateStatement _immutable;
-
-  ImmutableCreateStatement get asImmutable => _immutable;
 }
 
 class ImmutableCreateStatement {
@@ -152,9 +149,9 @@ abstract class CreateColumn<ValType> {
 
   bool get isPrimary;
 
-  Foreign get foreignKey;
+  Foreign? get foreignKey;
 
-  String get uniqueGroup;
+  String? get uniqueGroup;
 }
 
 class Foreign {

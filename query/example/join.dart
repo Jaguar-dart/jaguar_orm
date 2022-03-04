@@ -5,21 +5,21 @@ import 'package:jaguar_query/jaguar_query.dart';
 class Author {
   Author();
 
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
   static String tableName = 'author';
 }
 
 class Post {
-  int id;
+  int? id;
 
-  int authorId;
+  int? authorId;
 
-  String message;
+  String? message;
 
-  int likes;
+  int? likes;
 
   static String tableName = 'post';
 }

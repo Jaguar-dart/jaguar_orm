@@ -15,10 +15,10 @@ abstract class Adapter<ConnType> {
   ConnType get connection;
 
   /// Returns a row found by executing [statement]
-  Future<Map> findOne(Find statement);
+  Future<Map<String, dynamic>?> findOne(Find statement);
 
   /// Returns a list of rows found by executing [statement]
-  Future<List<Map>> find(Find statement);
+  Future<List<Map<String, dynamic>>> find(Find statement);
 
   /// Executes the insert or update statement and returns the primary key of
   /// inserted row
@@ -29,10 +29,10 @@ abstract class Adapter<ConnType> {
 
   /// Executes the insert statement and returns the primary key of
   /// inserted row
-  Future<T> insert<T>(Insert statement);
+  Future<T?> insert<T>(Insert statement);
 
   /// Executes the insert statement for many element
-  Future<void> insertMany<T>(InsertMany statement);
+  Future<void> insertMany(InsertMany statement);
 
   /// Updates the row and returns the number of rows updated
   Future<int> update(Update statement);
@@ -59,6 +59,8 @@ abstract class Adapter<ConnType> {
 
   /// Parses values coming from database into Dart values
   T parseValue<T>(dynamic v);
+
+  T? parseNullableValue<T>(dynamic v);
 }
 
 /// Convenience class to execute `Find` statement using [adapter]
@@ -71,14 +73,19 @@ class FindExecutor<ConnType> {
   FindExecutor(this.adapter, this._st);
 
   /// Returns a row found by executing [statement]
-  Future<Map> one() => adapter.findOne(_st);
+  Future<Map<String, dynamic>?> one() => adapter.findOne(_st);
 
   /// Returns a row found by executing [statement]
-  Future<List<Map>> many() async => await adapter.find(_st);
+  Future<List<Map<String, dynamic>>> many() async => await adapter.find(_st);
 
   /// Returns a row found by executing [statement]
-  Future<T> oneTo<T>(T converter(Map v)) async {
-    final Map map = await adapter.findOne(_st);
+  Future<T?> oneTo<T>(T converter(Map v)) async {
+    final Map<String, dynamic>? map = await adapter.findOne(_st);
+
+    if (map == null) {
+      return null;
+    }
+
     return converter(map);
   }
 

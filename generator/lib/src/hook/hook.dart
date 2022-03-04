@@ -30,7 +30,7 @@ class BeanGenerator extends GeneratorForAnnotation<ant.GenBean> {
             "GenBean annotation can only be defined on a class.");
       }
 
-      final String className = element.name;
+      final String? className = element.name;
 
       print("Generating bean for $className ...");
 

@@ -45,15 +45,26 @@ String composeExpression(final Expression exp) {
     return '(${composeField(exp.field)} BETWEEN ${composeValue(exp.low)} AND ${composeValue(exp.high)})';
   } else if (exp is InBetweenCol) {
     return '(${composeField(exp.field)} BETWEEN ${composeField(exp.low)} AND ${composeField(exp.high)})';
+  } else if (exp is InOperation) {
+    return '(${composeField(exp.field)} IN (${exp.values.map(composeValue).map((value) => value!).join(", ")}))';
   } else {
     throw new Exception('Unknown expression ${exp.runtimeType}!');
   }
 }
 
-String composeField(final Field col) =>
-    (col.tableName != null ? col.tableName + '.' : '') + col.name;
+String composeField(final Field? col) {
+    if (col == null) {
+      return "null";
+    }
 
-String composeValue(dynamic val) {
+    if (col.tableName == null) {
+      return col.name;
+    }
+
+    return col.tableName! + '.' + col.name;
+}
+
+String? composeValue(dynamic val) {
   if (val == null) return null;
   if (val is int) {
     return "$val";

@@ -23,11 +23,11 @@ class PostBean1 extends PostBean {
 
   @override
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, bool onlyNonNull = false, Set<String>? only}) {
     final ret = <SetColumn>[];
 
-    ret.add(msg.set(model.msg));
-    ret.add(author.set(model.author));
+    ret.add(msg.set(model.msg!));
+    ret.add(author.set(model.author!));
 
     return ret;
   }
@@ -55,7 +55,7 @@ main() async {
   final id2 = await bean.insert(Post.make(msg: 'hello@@g.com', author: 'bob'));
 
   // Find one post
-  Post post = await bean.findById(id1);
+  Post? post = await bean.findById(id1);
   print(post);
 
   print('Fetching all:');

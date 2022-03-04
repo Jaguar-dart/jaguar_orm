@@ -3,24 +3,24 @@ part of jaguar_orm.annotation;
 /// Interface for annotation on/for model property
 abstract class ColumnBase {
   /// Name of the column in database
-  String get name;
+  String? get name;
 
   bool get isNullable;
 
-  String get uniqueGroup;
+  String? get uniqueGroup;
 
   bool get auto;
 
-  int get length;
+  int? get length;
 }
 
 /// Annotation on model property to ignore it
 class IgnoreColumn implements ColumnBase {
-  final String name = null;
+  final String? name = null;
 
   final bool isNullable = false;
 
-  final String uniqueGroup = null;
+  final String? uniqueGroup = null;
 
   final bool auto = false;
 
@@ -34,15 +34,15 @@ class IgnoreColumn implements ColumnBase {
 /// In general, all model properties are used as
 class Column implements ColumnBase {
   /// Name of the column in database
-  final String name;
+  final String? name;
 
   final bool isNullable;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   final bool auto;
 
-  final int length;
+  final int? length;
 
   const Column(
       {this.name,
@@ -55,15 +55,15 @@ class Column implements ColumnBase {
 /// Annotation to declare a model property as primary key in database table
 class PrimaryKey implements ColumnBase {
   /// Name of the column in database
-  final String name;
+  final String? name;
 
   final bool isNullable;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   final bool auto;
 
-  final int length;
+  final int? length;
 
   const PrimaryKey(
       {this.name,
@@ -79,13 +79,13 @@ abstract class ForeignBase implements ColumnBase {
 
 class ForeignKey implements ForeignBase {
   /// Name of the column in database
-  final String name;
+  final String? name;
 
   final bool isPrimary;
 
   final bool isNullable;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   final String toTable;
 
@@ -93,7 +93,7 @@ class ForeignKey implements ForeignBase {
 
   final bool auto = false;
 
-  final int length;
+  final int? length;
 
   const ForeignKey(this.toTable,
       {this.name,
@@ -108,22 +108,22 @@ class BelongsTo implements ForeignBase {
   final Type bean;
 
   /// Name of the column in database
-  final String name;
+  final String? name;
 
   final bool isPrimary;
 
   final bool isNullable;
 
-  final String uniqueGroup;
+  final String? uniqueGroup;
 
   final bool auto = false;
 
-  final int length;
+  final int? length;
 
   /// The field/column in the foreign bean
   final String refCol;
 
-  final bool byHasMany;
+  final bool? byHasMany;
 
   final bool toMany;
 

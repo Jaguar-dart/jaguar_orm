@@ -75,18 +75,18 @@ String composeCreate(final Create create) {
 
   {
     final uniques = <CreateColumn>[];
-    final compositeUniques = <String, List<CreateColumn>>{};
+    final Map<String?, List<CreateColumn<dynamic>>> compositeUniques = <String, List<CreateColumn>>{};
     final foreigns = <String, Map<String, String>>{};
     for (CreateColumn col in info.columns.values) {
       if (col.foreignKey != null) {
-        if (!foreigns.containsKey(col.foreignKey.table)) {
-          foreigns[col.foreignKey.table] = <String, String>{};
+        if (!foreigns.containsKey(col.foreignKey!.table)) {
+          foreigns[col.foreignKey!.table] = <String, String>{};
         }
-        foreigns[col.foreignKey.table][col.name] = col.foreignKey.col;
+        foreigns[col.foreignKey!.table]![col.name] = col.foreignKey!.col;
       }
 
       if (col.uniqueGroup != null) {
-        if (col.uniqueGroup.isEmpty) {
+        if (col.uniqueGroup!.isEmpty) {
           uniques.add(col);
         } else {
           compositeUniques[col.uniqueGroup] =
@@ -96,7 +96,7 @@ String composeCreate(final Create create) {
     }
 
     for (final String foreignTab in foreigns.keys) {
-      final Map<String, String> cols = foreigns[foreignTab];
+      final Map<String, String> cols = foreigns[foreignTab]!;
       sb.write(', FOREIGN KEY (');
       sb.write(cols.keys.join(', '));
       sb.write(') REFERENCES ');
@@ -109,8 +109,8 @@ String composeCreate(final Create create) {
       sb.write(', UNIQUE(${col.name})');
     }
 
-    for (String group in compositeUniques.keys) {
-      final String str = compositeUniques[group]
+    for (String? group in compositeUniques.keys) {
+      final String str = compositeUniques[group]!
           .map((CreateColumn col) => col.name)
           .join(', ');
       sb.write(', UNIQUE($str)');

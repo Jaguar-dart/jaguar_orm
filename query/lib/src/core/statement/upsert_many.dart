@@ -12,9 +12,9 @@ class UpsertMany implements Statement {
 
   final List<Map<String, dynamic>> _bulkValues = [];
 
-  UpsertMany(this.name) {
-    _immutable = ImmutableUpsertManyStatement(this);
-  }
+  ImmutableUpsertManyStatement get asImmutable => ImmutableUpsertManyStatement(this);
+
+  UpsertMany(this.name);
 
   /// Adds a single [row] to be inserted.
   UpsertMany add(Iterable<SetColumn> row) {
@@ -48,12 +48,8 @@ class UpsertMany implements Statement {
   }
 
   /// Executes the statement with the given adapter.
-  Future<T> exec<T>(Adapter adapter) => adapter.upsertMany<T>(this);
+  Future<T> exec<T>(Adapter adapter) => adapter.upsertMany<T>(this) as Future<T>;
 
-  ImmutableUpsertManyStatement _immutable;
-
-  /// Read-only representation of this statement.
-  ImmutableUpsertManyStatement get asImmutable => _immutable;
 }
 
 class ImmutableUpsertManyStatement {

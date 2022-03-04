@@ -3,11 +3,11 @@ part of query;
 class Remove implements Statement, Whereable {
   final String name;
 
+  QueryRemoveInfo get info => QueryRemoveInfo(this);
+
   Expression _where = And();
 
-  Remove(this.name) {
-    _info = QueryRemoveInfo(this);
-  }
+  Remove(this.name);
 
   Remove or(Expression exp) {
     _where = _where.or(exp);
@@ -22,7 +22,7 @@ class Remove implements Statement, Whereable {
   Remove orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
+      _where = _where.or(exp);
     });
     return this;
   }
@@ -30,7 +30,7 @@ class Remove implements Statement, Whereable {
   Remove andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
+      _where = _where.and(exp);
     });
     return this;
   }
@@ -59,11 +59,11 @@ class Remove implements Statement, Whereable {
   Remove between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
+  Remove isIn<T>(String column, Set<T> values) =>
+      and(q.isIn<T>(column, values));
+
   Future<int> exec(Adapter adapter) => adapter.remove(this);
 
-  QueryRemoveInfo _info;
-
-  QueryRemoveInfo get info => _info;
 }
 
 class QueryRemoveInfo {

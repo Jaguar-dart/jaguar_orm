@@ -5,11 +5,12 @@ class Update implements Statement, Settable, Whereable {
 
   final Map<String, dynamic> _values = {};
 
+  ImmutableUpdateStatement get asImmutable => ImmutableUpdateStatement(this);
+
   Expression _where = And();
 
-  Update(this.name, {Expression where}) {
+  Update(this.name, {Expression? where}) {
     if (where != null) this.where(where);
-    _immutable = ImmutableUpdateStatement(this);
   }
 
   Update set<ValType>(Field<ValType> field, ValType value) {
@@ -71,7 +72,7 @@ class Update implements Statement, Settable, Whereable {
   Update orMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.or(exp);
+      _where = _where.or(exp);
     });
     return this;
   }
@@ -79,7 +80,7 @@ class Update implements Statement, Settable, Whereable {
   Update andMap<T>(Iterable<T> iterable, MappedExpression<T> func) {
     iterable.forEach((T v) {
       final Expression exp = func(v);
-      if (exp != null) _where = _where.and(exp);
+      _where = _where.and(exp);
     });
     return this;
   }
@@ -106,11 +107,11 @@ class Update implements Statement, Settable, Whereable {
   Update between<T>(String column, T low, T high) =>
       and(q.between<T>(column, low, high));
 
+  Update isIn<T>(String column, Set<T> values) =>
+      and(q.isIn<T>(column, values));
+
   Future<int> exec(Adapter adapter) => adapter.update(this);
 
-  ImmutableUpdateStatement _immutable;
-
-  ImmutableUpdateStatement get asImmutable => _immutable;
 }
 
 class ImmutableUpdateStatement {

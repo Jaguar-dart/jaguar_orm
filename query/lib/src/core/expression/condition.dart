@@ -9,7 +9,7 @@ class Cond<ValType> extends Expression {
   final Op op;
 
   /// The value of the relational expression the [field] is being compared against
-  final ValType rhs;
+  final ValType? rhs;
 
   const Cond(this.lhs, this.op, this.rhs);
 
@@ -32,13 +32,13 @@ class Cond<ValType> extends Expression {
   static Cond<ValType> eq<ValType>(Field<ValType> field, ValType value) =>
       Cond<ValType>(field, Op.Eq, value);
 
-  /// DSL to create 'IS' relational condition
-  static Cond<ValType> iss<ValType>(Field<ValType> field, ValType value) =>
-      Cond<ValType>(field, Op.Is, value);
+  /// DSL to create 'IS NULL' relational condition
+  static Cond<ValType> isNull<ValType>(Field<ValType> field) =>
+      Cond<ValType>(field, Op.Is, null);
 
-  /// DSL to create 'IS NOT' relational condition
-  static Cond<ValType> isNot<ValType>(Field<ValType> field, ValType value) =>
-      Cond<ValType>(field, Op.IsNot, value);
+  /// DSL to create 'IS NOT NULL' relational condition
+  static Cond<ValType> isNotNull<ValType>(Field<ValType> field) =>
+      Cond<ValType>(field, Op.IsNot, null);
 
   /// DSL to create 'is not equal to' relational condition
   static Cond<ValType> ne<ValType>(Field<ValType> field, ValType value) =>
@@ -68,6 +68,12 @@ class Cond<ValType> extends Expression {
   static Between<ValType> between<ValType>(
           Field<ValType> field, ValType low, ValType high) =>
       Between<ValType>(field, low, high);
+
+  /// DSL to create 'in' relational condition
+  static InOperation<ValType> isIn<ValType>(
+      Field<ValType> field, Set<ValType> values) =>
+      InOperation<ValType>(field, values);
+
 }
 
 /// A relational conditional expression
@@ -79,7 +85,7 @@ class CondCol<ValType> extends Expression {
   final Op op;
 
   /// The value of the relational expression the [field] is being compared against
-  final Field<ValType> rhs;
+  final Field<ValType>? rhs;
 
   const CondCol(this.lhs, this.op, this.rhs);
 
@@ -103,15 +109,15 @@ class CondCol<ValType> extends Expression {
           Field<ValType> field, Field<ValType> value) =>
       CondCol<ValType>(field, Op.Eq, value);
 
-  /// DSL to create 'IS' relational condition
-  static CondCol<ValType> iss<ValType>(
-          Field<ValType> field, Field<ValType> value) =>
-      CondCol<ValType>(field, Op.Is, value);
+  /// DSL to create 'IS NULL' relational condition
+  static CondCol<ValType> isNull<ValType>(
+          Field<ValType> field) =>
+      CondCol<ValType>(field, Op.Is, null);
 
-  /// DSL to create 'IS NOT' relational condition
-  static CondCol<ValType> isNot<ValType>(
-          Field<ValType> field, Field<ValType> value) =>
-      CondCol<ValType>(field, Op.IsNot, value);
+  /// DSL to create 'IS NOT NULL' relational condition
+  static CondCol<ValType> isNotNull<ValType>(
+          Field<ValType> field) =>
+      CondCol<ValType>(field, Op.IsNot, null);
 
   /// DSL to create 'is not equal to' relational condition
   static CondCol<ValType> ne<ValType>(
@@ -146,4 +152,10 @@ class CondCol<ValType> extends Expression {
   static InBetweenCol<ValType> between<ValType>(
           Field<ValType> field, Field<ValType> low, Field<ValType> high) =>
       InBetweenCol<ValType>(field, low, high);
+
+  // /// DSL to create 'in' relational condition
+  // static InOperationCol<ValType> isIn<ValType>(
+  //     Field<ValType> field, Field<Set<ValType>> values) =>
+  //     InOperationCol<ValType>(field, values);
+
 }

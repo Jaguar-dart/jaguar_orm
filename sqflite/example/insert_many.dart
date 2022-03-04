@@ -7,7 +7,7 @@ import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// The adapter
-SqfliteAdapter _adapter;
+late SqfliteAdapter _adapter;
 
 // The model
 class Post {
@@ -15,11 +15,11 @@ class Post {
 
   Post.make(this.id, this.msg, this.author);
 
-  int id;
+  int? id;
 
-  String msg;
+  String? msg;
 
-  String author;
+  String? author;
 
   String toString() => '$id $msg $author';
 }
@@ -48,17 +48,17 @@ class PostBean {
   }
 
   List<SetColumn> toSetColumns(Post model,
-      {bool update = false, Set<String> only}) {
+      {bool update = false, Set<String>? only}) {
     List<SetColumn> ret = [];
 
     if (only == null) {
-      ret.add(id.set(model.id));
-      ret.add(msg.set(model.msg));
-      ret.add(author.set(model.author));
+      ret.add(id.set(model.id!));
+      ret.add(msg.set(model.msg!));
+      ret.add(author.set(model.author!));
     } else {
-      if (only.contains(id.name)) ret.add(id.set(model.id));
-      if (only.contains(msg.name)) ret.add(msg.set(model.msg));
-      if (only.contains(author.name)) ret.add(author.set(model.author));
+      if (only.contains(id.name)) ret.add(id.set(model.id!));
+      if (only.contains(msg.name)) ret.add(msg.set(model.msg!));
+      if (only.contains(author.name)) ret.add(author.set(model.author!));
     }
 
     return ret;
@@ -88,7 +88,7 @@ class PostBean {
 
     updater.where(this.id.eq(id));
 
-    Map map = await _adapter.findOne(updater);
+    Map map = await (_adapter.findOne(updater) as FutureOr<Map<dynamic, dynamic>>);
 
     Post post = new Post();
     post.id = map['_id'];
@@ -104,7 +104,7 @@ class PostBean {
 
     List<Map> maps = await (await _adapter.find(finder)).toList();
 
-    List<Post> posts = new List<Post>();
+    List<Post> posts = <Post>[];
 
     for (Map map in maps) {
       Post post = new Post();

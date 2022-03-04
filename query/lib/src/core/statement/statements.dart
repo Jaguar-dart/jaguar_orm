@@ -3,7 +3,7 @@ part of query;
 class SelColumn {
   final String name;
 
-  final String alias;
+  final String? alias;
 
   SelColumn(this.name, [this.alias]);
 }
@@ -11,7 +11,7 @@ class SelColumn {
 class CountSelColumn extends SelColumn {
   final bool isDistinct;
 
-  CountSelColumn(String name, {String alias, this.isDistinct = false})
+  CountSelColumn(String name, {String? alias, this.isDistinct = false})
       : super(name, alias);
 }
 
@@ -80,4 +80,6 @@ abstract class Whereable implements Statement {
   Whereable like(String column, String val);
 
   Whereable between<T>(String column, T low, T high);
+
+  Whereable isIn<T>(String column, Set<T> values);
 }

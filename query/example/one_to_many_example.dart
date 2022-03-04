@@ -5,11 +5,11 @@ import 'package:jaguar_query_postgres/jaguar_query_postgres.dart';
 import 'package:jaguar_query_postgres/composer.dart';
 
 class Author {
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  List<Post> posts;
+  List<Post>? posts;
 
   static String tableName = 'authors';
 
@@ -17,15 +17,15 @@ class Author {
 }
 
 class Post {
-  int id;
+  int? id;
 
-  int authorId;
+  int? authorId;
 
-  Author author;
+  Author? author;
 
-  String message;
+  String? message;
 
-  int likes;
+  int? likes;
 
   String toString() => "Post($id, $authorId, $author, $message, $likes)";
 
@@ -70,7 +70,7 @@ Future<void> createTables() async {
   }
 }
 
-Future<int> insertAuthor(String name) =>
+Future<int?> insertAuthor(String name) =>
     Sql.insert('author').id('_id').setString('name', 'teja').exec<int>(adapter);
 
 Future<List<Author>> getAuthors() async =>
@@ -82,7 +82,7 @@ Future<List<Author>> getAuthors() async =>
 
 Future<Author> getAuthorId(int id) async {
   Find st = Sql.find('author').where(Field('_id').eq(id));
-  Map map = await adapter.findOne(st);
+  Map<dynamic, dynamic> map = (await adapter.findOne(st)) as Map<dynamic, dynamic>;
   return new Author()
     ..id = map['_id']
     ..name = map['name'];
@@ -103,7 +103,7 @@ Future<void> removeAuthors() async {
   await adapter.remove(st);
 }
 
-Future<int> insertPost(int authorId, String message, int likes) =>
+Future<int?> insertPost(int authorId, String message, int likes) =>
     Sql.insert('post')
         .id('_id')
         .setInt('authorId', authorId)
@@ -114,7 +114,7 @@ Future<int> insertPost(int authorId, String message, int likes) =>
 Future<List<Post>> getPosts() =>
     Sql.find('post').exec(adapter).manyTo(Post.fromMap);
 
-Future<Post> getPostById(int id) => Sql.find('post')
+Future<Post?> getPostById(int id) => Sql.find('post')
     .where(Field('_id').eq(id))
     .exec(adapter)
     .oneTo(Post.fromMap);
@@ -127,7 +127,7 @@ Future<Post> getPostByIdRelated(int id) async {
       .joinOn(Field.inTable('post', 'authorId')
           .eqField(Field.inTable('author', '_id')))
       .where(Field.inTable('post', '_id').eq(id));
-  Map map = await adapter.findOne(st);
+  Map<dynamic, dynamic> map = (await adapter.findOne(st)) as Map<dynamic, dynamic>;
 
   final post = new Post()
     ..id = map['_id']
@@ -151,7 +151,7 @@ Future<void> removePosts() async {
 }
 
 Future<void> getRelatedPost(Post post) async {
-  post.author = await getAuthorId(post.authorId);
+  post.author = await getAuthorId(post.authorId!);
 }
 
 main() async {
@@ -164,11 +164,11 @@ main() async {
   await removePosts();
   await removeAuthors();
 
-  final int author1Id = await insertAuthor('Teja');
+  final int? author1Id = await insertAuthor('Teja');
 
   print(await getAuthors());
 
-  final int post1Id = await insertPost(author1Id, 'Message 1', 10);
+  final int post1Id = (await insertPost(author1Id!, 'Message 1', 10)) as int;
   await insertPost(author1Id, 'Message 2', 15);
 
   print(await getPosts());
@@ -180,8 +180,8 @@ main() async {
 
   //Belongs to relationship
   {
-    Post post = await getPostById(post1Id);
-    await getRelatedPost(post);
+    Post? post = await getPostById(post1Id);
+    await getRelatedPost(post!);
 
     print(post);
   }
@@ -189,7 +189,7 @@ main() async {
   //Has many relationship
   {
     Author author = await getAuthorId(author1Id);
-    author.posts = await getPostsByAuthorId(author.id);
+    author.posts = await getPostsByAuthorId(author.id!);
     print(author);
   }
 
